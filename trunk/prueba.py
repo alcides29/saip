@@ -1,6 +1,6 @@
 from django.db import models
 
-# Si pueden leerlo, genial!
+# Si pueden leerlo, genial! Ya esta modificado.
 # Create your models here.
 
 class Poll(models.Model):
