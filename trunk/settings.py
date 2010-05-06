@@ -1,4 +1,5 @@
 # Django settings for saip project.
+import os.path
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -65,11 +66,11 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'saip.urls'
 
-TEMPLATE_DIRS = (
-    '/home/alcides/saip/templates'
+TEMPLATE_DIRS = ( 
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.abspath('templates')
 )
 
 INSTALLED_APPS = (
