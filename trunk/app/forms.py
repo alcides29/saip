@@ -32,6 +32,9 @@ class RolesForm(forms.ModelForm):
     class Meta:
     	model = Rol
         
+"""
+Form para Tipo de artefacto
+"""
 class TipoArtefactoForm(forms.ModelForm):
     nombre = forms.CharField(max_length=50, label='Nombre')
     descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
