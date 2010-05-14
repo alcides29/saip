@@ -40,19 +40,15 @@ class Privilegio(models.Model):
 class Vista(models.Model):
     descripcion = models.TextField(null=True, blank=True)
 
-"""
-Esta clase representa la fase del proyecto
-"""    
 class Fase(models.Model):
+    """Esta clase representa la fase del proyecto."""
     nombre = models.CharField(unique=True, max_length=50)
     
     def __unicode__(self):
         return self.nombre
 
-""""
-Esta clase representa a que tipo pertenece un artefacto
-"""
 class TipoArtefacto(models.Model):
+    """"Esta clase representa a que tipo pertenece un artefacto."""
     nombre = models.CharField(unique=True, max_length=50)
     descripcion = models.TextField(null=True, blank=True)
     #claves foraneas
@@ -60,10 +56,16 @@ class TipoArtefacto(models.Model):
     
     def __unicode__(self):
         return self.nombre
-"""
-Clase que representa a los artefactos
-"""
-class Artefacto(models.Model):   	
+
+class Artefacto(models.Model):
+    """Clase que representa a los artefactos.
+    
+    Argumentos:
+    usuario    -- Representa el usuario que crea el artefacto.
+    estado     -- Identifica si ha sido borrado logicamente o no.
+    habilitado -- Es False si ha sido borrado logicamente.
+    
+    """
     nombre = models.CharField(max_length=50)
     usuario = models.ForeignKey(User)
     estado = models.IntegerField(max_length=1, choices=STATUS_CHOICES, default=1)
@@ -94,13 +96,13 @@ class Adjunto(models.Model):
         return self.nombre
 
 class LineaBase(models.Model):
-    fechaCreacion = models.DateField(auto_now=False, auto_now_add=True, editable=False)
+    fecha_creacion = models.DateField(auto_now=False, auto_now_add=True, editable=False)
     #relaciones con otras tablas
     proyectos = models.ForeignKey(Proyecto)
     Fase = models.OneToOneField(Fase, parent_link=False)#ver
 
 class Historial(models.Model):
-    fechaCreacion = models.DateField(auto_now =False, auto_now_add=True, editable=False)
+    fecha_creacion = models.DateField(auto_now =False, auto_now_add=True, editable=False)
     #claves foraneas
     artefacto = models.OneToOneField(Artefacto, parent_link=False)#ojo
 
