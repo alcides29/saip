@@ -47,14 +47,13 @@ def proyectos(request):
 		form = ProyectosForm()
 	return render_to_response('admin/proyectos/abm_proyecto.html',{'form':form, 'user':user})
 
-"""
-Administracion de tipo de artefactos
-"""
 @login_required
 def admin_tipo_artefacto(request):
+    """Muestra la página de administracion de tipo de artefactos."""
     user = User.objects.get(username=request.user.username)
     lista = TipoArtefacto.objects.all()
-    return render_to_response('proyecto/artefacto/tipo_artefacto.html', {'lista': lista, 'user':user})
+    return render_to_response('admin/tipo_artefacto/tipo_artefacto.html',
+                              {'lista': lista, 'user':user})
 
 @login_required
 def terminar(peticion):
