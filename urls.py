@@ -22,8 +22,8 @@ urlpatterns = patterns('',
     
     # usuarios
 	(r'^usuarios/$', admin_usuarios),
-    (r'^usuarios/crear/$', create_object, {'form_class':UsuariosForm,'template_name':'admin/usuarios/abm_usuario.html', 'post_save_redirect':'/usuarios', 'login_required':True}),
-    (r'^usuarios/mod/(?P<object_id>\d+)/$', update_object, {'form_class':UsuariosForm, 'template_name':'admin/usuarios/abm_usuario.html', 'post_save_redirect':'/usuarios', 'login_required':True}),
+    (r'^usuarios/crear/$', add_user),
+    (r'^usuarios/mod/(?P<object_id>\d+)/$', update_object, {'form_class':ModUsuariosForm, 'template_name':'admin/usuarios/abm_usuario.html', 'post_save_redirect':'/usuarios', 'login_required':True}),
 	(r'^usuarios/del/(?P<object_id>\d+)/$', delete_object, {'model':User, 'template_name':'admin/usuarios/user_confirm_delete.html', 'post_delete_redirect':'/usuarios', 'login_required':True}),
     
     # proyectos
@@ -31,7 +31,8 @@ urlpatterns = patterns('',
     (r'^proyectos/crear/$', create_object, {'form_class': ProyectosForm, 'template_name':'admin/proyectos/abm_proyecto.html', 'post_save_redirect':'/proyectos', 'login_required':True}),
 	(r'^proyectos/mod/(?P<object_id>\d+)/$', update_object, {'form_class':ProyectosForm, 'template_name':'admin/proyectos/abm_proyecto.html', 'post_save_redirect':'/proyectos', 'login_required':True}),
 	(r'^proyectos/del/(?P<object_id>\d+)/$', delete_object, {'model':Proyecto, 'template_name':'admin/proyectos/proyecto_confirm_delete.html', 'post_delete_redirect':'/proyectos', 'login_required':True}),
-    
+	(r'^proyectos/miembros/(?P<object_id>\d+)/$', admin_usuarios_proyecto),
+	(r'^proyectos/miembros/(?P<object_id>\d+)/nuevo/$', add_usuario_proyecto),    
     # Tipo de artefacto
     (r'^tipo_artefacto/$', admin_tipo_artefacto),
     (r'^tipo_artefacto/crear/$', create_object, {'form_class': TipoArtefactoForm, 'template_name':'admin/tipo_artefacto/abm_tipo_artefacto.html', 'post_save_redirect':'/tipo_artefacto', 'login_required':True}),
