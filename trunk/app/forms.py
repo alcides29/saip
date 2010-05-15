@@ -9,6 +9,20 @@ class UsuariosForm(forms.ModelForm):
 	last_name = forms.CharField(max_length=30, label='Apellido')
 	email = forms.EmailField(max_length=75, label='Correo Electronico')
 	password = forms.CharField(max_length=128, label='Contrasena', widget=forms.PasswordInput())
+	password2 = forms.CharField(max_length=128, label='Confirmar contrasena', widget=forms.PasswordInput())
+	#class Meta:
+	#	model = User
+	#	fields = ('username', 'first_name', 'last_name', 'email', 'password')
+
+	def clean_password2(self):
+		if 'password' in self.cleaned_data:
+			password = self.cleaned_data['password']
+			password2 = self.cleaned_data['password2']
+			if password == password2:
+				return password2
+		raise forms.ValidationError('Las contrasenas no coinciden')
+
+class ModUsuariosForm(forms.ModelForm):
 	class Meta:
 		model = User
 		fields = ('username', 'first_name', 'last_name', 'email', 'password')
