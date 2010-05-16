@@ -3,12 +3,15 @@
 {% block head %}Miembros del Proyecto {{proyecto.id}}<br>{% endblock %}
 {% block content %}
 <form id="form_id" action="" method="post">
+<table>
+<tr><td class="titulo">Usuario</td><td class="titulo">Rol asignado</td></tr>
 	{% for form in lista %}
-		{{form.usuario.username}}, {{form}}
+		{{form.as_table}}
 	{% endfor %}
+</table>
+<p><a href="/proyectos/miembros/{{proyecto.id}}/nuevo/">Agregar nuevo miembro</a></p>
 <input type="submit" value="Guardar cambios" />
-<input type="button" value="Cancelar" onClick = "location.href='/' "/>
-	{{otroform.as_p}}
+<input type="button" value="Volver" onClick = "location.href='/proyectos' "/>
 </form>
 {% endblock%}
 
