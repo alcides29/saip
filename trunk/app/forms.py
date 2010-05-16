@@ -11,9 +11,9 @@ class UsuariosForm(forms.ModelForm):
 	email = forms.EmailField(max_length=75, label='Correo Electronico')
 	password = forms.CharField(max_length=128, label='Contrasena', widget=forms.PasswordInput())
 	password2 = forms.CharField(max_length=128, label='Confirmar contrasena', widget=forms.PasswordInput())
-	#class Meta:
-	#	model = User
-	#	fields = ('username', 'first_name', 'last_name', 'email', 'password')
+	class Meta:
+		model = User
+		fields = ('username', 'first_name', 'last_name', 'email', 'password')
 
 	def clean_password2(self):
 		if 'password' in self.cleaned_data:
