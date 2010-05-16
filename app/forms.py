@@ -46,6 +46,28 @@ class RolesForm(forms.ModelForm):
     usuario_creador = forms.ModelChoiceField(queryset=User.objects.all(), label='Creador')
     class Meta:
     	model = Rol
+
+class ItemForm(forms.Form):
+    def __init__(self, miembro, *args, **kwargs):
+        super(ItemForm, self).__init__(*args, **kwargs)
+        self.item = forms.ModelChoiceField(queryset= Rol.objects.filter(categoria = 1), label = miembro.username)
+
+class MiembrosProyectoForm(forms.Form):
+    item = forms.ModelChoiceField(queryset= Rol.objects.filter(categoria = 1), label = '')
+    usuario = User()
+
+class UsuarioProyectoForm(forms.Form):
+    usuario = forms.ModelChoiceField(queryset = User.objects.all())
+    rol = forms.ModelChoiceField(queryset = Rol.objects.all())
+    proyecto = Proyecto()
+
+    def clean_usuario(self):
+        if 'usuario' in self.cleaned_data:
+            usuarios_existentes = UsuarioRolProyecto.objects.filter(id = self.proyecto.id)
+            for i in usuarios_existentes:
+                if(usuarios_existentes.usuario == form.clean_data['usuario']):
+                    raise forms.ValidationError('Ya existe este usuario')
+            return self.cleaned_data['usuario']
         
 class TipoArtefactoForm(forms.ModelForm):
     """Form para Tipo de artefacto."""
