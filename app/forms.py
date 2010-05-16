@@ -38,14 +38,10 @@ class ProyectosForm(forms.ModelForm):
     class Meta:
 		model = Proyecto		
 		
-class RolesForm(forms.ModelForm):
+class RolesForm(forms.Form):
     nombre = forms.CharField(max_length=50, label='Nombre')
     categoria = forms.CharField(max_length=1, widget=forms.Select(choices=CATEGORY_CHOICES), label='Categoria')
     descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
-    fecHor_creacion = forms.DateTimeField(initial=datetime.datetime.now(), required=False, label='Fecha/Hora de creacion')#ojo
-    usuario_creador = forms.ModelChoiceField(queryset=User.objects.all(), label='Creador')
-    class Meta:
-    	model = Rol
 
 class ItemForm(forms.Form):
     def __init__(self, miembro, *args, **kwargs):
