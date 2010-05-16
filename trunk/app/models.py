@@ -59,14 +59,7 @@ class TipoArtefacto(models.Model):
         return self.nombre
 
 class Artefacto(models.Model):
-    """Clase que representa a los artefactos.
-    
-    Argumentos:
-    usuario    -- Representa el usuario que crea el artefacto.
-    estado     -- Identifica si ha sido borrado logicamente o no.
-    habilitado -- Es False si ha sido borrado logicamente.
-    
-    """
+    """Clase que representa a los artefactos."""
     nombre = models.CharField(max_length=50)
     usuario = models.ForeignKey(User)
     estado = models.IntegerField(max_length=1, choices=STATUS_CHOICES, default=1)
@@ -107,7 +100,7 @@ class Historial(models.Model):
     #claves foraneas
     artefacto = models.OneToOneField(Artefacto, parent_link=False)#ojo
 
-class RegitroHistorial(models.Model):
+class RegistroHistorial(models.Model):
     version = models.PositiveIntegerField()#ojo
     descripcion = models.TextField(null=True, blank=True)
     fecha_modificacion = models.DateField(auto_now=True, auto_now_add=False)#ojo
