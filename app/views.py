@@ -17,41 +17,27 @@ def principal(request):
 
 @login_required
 def admin_usuarios_proyecto(request, object_id):
-	user = User.objects.get(username=request.user.username)
-	p = Proyecto.objects.get(pk = object_id)
-	miembros = UsuarioRolProyecto.objects.filter(proyecto = p)
-	print miembros
-	if request.method == 'POST':
-		#form = MiembrosProyectoForm(request.POST)
-		if form.is_valid():
-			pass
-	else:
-		#form = MiembrosProyectoForm()
-		#form.usuario = miembros[0].usuario
-		lista = []
-		for i in miembros:
-			nuevo = MiembrosProyectoForm(initial={'item':'rol2'})
-			nuevo.usuario = i.usuario
-			lista.append(nuevo)
-		oform = ItemForm(miembros[0].usuario, initial={'item': '2'})
-	return render_to_response('admin/proyectos/admin_miembros.html',{'otroform':oform, 'lista':lista, 'user':user, 'proyecto':Proyecto.objects.get(id=object_id)})
-    
-'''
+    user = User.objects.get(username=request.user.username)
     p = Proyecto.objects.get(pk = object_id)
-	miembros = UsuarioRolProyecto.objects.filter(proyecto = p)
-	print miembros
-	if request.method == 'POST':
-		form = MiembrosProyectoForm(request.POST)
-		if form.is_valid():
-			for i in range(miembros.length):
-				if(miembros[i].rol != form.cleaned_data['rol_miembros[i]']):
-					miembros[i].rol = form.cleaned_data['rol_miembros[i]']
-					miembros[i].save()
-			return HttpResponseRedirect("/proyectos")
-	else:
-		form = MiembrosProyectoForm(miembros)
-	return render_to_response('admin/proyectos/admin_miembros.html',{'form':form, 'user':user, 'proyecto':Proyecto.objects.get(id=object_id)})
-'''
+    miembros = UsuarioRolProyecto.objects.filter(proyecto = p)
+    print miembros
+    if request.method == 'POST':
+        #form = MiembrosProyectoForm(request.POST)
+        if form.is_valid():
+            pass
+    else:
+        #form = MiembrosProyectoForm()
+        #form.usuario = miembros[0].usuario
+        lista = []
+        k = 0
+        for i in miembros:
+            nuevo = ItemForm(miembros[k].usuario, initial = {'item':miembros[k].rol._get_pk_val()})
+            nuevo.usuario = i.usuario
+            lista.append(nuevo)
+            k = k + 1
+        #oform = ItemForm(miembros[1].usuario, initial = {'item':miembros[1].rol._get_pk_val()})
+        #print miembros[1].rol._get_pk_val()
+    return render_to_response('admin/proyectos/admin_miembros.html',{'lista':lista, 'user':user, 'proyecto':Proyecto.objects.get(id=object_id)})
 		
 @login_required
 def add_usuario_proyecto(request, object_id):
@@ -64,10 +50,10 @@ def add_usuario_proyecto(request, object_id):
 			relacion.proyecto = Proyecto.objects.get(pk = object_id)
 			relacion.rol = form.cleaned_data['rol']
 			relacion.save()
-			return HttpResponseRedirect("/proyectos/")
+			return HttpResponseRedirect("/proyectos/miembros/" + str(object_id))
 	else:
 		form = UsuarioProyectoForm()
-	return render_to_response('admin/proyectos/add_miembro.html', {'form':form, 'user':user})
+	return render_to_response('admin/proyectos/add_miembro.html', {'form':form, 'user':user,  'proyecto': Proyecto.objects.get(pk=object_id)})
 
 @login_required
 def add_user(request):
