@@ -1,4 +1,5 @@
 # Django settings for saip project.
+# -*- coding: iso-8859-15 -*-
 import os.path
 
 DEBUG = True

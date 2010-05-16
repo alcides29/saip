@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-15 -*-
 from django import forms
 from django.contrib.auth.models import User
 from saip.app.models import *
@@ -54,7 +55,7 @@ class TipoArtefactoForm(forms.ModelForm):
     class Meta:
     	model = TipoArtefacto
 
-class ArtefactoForm(forms.ModelForm):   	
+class ArtefactoForm(forms.ModelForm):
     nombre = forms.CharField(max_length=50, label='Nombre')
     estado = forms.CharField(max_length=1, widget=forms.Select(choices=STATUS_CHOICES), label='Estado')
     version = forms.IntegerField() # No deberia estar en el form para editar

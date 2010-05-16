@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-15 -*-
 from django.conf.urls.defaults import *
 from django.views.generic.create_update import *
 from django.contrib.auth.models import User
