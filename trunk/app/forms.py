@@ -4,16 +4,16 @@ from django.contrib.auth.models import User
 from saip.app.models import *
 import datetime
 
-class UsuariosForm(forms.ModelForm):
+class UsuariosForm(forms.Form):
 	username = forms.CharField(max_length=30, label='Usuario')
 	first_name = forms.CharField(max_length=30, label='Nombre')
 	last_name = forms.CharField(max_length=30, label='Apellido')
 	email = forms.EmailField(max_length=75, label='Correo Electronico')
 	password = forms.CharField(max_length=128, label='Contrasena', widget=forms.PasswordInput())
 	password2 = forms.CharField(max_length=128, label='Confirmar contrasena', widget=forms.PasswordInput())
-	class Meta:
-		model = User
-		fields = ('username', 'first_name', 'last_name', 'email', 'password')
+	#class Meta:
+	#	model = User
+	#	fields = ('username', 'first_name', 'last_name', 'email', 'password')
 
 	def clean_password2(self):
 		if 'password' in self.cleaned_data:
