@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Roles{% endblock %}
+{% block head %}Roles<br>{% endblock %}
+{% block content %}
+	<table>
+	<tr>
+	<td class="titulo">Nombre</td>
+	<td class="titulo">Categor&iacute;a</td>
+	<td class="titulo">Descripci&oacute;n</td>
+	<td class="titulo">Creado el:</td>
+	<td class="titulo">Responsable</td>
+	<td class="titulo">Acciones</td>
+	</tr>
+	{%for item in lista%}
+		<tr>
+		<td><a href="/roles/mod/{{item.id}}/">{{item.nombre}}</a></td>
+		<td>{{item.categoria}}</td>
+		<td>{{item.descripcion}}</td>
+		<td>{{item.fecHor_creacion}}</td>
+		<td>{{item.usuario_creador}}</td>
+		<td><a href="/roles/del/{{item.id}}/">Borrar</a></td>
+		</tr>
+	{% endfor %}
+	</table>
+	<div class="footer"><a href="/roles/crear/">Crear un nuevo rol</a></div>
+{% endblock %}
