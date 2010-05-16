@@ -1,0 +1,12 @@
+
+- Ver para poner el rol por defecto que le corresponde a un usuario de proyecto(proyecto--> usuario-->rol)
+
+- Verificar el formato de entrada de fechas.
+- Cambiar contraseña de usuario
+- Artefacto
+- Permisos
+- Roles
+- Calculo de complejidad
+- Historial - Registro historial
+- Adjunto
+- Linea Base
