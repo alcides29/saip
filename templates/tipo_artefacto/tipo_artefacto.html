@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Tipo de artefacto{% endblock %}
+{% block head %}Tipo de artefacto<br>{% endblock %}
+{% block content %}
+	<table>
+	<tr>
+	<td class="titulo">Nombre</td>
+	<td class="titulo">Descripci&oacute;n</td>
+	<td class="titulo">Fase</td>
+	<td class="titulo">Acciones</td>
+	</tr>
+	{%for item in lista%}
+		<tr>
+		<td><a href="/tipo_artefacto/mod/{{item.id}}/">{{item.nombre}}</a></td>
+		<td>{{item.descripcion}}</td>
+		<td>{{item.fase}}</td>
+		<td><a href="/tipo_artefacto/del/{{item.id}}/">Borrar</a></td>
+		</tr>
+	{% endfor %}
+	</table>
+	<div class="footer"><a href="/tipo_artefacto/crear/">Crear un nuevo artefacto</a></div>
+{% endblock %}
