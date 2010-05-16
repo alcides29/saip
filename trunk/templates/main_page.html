@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}P&aacute;gina Principal{% endblock %}
+{% block head %}<center>P&aacute;gina Principal del Sistema</center>{% endblock %}
+{% block content %}
+  {% if user.username %}
+    <p>¡Bienvenido/a, {{ user.username }}!</p>
+	<h2>Tareas disponibles</h2>
+	<ul>
+	<li><a href ="/usuarios/">Administraci&oacute;n de usuarios</a></li>
+	<li><a href ="/proyectos/">Administraci&oacute;n de proyectos</a></li>
+	<li><a href ="/roles/">Administraci&oacute;n de roles</a></li>
+	</ul>
+  {% else %}
+    <p>Bienvenido, visitante.</p>
+    <p>Puedes iniciar sesi&oacute;n <a href="/login/">aqu&iacute;</a>.</p>
+  {% endif %}
+{% endblock %}
