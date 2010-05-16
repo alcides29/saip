@@ -48,13 +48,9 @@ class ItemForm(forms.Form):
         super(ItemForm, self).__init__(*args, **kwargs)
         self.item = forms.ModelChoiceField(queryset= Rol.objects.filter(categoria = 1), label = miembro.username)
 
-class MiembrosProyectoForm(forms.Form):
-    item = forms.ModelChoiceField(queryset= Rol.objects.filter(categoria = 1), label = '')
-    usuario = User()
-
 class UsuarioProyectoForm(forms.Form):
     usuario = forms.ModelChoiceField(queryset = User.objects.all())
-    rol = forms.ModelChoiceField(queryset = Rol.objects.all())
+    rol = forms.ModelChoiceField(queryset = Rol.objects.filter(categoria = 2))
     proyecto = Proyecto()
 
     def clean_usuario(self):
