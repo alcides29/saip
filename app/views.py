@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-15 -*-
 import hashlib
 
 from django.shortcuts import render_to_response
@@ -90,7 +91,7 @@ def add_user(request):
             return HttpResponseRedirect("/usuarios")
     else:
         form = UsuariosForm()
-        return render_to_response('admin/usuarios/abm_usuario.html',{'form':form, 'user':user})
+    return render_to_response('admin/usuarios/abm_usuario.html',{'form':form, 'user':user})
 
 def lista(request, tipo):
     """Metodo de prueba para listar items"""
