@@ -44,9 +44,10 @@ class RolesForm(forms.Form):
     descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
 
 class ItemForm(forms.Form):
-    def __init__(self, miembro, *args, **kwargs):
-        super(ItemForm, self).__init__(*args, **kwargs)
-        self.item = forms.ModelChoiceField(queryset= Rol.objects.filter(categoria = 1), label = miembro.username)
+	item = forms.ModelChoiceField(queryset= Rol.objects.filter(categoria = 2), empty_label = None)
+	def __init__(self, miembro, *args, **kwargs):
+		super(ItemForm, self).__init__(*args, **kwargs)
+		self.fields['item'].label = miembro.username
 
 class UsuarioProyectoForm(forms.Form):
     usuario = forms.ModelChoiceField(queryset = User.objects.all())
