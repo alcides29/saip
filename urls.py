@@ -34,6 +34,7 @@ urlpatterns = patterns('',
 	(r'^proyectos/del/(?P<object_id>\d+)/$', delete_object, {'model':Proyecto, 'template_name':'admin/proyectos/proyecto_confirm_delete.html', 'post_delete_redirect':'/proyectos', 'login_required':True}),
 	(r'^proyectos/miembros/(?P<object_id>\d+)/$', admin_usuarios_proyecto),
 	(r'^proyectos/miembros/(?P<object_id>\d+)/nuevo/$', add_usuario_proyecto),
+    (r'^proyectos/miembros/(?P<proyecto_id>\d+)/cambiar/(?P<user_id>\d+)/$', cambiar_rol_usuario_proyecto),
     
     #roles
     (r'^roles/$', admin_roles),
