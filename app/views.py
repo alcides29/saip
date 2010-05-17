@@ -8,8 +8,10 @@ from django.http import Http404
 from django.contrib.auth import logout
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
+from django.forms.formsets import formset_factory
 
 from saip.app.forms import *
+from saip.app.models import *
 
 def principal(request):
     """Muestra la pagina principal."""
@@ -20,25 +22,24 @@ def admin_usuarios_proyecto(request, object_id):
     user = User.objects.get(username=request.user.username)
     p = Proyecto.objects.get(pk = object_id)
     miembros = UsuarioRolProyecto.objects.filter(proyecto = p)
-    print miembros
+    return render_to_response('admin/proyectos/admin_miembros.html',{'user':user, 'proyecto':Proyecto.objects.get(id=object_id), 'miembros': miembros})
+	
+@login_required
+def cambiar_rol_usuario_proyecto(request, proyecto_id, user_id):
+    user = User.objects.get(username=request.user.username)
+    p = Proyecto.objects.get(pk = proyecto_id)
+    u = User.objects.get(pk = user_id)
+    lista = UsuarioRolProyecto.objects.filter(proyecto = p, usuario = u)
+    item = lista[0]
     if request.method == 'POST':
-        #form = MiembrosProyectoForm(request.POST)
         if form.is_valid():
-            pass
+            if (form.cleaned_data['item'] != item.rol):
+                item.rol = form.cleaned_data['item']
+                item.save()
     else:
-        #form = MiembrosProyectoForm()
-        #form.usuario = miembros[0].usuario
-        lista = []
-        k = 0
-        for i in miembros:
-            nuevo = ItemForm(miembros[k].usuario, initial = {'item':miembros[k].rol._get_pk_val()})
-            nuevo.usuario = i.usuario
-            lista.append(nuevo)
-            k = k + 1
-        #oform = ItemForm(miembros[1].usuario, initial = {'item':miembros[1].rol._get_pk_val()})
-        #print miembros[1].rol._get_pk_val()
-    return render_to_response('admin/proyectos/admin_miembros.html',{'lista':lista, 'user':user, 'proyecto':Proyecto.objects.get(id=object_id)})
-		
+        form = ItemForm(item.usuario, initial = {'item':item.rol._get_pk_val()})
+    return render_to_response("admin/proyectos/cambiar_usuario_rol.html", {'user': user, 'form':form, 'usuario':u, 'proyecto': p})
+	
 @login_required
 def add_usuario_proyecto(request, object_id):
 	user = User.objects.get(username=request.user.username)
