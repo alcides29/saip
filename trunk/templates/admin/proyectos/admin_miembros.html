@@ -4,14 +4,13 @@
 {% block content %}
 <form id="form_id" action="" method="post">
 <table>
-<tr><td class="titulo">Usuario</td><td class="titulo">Rol asignado</td></tr>
-	{% for form in lista %}
-		{{form.as_table}}
+<tr><td class="titulo">Usuario</td><td class="titulo">Rol asignado</td><td>Acciones</td></tr>
+	{% for item in miembros %}
+		<tr><td>{{item.usuario.username}}</td><th>{{item.rol.nombre}}</td><td><a href="/proyectos/miembros/{{proyecto.id}}/cambiar/{{item.usuario.id}}">Cambiar</a></td></tr>
 	{% endfor %}
 </table>
 <p><a href="/proyectos/miembros/{{proyecto.id}}/nuevo/">Agregar nuevo miembro</a></p>
-<input type="submit" value="Guardar cambios" />
-<input type="button" value="Volver" onClick = "location.href='/proyectos' "/>
+<input type="button" value="Volver" onClick = "location.href='/proyectos' "/>	
 </form>
 {% endblock%}
 
