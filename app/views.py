@@ -32,10 +32,12 @@ def cambiar_rol_usuario_proyecto(request, proyecto_id, user_id):
     lista = UsuarioRolProyecto.objects.filter(proyecto = p, usuario = u)
     item = lista[0]
     if request.method == 'POST':
+        form = ItemForm(item.usuario, request.POST)
         if form.is_valid():
             if (form.cleaned_data['item'] != item.rol):
                 item.rol = form.cleaned_data['item']
                 item.save()
+            return HttpResponseRedirect("/proyectos/miembros/" + str(proyecto_id))
     else:
         form = ItemForm(item.usuario, initial = {'item':item.rol._get_pk_val()})
     return render_to_response("admin/proyectos/cambiar_usuario_rol.html", {'user': user, 'form':form, 'usuario':u, 'proyecto': p})
