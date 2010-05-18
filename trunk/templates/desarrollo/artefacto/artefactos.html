@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Artefactos{% endblock %}
+{% block head %}Artefactos<br>{% endblock %}
+{% block content %}
+<table>
+	<tr>
+		<td class="titulo">Nombre</td>
+        <td class="titulo">Usuario</td>
+		<td class="titulo">Estado</td>
+        <td class="titulo">Fecha/Creaci&oacute;n</td>
+		<td class="titulo">Versi&oacute;n</td>
+		<td class="titulo">Complejidad</td>
+		<td class="titulo">Descripci&oacute;n Corta</td>
+		<td class="titulo">Descripci&oacute;n Larga</td>
+		<td class="titulo">Habilitado</td>
+		<td class="titulo">Icono</td>
+		
+		<td class="titulo">Proyecto</td>
+		<td class="titulo">Tipo</td>
+		<td class="titulo">Acciones</td>
+	</tr>
+	{% for item in lista %}
+	<tr>
+		<td><a href="/artefactos/mod/{{item.nombre}}">{{item.nombre}}</a></td>
+        <td>{{item.usuario}}</td>
+		<td>{{item.estado}}</td>
+        <td>{{item.fecha_creacion}}</td>
+        <td>{{item.version}}</td>
+		<td>{{item.complejidad}}</td>
+		<td>{{item.descripcion_corta}}</td>
+		<td>{{item.decripcion_larga}}</td>
+		<td>{{item.habilitado}}</td>
+		<td>{{item.icono}}</td>
+		
+		<td>{{item.proyecto}}</td>
+		<td>{{item.tipo}}</td>
+		<td><a href="/artefactos/del/{{item.nombre}}/">Borrar</a></td>
+	</tr>
+	{% endfor %}
+</table>
+<div class="footer"><a href="/artefactos/crear/">Registrar un nuevo Artefacto</a></div>
+{% endblock%}
