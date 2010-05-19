@@ -2,7 +2,7 @@
 {% block title %}Artefactos{% endblock %}
 {% block head %}A&ntilde;adir/Modificar nuevo artefacto<br>{% endblock %}
 {% block content %}
-<form action="/artefactos/mod/{{ art.nombre|urlencode }}" method="post">
+<form action="/artefactos/mod/{{ art.id }}/" method="post">
    <p>{{ form.nombre.errors }}<label for="id_nombre">Nombre:</label>{{ form.nombre }}</p>
     <p>{{ form.complejidad.errors }}<label for="id_complejidad">Complejidad:</label>{{ form.complejidad }}</p>
     <p>{{ form.descripcion_corta.errors }}<label for="id_descripcion_corta">Descripci&oacute;n Corta:</label>{{ form.descripcion_corta }}</p>
