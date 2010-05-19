@@ -1,6 +1,5 @@
 
 - Ver para poner el rol por defecto que le corresponde a un usuario de proyecto(proyecto--> usuario-->rol)
-
 - Verificar el formato de entrada de fechas.
 - Cambiar contrasenha de usuario
 - Artefacto
