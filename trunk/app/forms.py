@@ -37,21 +37,28 @@ class ProyectosForm(forms.ModelForm):
     cronograma = forms.FileField(required=False, label='Cronograma')
     class Meta:
 		model = Proyecto		
-		
+	
+class ElegirRolForm(forms.Form):
+	categoria = forms.CharField(max_length=1, widget=forms.Select(choices=CATEGORY_CHOICES), label='Elija una categoria')
+	
 class RolesForm(forms.Form):
     nombre = forms.CharField(max_length=50, label='Nombre')
-    categoria = forms.CharField(max_length=1, widget=forms.Select(choices=CATEGORY_CHOICES), label='Categoria')
     descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
+    
+class ModRolesForm(forms.ModelForm):
+	class Meta:
+		model = Rol
+		fields = ('nombre', 'descripcion')
 
 class ItemForm(forms.Form):
-	item = forms.ModelChoiceField(queryset= Rol.objects.filter(categoria = 2), empty_label = None)
+	item = forms.ModelChoiceField(queryset= RolProyecto.objects.all(), empty_label = None)
 	def __init__(self, miembro, *args, **kwargs):
 		super(ItemForm, self).__init__(*args, **kwargs)
 		self.fields['item'].label = miembro.username
 
 class UsuarioProyectoForm(forms.Form):
     usuario = forms.ModelChoiceField(queryset = User.objects.all())
-    rol = forms.ModelChoiceField(queryset = Rol.objects.filter(categoria = 2))
+    rol = forms.ModelChoiceField(queryset = RolProyecto.objects.all())
     proyecto = Proyecto()
 
     def clean_usuario(self):

@@ -27,7 +27,7 @@ class Proyecto(models.Model):
 
 class Rol(models.Model):
     nombre = models.CharField(unique=True, max_length=50)
-    categoria = models.IntegerField(max_length=1, choices=CATEGORY_CHOICES)
+    #categoria = models.IntegerField(max_length=1, choices=CATEGORY_CHOICES)
     descripcion = models.TextField(null=True, blank=True)
     fecHor_creacion = models.DateTimeField(auto_now=False, auto_now_add=True, null=True, blank=True, editable=False)
     usuario_creador = models.ForeignKey(User)
@@ -35,11 +35,18 @@ class Rol(models.Model):
     def __unicode__(self):
         return self.nombre
 
+class RolProyecto(Rol):
+    pass
+
+class RolSistema(Rol):
+    pass
+
 class Privilegio(models.Model):
     descripcion = models.TextField(null=True, blank=True)
 
 class Vista(models.Model):
     descripcion = models.TextField(null=True, blank=True)
+    categoria = models.IntegerField(max_length=1, choices=CATEGORY_CHOICES)
 
 class Fase(models.Model):
     """Esta clase representa la fase del proyecto."""
