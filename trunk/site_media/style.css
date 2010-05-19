@@ -1,0 +1,13 @@
+table td{
+	border:1px solid black;
+	text-align:center;
+}
+
+td.titulo{
+	font-weight:bold;
+}
+
+div.footer{
+	text-align:left;
+}
+
