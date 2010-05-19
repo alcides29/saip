@@ -21,7 +21,7 @@
 	</tr>
 	{% for item in lista %}
 	<tr>
-		<td><a href="/artefactos/mod/{{item.nombre}}">{{item.nombre}}</a></td>
+		<td><a href="/artefactos/mod/{{item.id}}/">{{item.nombre}}</a></td>
         <td>{{item.usuario}}</td>
 		<td>{{item.estado}}</td>
         <td>{{item.fecha_creacion}}</td>
@@ -34,7 +34,7 @@
 		
 		<td>{{item.proyecto}}</td>
 		<td>{{item.tipo}}</td>
-		<td><a href="/artefactos/del/{{item.nombre}}/">Borrar</a></td>
+		<td><a href="/artefactos/del/{{item.id}}/">Borrar</a></td>
 	</tr>
 	{% endfor %}
 </table>
