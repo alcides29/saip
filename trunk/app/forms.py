@@ -77,18 +77,18 @@ class TipoArtefactoForm(forms.ModelForm):
     class Meta:
     	model = TipoArtefacto
 
-class ArtefactoForm(forms.ModelForm):
+class ArtefactoForm(forms.Form):
     nombre = forms.CharField(max_length=50, label='Nombre')
-    estado = forms.CharField(max_length=1, widget=forms.Select(choices=STATUS_CHOICES), label='Estado')
-    version = forms.IntegerField() # No deberia estar en el form para editar
-    complejidad = forms.IntegerField()
+    complejidad = forms.IntegerField(label='Complejidad')
     descripcion_corta = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Corta')
     descripcion_larga = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Larga')
-    habilitado = forms.BooleanField()
-    icono = forms.FileField(required=False, label='Icono de Artefacto')
-    relacionados = forms.ModelMultipleChoiceField(queryset=Artefacto.objects.all(), required=False, label='Artefactos relacionados')
-    proyectos = forms.ModelChoiceField(queryset=Proyecto.objects.all(), label='Proyectos')
+    habilitado = forms.BooleanField(label='Habilitado')
+    icono = forms.FileField(required=False, label='Icono/Artefacto')
+    #relacionados = forms.ModelMultipleChoiceField(queryset=Artefacto.objects.all(), required=False, label='Artefactos/relacionados')
+    proyecto = forms.ModelChoiceField(queryset=Proyecto.objects.all(), label='Proyecto')
     tipo = forms.ModelChoiceField(queryset=TipoArtefacto.objects.all(), label='Tipo')
+
+class ModArtefactoForm(forms.ModelForm):
     class Meta:
         model = Artefacto
-        
+        fields = ('nombre', 'complejidad', 'descripcion_corta', 'descripcion_larga', 'habilitado', 'icono', 'proyecto', 'tipo')
