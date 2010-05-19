@@ -113,19 +113,53 @@ def admin_proyectos(request):
 def admin_roles(request):
     """Administracion general de roles"""
     user = User.objects.get(username=request.user.username)
-    lista = Rol.objects.all()
-    return render_to_response('admin/roles/roles.html',{'lista':lista, 'user':user})
+    lista1 = RolSistema.objects.all()
+    lista2 = RolProyecto.objects.all()
+    return render_to_response('admin/roles/roles.html',{'lista1':lista1, 'lista2':lista2, 'user':user})
 
 @login_required
 def crear_rol(request):
     """Agrega un nuevo rol."""
     user = User.objects.get(username=request.user.username)
     if request.method == 'POST':
+        form = ElegirRolForm(request.POST)
+        if form.is_valid():
+            res = form.cleaned_data['categoria']
+            if res == '1':
+                return HttpResponseRedirect("/roles/crears")
+            elif res == '2':
+                return HttpResponseRedirect("/roles/crearp")
+    else:
+        form = ElegirRolForm()
+    return render_to_response('admin/roles/crear_rol.html',{'form':form, 'user':user})
+
+@login_required
+def crear_rol_sistema(request):
+    """Agrega un nuevo rol."""
+    user = User.objects.get(username=request.user.username)
+    if request.method == 'POST':
         form = RolesForm(request.POST)
         if form.is_valid():
-            r = Rol()
+            r = RolSistema()
             r.nombre = form.cleaned_data['nombre']
-            r.categoria = form.cleaned_data['categoria']
+            r.descripcion = form.cleaned_data['descripcion']
+            r.fecHor_creacion = datetime.datetime.now()
+            r.usuario_creador = user
+            r.save()
+            return HttpResponseRedirect('/roles')
+    else:
+        form = RolesForm()
+    return render_to_response('admin/roles/abm_rol.html',{'form':form, 'user':user})
+
+@login_required
+def crear_rol_proyecto(request):
+    """Agrega un nuevo rol."""
+    user = User.objects.get(username=request.user.username)
+    if request.method == 'POST':
+        form = RolesForm(request.POST)
+        if form.is_valid():
+            r = RolProyecto()
+            r.nombre = form.cleaned_data['nombre']
             r.descripcion = form.cleaned_data['descripcion']
             r.fecHor_creacion = datetime.datetime.now()
             r.usuario_creador = user

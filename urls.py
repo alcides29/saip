@@ -39,7 +39,9 @@ urlpatterns = patterns('',
     #roles
     (r'^roles/$', admin_roles),
     (r'^roles/crear/$', crear_rol),
-    (r'^roles/mod/(?P<object_id>\d+)/$', update_object, {'model':Rol, 'template_name':'admin/roles/abm_rol.html', 'post_save_redirect':'/roles', 'login_required':True}),
+    (r'^roles/crearp/$', crear_rol_proyecto),
+    (r'^roles/crears/$', crear_rol_sistema),
+    (r'^roles/mod/(?P<object_id>\d+)/$', update_object, {'form_class':ModRolesForm, 'template_name':'admin/roles/abm_rol.html', 'post_save_redirect':'/roles', 'login_required':True}),
     (r'^roles/del/(?P<object_id>\d+)/$', delete_object, {'model':Rol, 'template_name':'admin/roles/rol_confirm_delete.html', 'post_delete_redirect':'/roles', 'login_required':True}),
     
     # Tipo de artefacto
