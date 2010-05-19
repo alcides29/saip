@@ -199,6 +199,93 @@ def logout_pagina(request):
     logout(request)
     return render_to_response('logout.html')
 
+#desde aqui artefacto
+def admin_artefactos(request):
+    """Muestra la página de administracion de artefactos."""
+    user = User.objects.get(username=request.user.username)
+    lista = Artefacto.objects.all()
+    return render_to_response('desarrollo/artefacto/artefactos.html',{'lista':lista})
+    
+def crear_artefacto(request):
+    """Crear un artefacto"""
+    user = User.objects.get(username=request.user.username)
+    if (request.POST):
+        form = ArtefactoForm(request.POST)
+        if form.is_valid():
+            art = Artefacto()
+            art.nombre = form.cleaned_data['nombre']
+            art.usuario = user
+            art.estado = 1
+            art.fecha_creacion = datetime.date.today()
+            art.version = 1
+            art.complejidad = form.cleaned_data['complejidad']
+            art.descripcion_corta = form.cleaned_data['descripcion_corta']
+            art.descripcion_larga = form.cleaned_data['descripcion_larga']
+            art.habilitado = True
+            art.icono = form.cleaned_data['icono']
+            #art.relacionados = form.cleaned_data['relacionados']
+            art.proyecto = form.cleaned_data['proyecto']
+            art.tipo = form.cleaned_data['tipo']            
+            art.save()
+            return HttpResponseRedirect('/artefactos')
+    else:
+        form = ArtefactoForm()
+    variables = RequestContext(request, {
+                                        'form': form,
+                                        })                
+    return render_to_response('desarrollo/artefacto/crear_artefacto.html', variables)
+
+
+def modificar_artefacto(request, id_art):
+    """Modificar un artefacto"""
+    if (request.POST):
+        art = Artefacto.objects.get(pk=id_art)
+        form = ModArtefactoForm(request.POST)
+        if (form.is_valid()):
+            #realizar una copia del artefacto antiguo e ir comparando
+            art.nombre = form.cleaned_data['nombre']
+            art.version = art.version + 1 #comprobar si hubo cambio
+            art.complejidad = form.cleaned_data['complejidad']
+            art.descripcion_corta = form.cleaned_data['descripcion_corta']
+            art.descripcion_larga = form.cleaned_data['descripcion_larga']
+            art.estado = 2
+            art.habilitado = form.cleaned_data['habilitado']
+            art.icono = form.cleaned_data['icono']
+            #art.relacionados = form.cleaned_data['relacionados']
+            art.proyecto = form.cleaned_data['proyecto']#no tiene que estar
+            art.tipo = form.cleaned_data['tipo']
+            art.save()
+            return HttpResponseRedirect('/artefactos')
+    else:
+        #nombre_art = request.GET['nombre']
+        art = get_object_or_404(Artefacto, id=id_art)
+        form = ModArtefactoForm({
+                        'nombre': art.nombre,
+                        'complejidad': art.complejidad,
+                        'descripcion_corta':art.descripcion_corta,
+                        'descripcion_larga':art.descripcion_larga,
+                        'habilitado':art.habilitado,
+                        'icono':art.icono,
+                        'proyecto':art.proyecto,#ojo
+                        'tipo':art.tipo,
+                       })      
+    variables = RequestContext(request, {'form':form,
+                                         'art':art,
+                                         })          
+    return render_to_response('desarrollo/artefacto/mod_artefacto.html', variables)
+
+def borrar_artefacto(request, id_art):
+    """Dar de baja un artefacto"""
+    art = get_object_or_404(Artefacto, id=id_art)
+    if (request.POST):
+        art.habilitado= False
+        art.save()
+        return HttpResponseRedirect('/artefactos')
+    variables = RequestContext(request, {'art': art,
+                                        })
+    return render_to_response('desarrollo/artefacto/artefacto_confirm_delete.html', variables)
+
+
 def login_redirect(request):
     """Redirige de /accounts/login a /login."""
     return HttpResponseRedirect('/login')
