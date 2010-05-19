@@ -67,7 +67,7 @@ class TipoArtefacto(models.Model):
 
 class Artefacto(models.Model):
     """Clase que representa a los artefactos."""
-    nombre = models.CharField(max_length=50)
+    nombre = models.CharField(unique=True, max_length=50)
     usuario = models.ForeignKey(User)
     estado = models.IntegerField(max_length=1, choices=STATUS_CHOICES, default=1)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -78,7 +78,7 @@ class Artefacto(models.Model):
     habilitado = models.BooleanField()
     icono = models.FileField(upload_to='/icono', null=True, blank=True)
     #relaciones con otras tablas
-    relacionados = models.ManyToManyField("self")
+    #relacionados = models.ManyToManyField("self")
     #claves foraneas
     proyecto = models.ForeignKey(Proyecto)
     tipo = models.ForeignKey(TipoArtefacto)
