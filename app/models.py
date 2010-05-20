@@ -125,7 +125,7 @@ class Permiso(models.Model):
 
 class UsuarioRolProyecto(models.Model):   
     usuario = models.ForeignKey(User)
-    rol = models.ForeignKey(Rol)
+    rol = models.ForeignKey(RolProyecto)
     proyecto = models.ForeignKey(Proyecto)
 
     class Meta:
