@@ -27,19 +27,6 @@ STATUS_CHOICES = (
                 ('3', 'Revisado'),
  	        )
 
-
-
-class Proyecto(models.Model):
-    nombre = models.CharField(unique=True, max_length=50)
-    usuario_lider = models.ForeignKey(User)
-    descripcion = models.TextField(null=True, blank=True)
-    fecha_inicio = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    fecha_fin = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    cronograma = models.FileField(upload_to='cronogramas', null=True, blank=True)
-    
-    def __unicode__(self):
-        return self.nombre
-
 class Rol(models.Model):
     nombre = models.CharField(unique=True, max_length=50)
     #categoria = models.IntegerField(max_length=1, choices=CATEGORY_CHOICES)
@@ -70,6 +57,19 @@ class Fase(models.Model):
     def __unicode__(self):
         return self.nombre
 
+class Proyecto(models.Model):
+    """Clase que representa un proyecto."""
+    nombre = models.CharField(unique=True, max_length=50)
+    usuario_lider = models.ForeignKey(User)
+    fase = models.ForeignKey(Fase)
+    descripcion = models.TextField(null=True, blank=True)
+    fecha_inicio = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    fecha_fin = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    cronograma = models.FileField(upload_to='cronogramas', null=True, blank=True)
+    
+    def __unicode__(self):
+        return self.nombre
+    
 class TipoArtefacto(models.Model):
     """"Esta clase representa a que tipo pertenece un artefacto."""
     nombre = models.CharField(unique=True, max_length=50)

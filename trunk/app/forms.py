@@ -28,16 +28,21 @@ class ModUsuariosForm(forms.ModelForm):
 		model = User
 		fields = ('username', 'first_name', 'last_name', 'email', 'password')
 
-class ProyectosForm(forms.ModelForm):
+class ProyectosForm(forms.Form):
+    """Formulario para la creacion de proyectos."""
     nombre = forms.CharField(max_length=50, label='Nombre')
     usuario_lider = forms.ModelChoiceField(queryset=User.objects.all(), label='Lider')
     descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
     fecha_inicio = forms.DateField(required=False, label='Fecha de Inicio')
     fecha_fin = forms.DateField(required=False, label='Fecha de Finalizacion')
     cronograma = forms.FileField(required=False, label='Cronograma')
+
+class ModProyectosForm(forms.ModelForm):
+    """Formulario para la modificacion de proyectos."""
     class Meta:
-		model = Proyecto		
-	
+        model = Proyecto
+        exclude = ('fase')
+
 class ElegirRolForm(forms.Form):
 	categoria = forms.CharField(max_length=1, widget=forms.Select(choices=CATEGORY_CHOICES), label='Elija una categoria')
 	
