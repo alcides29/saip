@@ -34,8 +34,8 @@ urlpatterns = patterns('',
     
     # proyectos
 	(r'^proyectos/$', admin_proyectos),
-    (r'^proyectos/crear/$', create_object, {'form_class': ProyectosForm, 'template_name':'admin/proyectos/abm_proyecto.html', 'post_save_redirect':'/proyectos', 'login_required':True}),
-	(r'^proyectos/mod/(?P<object_id>\d+)/$', update_object, {'form_class':ProyectosForm, 'template_name':'admin/proyectos/abm_proyecto.html', 'post_save_redirect':'/proyectos', 'login_required':True}),
+    (r'^proyectos/crear/$', crear_proyecto),
+	(r'^proyectos/mod/(?P<object_id>\d+)/$', update_object, {'form_class':ModProyectosForm, 'template_name':'admin/proyectos/abm_proyecto.html', 'post_save_redirect':'/proyectos', 'login_required':True}),
 	(r'^proyectos/del/(?P<object_id>\d+)/$', delete_object, {'model':Proyecto, 'template_name':'admin/proyectos/proyecto_confirm_delete.html', 'post_delete_redirect':'/proyectos', 'login_required':True}),
 	(r'^proyectos/miembros/(?P<object_id>\d+)/$', admin_usuarios_proyecto),
 	(r'^proyectos/miembros/(?P<object_id>\d+)/nuevo/$', add_usuario_proyecto),

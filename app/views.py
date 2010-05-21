@@ -177,16 +177,25 @@ def crear_rol_proyecto(request):
     return render_to_response('admin/roles/abm_rol.html',{'form':form, 'user':user})
 
 @login_required
-def proyectos(request):
-	user = User.objects.get(username=request.user.username)
-	if request.method == 'POST':
-		form = ProyectosForm(request.POST)
-		if form.is_valid():
-			form.save()
-			return HttpResponseRedirect('/terminar')
-	else:
-		form = ProyectosForm()
-	return render_to_response('admin/proyectos/abm_proyecto.html',{'form':form, 'user':user})
+def crear_proyecto(request):
+    """Crea un nuevo proyecto."""
+    user = User.objects.get(username=request.user.username)
+    if request.method == 'POST':
+        form = ProyectosForm(request.POST)
+        if form.is_valid():
+            p = Proyecto()
+            p.nombre = form.cleaned_data['nombre']
+            p.usuario_lider = form.cleaned_data['usuario_lider']
+            p.descripcion = form.cleaned_data['descripcion']
+            p.fecha_inicio = form.cleaned_data['fecha_inicio']
+            p.fecha_fin = form.cleaned_data['fecha_fin']
+            p.cronograma = form.cleaned_data['cronograma']
+            p.fase = Fase.objects.get(pk=1)
+            p.save()
+            return HttpResponseRedirect('/terminar')
+    else:
+        form = ProyectosForm()
+    return render_to_response('admin/proyectos/abm_proyecto.html',{'form':form, 'user':user})
 
 @login_required
 def admin_tipo_artefacto(request):
