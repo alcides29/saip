@@ -20,6 +20,11 @@ urlpatterns = patterns('',
     (r'^$', principal),
     (r'^login/$', 'django.contrib.auth.views.login'),
     (r'^accounts/login/$', login_redirect),
+    (r'^terminar/$', terminar),
+    (r'^logout/$', logout_pagina),    
+    (r'^lista/(?P<tipo>\w+)/$', lista),
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
+       {'document_root': os.path.abspath('site_media')}),
     
     # usuarios
 	(r'^usuarios/$', admin_usuarios),
@@ -36,6 +41,12 @@ urlpatterns = patterns('',
 	(r'^proyectos/miembros/(?P<object_id>\d+)/nuevo/$', add_usuario_proyecto),
     (r'^proyectos/miembros/(?P<proyecto_id>\d+)/cambiar/(?P<user_id>\d+)/$', cambiar_rol_usuario_proyecto),
     
+    #artefactos
+    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/$', admin_artefactos),
+    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/crear/$', crear_artefacto),
+    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/mod/(?P<art_id>\d+)/$', modificar_artefacto),
+    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/del/(?P<art_id>\d+)/$', borrar_artefacto),
+    
     #roles
     (r'^roles/$', admin_roles),
     (r'^roles/crear/$', crear_rol),
@@ -50,17 +61,6 @@ urlpatterns = patterns('',
     (r'^tipo_artefacto/mod/(?P<object_id>\d+)/$', update_object, {'form_class':TipoArtefactoForm, 'template_name':'admin/tipo_artefacto/abm_tipo_artefacto.html', 'post_save_redirect':'/tipo_artefacto', 'login_required':True}),
     (r'^tipo_artefacto/del/(?P<object_id>\d+)/$', delete_object, {'model':TipoArtefacto, 'template_name':'admin/tipo_artefacto/tipo_artefacto_confirm_delete.html', 'post_delete_redirect':'/tipo_artefacto', 'login_required':True}),
 
-    #artefactos
-    (r'^artefactos/$', admin_artefactos),
-    (r'^artefactos/crear/$', crear_artefacto),
-    (r'^artefactos/mod/(\d+)/$', modificar_artefacto),
-    (r'^artefactos/del/(\d+)/$', borrar_artefacto),
+           
     
-       
-    (r'^terminar/$', terminar),
-    (r'^logout/$', logout_pagina),
-    
-    (r'^lista/(?P<tipo>\w+)/$', lista),
-    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
-       {'document_root': os.path.abspath('site_media')}),
 )

@@ -4,8 +4,21 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 CATEGORY_CHOICES = (
- 	            ('1', 'Rol de Sistema'),
- 	            ('2', 'Rol de Proyecto'),
+                 ('1', 'Rol de Sistema'),
+                 ('2', 'Rol de Proyecto'),
+             )    
+
+COMPLEXITY_CHOICES = (
+                      ('1', '1'),
+                      ('2', '2'),
+                      ('3', '3'),
+                      ('4', '4'),
+                      ('5', '5'),
+                      ('6', '6'),
+                      ('7', '7'),
+                      ('8', '8'),
+                      ('9', '9'),
+                      ('10', '10'),
  	        )    
 
 STATUS_CHOICES = (
@@ -13,6 +26,8 @@ STATUS_CHOICES = (
  	            ('2', 'Modificado'),
                 ('3', 'Revisado'),
  	        )
+
+
 
 class Proyecto(models.Model):
     nombre = models.CharField(unique=True, max_length=50)
@@ -70,13 +85,13 @@ class Artefacto(models.Model):
     nombre = models.CharField(unique=True, max_length=50)
     usuario = models.ForeignKey(User)
     estado = models.IntegerField(max_length=1, choices=STATUS_CHOICES, default=1)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    version = models.PositiveIntegerField()#ojo
-    complejidad = models.PositiveIntegerField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True, editable = False)
+    version = models.PositiveIntegerField()
+    complejidad = models.IntegerField(max_length=1, choices=COMPLEXITY_CHOICES)
     descripcion_corta = models.TextField(null=True, blank=True)
     descripcion_larga = models.TextField(null=True, blank=True)
-    habilitado = models.BooleanField()
-    icono = models.FileField(upload_to='/icono', null=True, blank=True)
+    habilitado = models.BooleanField(default=True)
+    icono = models.FileField(upload_to='icono', null=True, blank=True)
     #relaciones con otras tablas
     #relacionados = models.ManyToManyField("self")
     #claves foraneas
@@ -87,8 +102,8 @@ class Artefacto(models.Model):
         return self.nombre
 
 class Adjunto(models.Model):
-    nombre = models.CharField(max_length=50)
-    archivo = models.FileField(upload_to='/adjuntos')
+    #nombre = models.CharField(max_length=50)
+    archivo = models.FileField(upload_to='artefactos')
     descripcion = models.TextField(null=True, blank=True)  
     #claves foraneas
     artefacto = models.ForeignKey(Artefacto)

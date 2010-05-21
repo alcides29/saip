@@ -1,17 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Artefactos{% endblock %}
-{% block head %}A&ntilde;adir/Modificar nuevo artefacto<br>{% endblock %}
+{% block head %}A&ntilde;adir nuevo artefacto<br>{% endblock %}
 {% block content %}
-<form action="" method="post">
-    <p>{{ form.nombre.errors }}<label for="id_nombre">Nombre:</label>{{ form.nombre }}</p>
-    <p>{{ form.complejidad.errors }}<label for="id_complejidad">Complejidad:</label>{{ form.complejidad }}</p>
-    <p>{{ form.descripcion_corta.errors }}<label for="id_descripcion_corta">Descripci&oacute;n Corta:</label>{{ form.descripcion_corta }}</p>
-	<p>{{ form.descripcion_larga.errors }}<label for="id_descripcion_larga">Descripci&oacute;n Larga:</label>{{ form.descripcion_larga }}</p>
-	<p>{{ form.habilitado.errors }}<label for="id_habilitado">Habilitado:</label>{{ form.habilitado }}</p>
-	<p>{{ form.icono.errors }}<label for="id_icono">Icono:</label>{{ form.icono }}</p>
-    <p>{{ form.proyecto.errors }}<label for="id_proyecto">Proyecto:</label>{{ form.proyecto }}</p>
-	<p>{{ form.tipo.errors }}<label for="id_tipo">Tipo:</label>{{ form.tipo }}</p>
+<form enctype="multipart/form-data" id="form_id" action="" method="post">
+	<table>
+    {{ form.as_table }}
+	</table>
 <input type="submit" value="Guardar" />
-<input type="button" value="Cancelar" onClick = "location.href='/artefactos' "/>
+<input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos/{{proyecto.id}}/' "/>
 </form>
 {% endblock%}

@@ -2,9 +2,9 @@
 {% block title %}Artefacto{% endblock %}
 {% block head %}Artefacto<br>{% endblock %}
 {% block content %}
-<form action="/artefactos/del/{{art.id}}/" method="post">
+<form action="/proyectos/artefactos/{{proyecto.id}}/del/{{art.id}}/" method="post">
 <p>Est&aacute; seguro que desea deshabilitar el artefacto?</p>
 <input type="submit" value="Aceptar" />
-<input type="button" value="Cancelar" onClick = "location.href='/artefactos' "/>
+<input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos/{{proyecto.id}}/'"/>
 </form>
 {% endblock%}
