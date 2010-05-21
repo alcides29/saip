@@ -11,32 +11,28 @@
 		<td class="titulo">Versi&oacute;n</td>
 		<td class="titulo">Complejidad</td>
 		<td class="titulo">Descripci&oacute;n Corta</td>
-		<td class="titulo">Descripci&oacute;n Larga</td>
-		<td class="titulo">Habilitado</td>
-		<td class="titulo">Icono</td>
-		
+		<td class="titulo">Descripci&oacute;n Larga</td>		
+		<td class="titulo">Icono</td>		
 		<td class="titulo">Proyecto</td>
 		<td class="titulo">Tipo</td>
 		<td class="titulo">Acciones</td>
 	</tr>
 	{% for item in lista %}
 	<tr>
-		<td><a href="/artefactos/mod/{{item.id}}/">{{item.nombre}}</a></td>
+		<td><a href="/proyectos/artefactos/{{proyecto.id}}/mod/{{item.id}}/">{{item.nombre}}</a></td>
         <td>{{item.usuario}}</td>
 		<td>{{item.estado}}</td>
         <td>{{item.fecha_creacion}}</td>
         <td>{{item.version}}</td>
 		<td>{{item.complejidad}}</td>
 		<td>{{item.descripcion_corta}}</td>
-		<td>{{item.decripcion_larga}}</td>
-		<td>{{item.habilitado}}</td>
-		<td>{{item.icono}}</td>
-		
+		<td>{{item.descripcion_larga}}</td>
+		<td>{{item.icono}}</td>		
 		<td>{{item.proyecto}}</td>
 		<td>{{item.tipo}}</td>
-		<td><a href="/artefactos/del/{{item.id}}/">Borrar</a></td>
+		<td><a href="/proyectos/artefactos/{{proyecto.id}}/del/{{item.id}}/">Borrar</a></td>
 	</tr>
 	{% endfor %}
 </table>
-<div class="footer"><a href="/artefactos/crear/">Registrar un nuevo Artefacto</a></div>
+<div class="footer"><a href="/proyectos/artefactos/{{proyecto.id}}/crear/">Registrar un nuevo Artefacto</a></div>
 {% endblock%}

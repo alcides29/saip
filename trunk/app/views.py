@@ -196,26 +196,23 @@ def admin_tipo_artefacto(request):
     return render_to_response('admin/tipo_artefacto/tipo_artefacto.html',
                               {'lista': lista, 'user':user})
 
-@login_required
-def terminar(peticion):
-    """Muestra una pagina de confirmacion de exito"""
-    return render_to_response('operacion_exitosa.html');
-
-def logout_pagina(request):
-    """Pagina de logout"""
-    logout(request)
-    return render_to_response('logout.html')
-
 #desde aqui artefacto
-def admin_artefactos(request):
+@login_required
+def admin_artefactos(request, proyecto_id):
     """Muestra la página de administracion de artefactos."""
     user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
     lista = Artefacto.objects.all()
-    return render_to_response('desarrollo/artefacto/artefactos.html',{'lista':lista})
-    
-def crear_artefacto(request):
+    variables = RequestContext(request, {'proyecto': proyect,
+                                        'lista': lista,
+                                        })
+    return render_to_response('desarrollo/artefacto/artefactos.html', variables)
+
+@login_required    
+def crear_artefacto(request, proyecto_id):
     """Crear un artefacto"""
     user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
     if (request.POST):
         form = ArtefactoForm(request.POST)
         if form.is_valid():
@@ -230,69 +227,82 @@ def crear_artefacto(request):
             art.descripcion_larga = form.cleaned_data['descripcion_larga']
             art.habilitado = True
             art.icono = form.cleaned_data['icono']
-            #art.relacionados = form.cleaned_data['relacionados']
-            art.proyecto = form.cleaned_data['proyecto']
-            art.tipo = form.cleaned_data['tipo']            
+            art.proyecto = proyect
+            art.tipo = form.cleaned_data['tipo']#hay que ver            
             art.save()
-            return HttpResponseRedirect('/artefactos')
+            return HttpResponseRedirect("/proyectos/artefactos/" + str(proyecto_id)+"/")
     else:
         form = ArtefactoForm()
-    variables = RequestContext(request, {
+        
+    variables = RequestContext(request, {'proyecto': proyect,
                                         'form': form,
                                         })                
     return render_to_response('desarrollo/artefacto/crear_artefacto.html', variables)
 
-
-def modificar_artefacto(request, id_art):
+@login_required
+def modificar_artefacto(request, proyecto_id, art_id):
     """Modificar un artefacto"""
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
     if (request.POST):
-        art = Artefacto.objects.get(pk=id_art)
+        art = Artefacto.objects.get(pk=art_id)
         form = ModArtefactoForm(request.POST)
         if (form.is_valid()):
             #realizar una copia del artefacto antiguo e ir comparando
-            art.nombre = form.cleaned_data['nombre']
+            #art.nombre = form.cleaned_data['nombre']
             art.version = art.version + 1 #comprobar si hubo cambio
             art.complejidad = form.cleaned_data['complejidad']
             art.descripcion_corta = form.cleaned_data['descripcion_corta']
             art.descripcion_larga = form.cleaned_data['descripcion_larga']
-            art.estado = 2
-            art.habilitado = form.cleaned_data['habilitado']
+            #art.estado = 2
+            #art.habilitado = form.cleaned_data['habilitado']
             art.icono = form.cleaned_data['icono']
-            #art.relacionados = form.cleaned_data['relacionados']
-            art.proyecto = form.cleaned_data['proyecto']#no tiene que estar
             art.tipo = form.cleaned_data['tipo']
             art.save()
-            return HttpResponseRedirect('/artefactos')
+            return HttpResponseRedirect("/proyectos/artefactos/" + str(proyecto_id)+"/")
     else:
-        #nombre_art = request.GET['nombre']
-        art = get_object_or_404(Artefacto, id=id_art)
+        art = get_object_or_404(Artefacto, id=art_id)
         form = ModArtefactoForm({
-                        'nombre': art.nombre,
+                        #'nombre': art.nombre,
                         'complejidad': art.complejidad,
                         'descripcion_corta':art.descripcion_corta,
                         'descripcion_larga':art.descripcion_larga,
-                        'habilitado':art.habilitado,
                         'icono':art.icono,
-                        'proyecto':art.proyecto,#ojo
                         'tipo':art.tipo,
                        })      
-    variables = RequestContext(request, {'form':form,
+    variables = RequestContext(request, {'nombre':art.nombre,
+                                         'form':form,
+                                         'proyecto':proyect,
                                          'art':art,
                                          })          
     return render_to_response('desarrollo/artefacto/mod_artefacto.html', variables)
 
-def borrar_artefacto(request, id_art):
+@login_required
+def borrar_artefacto(request, proyecto_id, art_id):
     """Dar de baja un artefacto"""
-    art = get_object_or_404(Artefacto, id=id_art)
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
+    art = get_object_or_404(Artefacto, id=art_id)
     if (request.POST):
         art.habilitado= False
         art.save()
-        return HttpResponseRedirect('/artefactos')
-    variables = RequestContext(request, {'art': art,
+        return HttpResponseRedirect("/proyectos/artefactos/" + str(proyecto_id)+"/")
+    
+    variables = RequestContext(request, {'proyecto':proyect,
+                                         'art':art,
                                         })
     return render_to_response('desarrollo/artefacto/artefacto_confirm_delete.html', variables)
 
+@login_required
+def terminar(peticion):
+    """Muestra una pagina de confirmacion de exito"""
+    return render_to_response('operacion_exitosa.html');
 
 def login_redirect(request):
     """Redirige de /accounts/login a /login."""
     return HttpResponseRedirect('/login')
+
+def logout_pagina(request):
+    """Pagina de logout"""
+    logout(request)
+    return render_to_response('logout.html')
