@@ -11,6 +11,7 @@ class UsuariosForm(forms.Form):
 	email = forms.EmailField(max_length=75, label='Correo Electronico')
 	password = forms.CharField(max_length=128, label='Contrasena', widget=forms.PasswordInput())
 	password2 = forms.CharField(max_length=128, label='Confirmar contrasena', widget=forms.PasswordInput())
+	roles = forms.ModelMultipleChoiceField(queryset = RolSistema.objects.all(), label = 'Roles de Sistema')
 	#class Meta:
 	#	model = User
 	#	fields = ('username', 'first_name', 'last_name', 'email', 'password')
@@ -49,6 +50,11 @@ class ElegirRolForm(forms.Form):
 class RolesForm(forms.Form):
     nombre = forms.CharField(max_length=50, label='Nombre')
     descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
+    permisos = forms.ModelMultipleChoiceField(queryset = None)
+    
+    def __init__(self, cat, *args, **kwargs):
+		super(RolesForm, self).__init__(*args, **kwargs)
+		self.fields['permisos'].queryset = Permiso.objects.filter(categoria = cat)
     
 class ModRolesForm(forms.ModelForm):
 	class Meta:
