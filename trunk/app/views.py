@@ -145,7 +145,7 @@ def crear_rol_sistema(request):
     """Agrega un nuevo rol."""
     user = User.objects.get(username=request.user.username)
     if request.method == 'POST':
-        form = RolesForm(request.POST)
+        form = RolesForm(1, request.POST)
         if form.is_valid():
             r = RolSistema()
             r.nombre = form.cleaned_data['nombre']
@@ -153,9 +153,12 @@ def crear_rol_sistema(request):
             r.fecHor_creacion = datetime.datetime.now()
             r.usuario_creador = user
             r.save()
+            print r.id
+            r.permisos=form.cleaned_data['permisos']
+            r.save()
             return HttpResponseRedirect('/roles')
     else:
-        form = RolesForm()
+        form = RolesForm('1')
     return render_to_response('admin/roles/abm_rol.html',{'form':form, 'user':user})
 
 @login_required
@@ -163,7 +166,7 @@ def crear_rol_proyecto(request):
     """Agrega un nuevo rol."""
     user = User.objects.get(username=request.user.username)
     if request.method == 'POST':
-        form = RolesForm(request.POST)
+        form = RolesForm(2, request.POST)
         if form.is_valid():
             r = RolProyecto()
             r.nombre = form.cleaned_data['nombre']
@@ -171,9 +174,11 @@ def crear_rol_proyecto(request):
             r.fecHor_creacion = datetime.datetime.now()
             r.usuario_creador = user
             r.save()
+            r.permisos.add(form.cleaned_data['permisos'])
+            r.save()
             return HttpResponseRedirect('/roles')
     else:
-        form = RolesForm()
+        form = RolesForm('2')
     return render_to_response('admin/roles/abm_rol.html',{'form':form, 'user':user})
 
 @login_required

@@ -27,12 +27,20 @@ STATUS_CHOICES = (
                 ('3', 'Revisado'),
  	        )
 
+class Permiso(models.Model):
+    nombre = models.CharField(unique=True, max_length = 50)
+    categoria = models.IntegerField(max_length=1, choices=CATEGORY_CHOICES)
+    
+    def __unicode__(self):
+        return self.nombre
+
 class Rol(models.Model):
     nombre = models.CharField(unique=True, max_length=50)
     #categoria = models.IntegerField(max_length=1, choices=CATEGORY_CHOICES)
     descripcion = models.TextField(null=True, blank=True)
     fecHor_creacion = models.DateTimeField(auto_now=False, auto_now_add=True, null=True, blank=True, editable=False)
     usuario_creador = models.ForeignKey(User)
+    permisos = models.ManyToManyField(Permiso)
     
     def __unicode__(self):
         return self.nombre
@@ -42,13 +50,6 @@ class RolProyecto(Rol):
 
 class RolSistema(Rol):
     pass
-
-class Privilegio(models.Model):
-    descripcion = models.TextField(null=True, blank=True)
-
-class Vista(models.Model):
-    descripcion = models.TextField(null=True, blank=True)
-    categoria = models.IntegerField(max_length=1, choices=CATEGORY_CHOICES)
 
 class Fase(models.Model):
     """Esta clase representa la fase del proyecto."""
@@ -129,15 +130,6 @@ class RegistroHistorial(models.Model):
     #claves foraneas
     historial = models.ForeignKey(Historial)
 
-class Permiso(models.Model):
-    #claves foraneas
-    rol = models.ForeignKey(Rol)
-    privilegio = models.ForeignKey(Privilegio)
-    vista = models.ForeignKey(Vista)
-
-    class Meta:
-        unique_together = [("rol", "privilegio", "vista")]
-
 class UsuarioRolProyecto(models.Model):   
     usuario = models.ForeignKey(User)
     rol = models.ForeignKey(RolProyecto)
@@ -145,3 +137,11 @@ class UsuarioRolProyecto(models.Model):
 
     class Meta:
         unique_together = [("usuario", "rol", "proyecto")]
+        
+class UsuarioRolSistema(models.Model):
+    usuario = models.ForeignKey(User)
+    rol = models.ForeignKey(RolSistema)
+    
+    class Meta:
+        unique_together = [("usuario", "rol")]
+
