@@ -30,6 +30,7 @@ table th{
 td.titulo{
 	background-color:#42426F;
 	color: white;
+	text-align: center;
 	font-weight:bold;
 	padding-left: 10px;
 	padding-right: 10px;

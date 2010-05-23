@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Artefactos{% endblock %}
-{% block head %}Artefactos<br>{% endblock %}
+{% block head %}Artefactos eliminados<br>{% endblock %}
 {% block content %}
 <table>
 	<tr>
@@ -12,11 +12,11 @@
 		<td class="titulo">Descripci&oacute;n Larga</td>		
 		<td class="titulo">Icono</td>		
 		<td class="titulo">Tipo</td>
-		<td class="titulo">Acciones</td>
+		<td class="titulo">Acci&oacute;n</td>
 	</tr>
 	{% for item in lista %}
 	<tr>
-		<td><a href="/proyectos/artefactos/{{proyecto.id}}/mod/{{item.id}}/">{{item.nombre}}</a></td>
+		<td>{{item.nombre}}</a></td>
         <td>{{item.version}}</td>
 		<td>{{item.estado}}</td>        
 		<td>{{item.complejidad}}</td>
@@ -24,14 +24,9 @@
 		<td>{{item.descripcion_larga}}</td>
 		<td>{{item.icono}}</td>			
 		<td>{{item.tipo}}</td>
-		<td><a href="/proyectos/artefactos/{{proyecto.id}}/del/{{item.id}}/">Borrar</a> <a href="/proyectos/artefactos/{{proyecto.id}}/historial/{{item.id}}/">Ver Historial</a></td>
+		<td><a href="/proyectos/artefactos/{{proyecto.id}}/res/{{item.id}}/">Restaurar</a></td>
 	</tr>
 	{% endfor %}
 </table><br>
-<div class="footer">
-  <td><a href="/proyectos/artefactos/{{proyecto.id}}/crear/">Registrar un nuevo artefacto</a></td>
-  <td><a href="/proyectos/artefactos/{{proyecto.id}}/res/">| Ver artefactos eliminados</a></td>
-</div>
-<br>
-<input type="button" value="<< Volver" onClick = "location.href='/proyectos/' "/>	
+<input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos/{{proyecto.id}}' "/>	
 {% endblock%}

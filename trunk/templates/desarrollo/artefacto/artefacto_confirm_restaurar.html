@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Artefacto{% endblock %}
+{% block head %}Restaurar Artefacto<br>{% endblock %}
+{% block content %}
+<form action="/proyectos/artefactos/{{proyecto.id}}/res/{{art.id}}/" method="post">
+<p>Est&aacute; seguro que desea restaurar el artefacto {{art.nombre}}?</p>
+<input type="submit" value="Aceptar" />
+<input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos/{{proyecto.id}}/res/' "/>
+</form>
+{% endblock%}
