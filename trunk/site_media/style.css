@@ -1,13 +1,80 @@
+body{
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+div#cabecera{
+	background-color: #D8BFD8;
+}
+
+h2{
+	border-bottom:dotted 2px #42426F;
+}
+a{
+	color: #5D478B
+}
+
+a:link, a:visited{
+	text-decoration:none;
+}
+
+a:hover{
+	text-decoration:underline;
+}
+
 table td{
-	border:1px solid black;
-	text-align:center;
+}
+
+table th{
 }
 
 td.titulo{
+	background-color:#42426F;
+	color: white;
 	font-weight:bold;
+	padding-left: 10px;
+	padding-right: 10px;
 }
 
 div.footer{
 	text-align:left;
 }
+
+input[type=button]{
+	border: solid 1px black;
+	background-color: #DCDCDC;
+	color: black;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+input[type=submit]{
+	border: solid 1px black;
+	background-color: #DCDCDC;
+	color: black;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+select{
+	border: solid 1px black;
+	background-color: #DCDCDC;
+	color: black;
+}
+
+input[type=checkbox]{
+	border: solid 1px black;
+	background-color: #DCDCDC;
+	color: black;
+}
+
+ul.errorlist{
+	color: red;
+}
+
+div.bienvenida{
+	text-align: right;
+	font-size: 0.9em;
+	color:#42426F;
+}
+
 

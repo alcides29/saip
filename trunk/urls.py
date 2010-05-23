@@ -27,10 +27,12 @@ urlpatterns = patterns('',
        {'document_root': os.path.abspath('site_media')}),
     
     # usuarios
-	(r'^usuarios/$', admin_usuarios),
+    (r'^usuarios/$', admin_usuarios),
     (r'^usuarios/crear/$', add_user),
-    (r'^usuarios/mod/(?P<object_id>\d+)/$', update_object, {'form_class':ModUsuariosForm, 'template_name':'admin/usuarios/abm_usuario.html', 'post_save_redirect': '/usuarios', 'login_required':True}),
-	(r'^usuarios/del/(?P<object_id>\d+)/$', delete_object, {'model':User, 'template_name':'admin/usuarios/user_confirm_delete.html', 'post_delete_redirect':'/usuarios', 'login_required':True}),
+    (r'^usuarios/mod&id=(?P<usuario_id>\d+)/$', mod_user),
+    (r'^usuarios/pass&id=(?P<usuario_id>\d+)/$', cambiar_password),
+    (r'^usuarios/rol&id=(?P<usuario_id>\d+)/$', asignar_roles_sistema),
+    (r'^usuarios/del&id=(?P<usuario_id>\d+)/$', borrar_usuario),
     
     # proyectos
 	(r'^proyectos/$', admin_proyectos),
@@ -54,9 +56,8 @@ urlpatterns = patterns('',
     #roles
     (r'^roles/$', admin_roles),
     (r'^roles/crear/$', crear_rol),
-    (r'^roles/crearp/$', crear_rol_proyecto),
-    (r'^roles/crears/$', crear_rol_sistema),
-    (r'^roles/mod/(?P<object_id>\d+)/$', update_object, {'form_class':ModRolesForm, 'template_name':'admin/roles/abm_rol.html', 'post_save_redirect':'/roles', 'login_required':True}),
+    (r'^roles/mod&id=(?P<rol_id>\d+)/$', mod_rol),
+    (r'^roles/permisos&id=(?P<rol_id>\d+)/$', admin_permisos),
     (r'^roles/del/(?P<object_id>\d+)/$', delete_object, {'model':Rol, 'template_name':'admin/roles/rol_confirm_delete.html', 'post_delete_redirect':'/roles', 'login_required':True}),
     
     # Tipo de artefacto

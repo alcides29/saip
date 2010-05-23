@@ -11,7 +11,6 @@ class UsuariosForm(forms.Form):
 	email = forms.EmailField(max_length=75, label='Correo Electronico')
 	password = forms.CharField(max_length=128, label='Contrasena', widget=forms.PasswordInput())
 	password2 = forms.CharField(max_length=128, label='Confirmar contrasena', widget=forms.PasswordInput())
-	roles = forms.ModelMultipleChoiceField(queryset = RolSistema.objects.all(), label = 'Roles de Sistema')
 	#class Meta:
 	#	model = User
 	#	fields = ('username', 'first_name', 'last_name', 'email', 'password')
@@ -24,10 +23,29 @@ class UsuariosForm(forms.Form):
 				return password2
 		raise forms.ValidationError('Las contrasenas no coinciden')
 
-class ModUsuariosForm(forms.ModelForm):
-	class Meta:
-		model = User
-		fields = ('username', 'first_name', 'last_name', 'email', 'password')
+class ModUsuariosForm(forms.Form):
+	first_name = forms.CharField(max_length=30, label='Nombre')
+	last_name = forms.CharField(max_length=30, label='Apellido')
+	email = forms.EmailField(max_length=75, label='Correo Electronico')
+
+class CambiarPasswordForm(forms.Form):
+	password1 = forms.CharField(widget = forms.PasswordInput, max_length=128, label = 'Escriba su contrasena')
+	password2 = forms.CharField(widget = forms.PasswordInput, max_length=128, label = 'Repita la contrasena')
+	
+	def clean_password2(self):
+		if 'password1' in self.cleaned_data:
+			password1 = self.cleaned_data['password1']
+			password2 = self.cleaned_data['password2']
+			if password1 == password2:
+				return password2
+		raise forms.ValidationError('Las contrasenas no coinciden')
+
+class AsignarRolesForm(forms.Form):
+	roles = forms.ModelMultipleChoiceField(queryset = None, widget = forms.CheckboxSelectMultiple, label = 'Roles disponibles')
+	
+	def __init__(self, cat, *args, **kwargs):
+		super(AsignarRolesForm, self).__init__(*args, **kwargs)
+		self.fields['roles'].queryset = Rol.objects.filter(categoria = cat)
 
 class ProyectosForm(forms.Form):
     """Formulario para la creacion de proyectos."""
@@ -42,34 +60,43 @@ class ModProyectosForm(forms.ModelForm):
     """Formulario para la modificacion de proyectos."""
     class Meta:
         model = Proyecto
-        exclude = ('fase')
-
-class ElegirRolForm(forms.Form):
-	categoria = forms.CharField(max_length=1, widget=forms.Select(choices=CATEGORY_CHOICES), label='Elija una categoria')
+        fields = ('nombre', 'descripcion','fecha_inicio', 'fecha_fin', 'cronograma')
 	
 class RolesForm(forms.Form):
-    nombre = forms.CharField(max_length=50, label='Nombre')
-    descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
-    permisos = forms.ModelMultipleChoiceField(queryset = None)
-    
-    def __init__(self, cat, *args, **kwargs):
-		super(RolesForm, self).__init__(*args, **kwargs)
+	nombre = forms.CharField(max_length=50, label='Nombre')
+	descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
+	categoria = forms.CharField(max_length=1, widget=forms.Select(choices=CATEGORY_CHOICES), label='Elija una categoria')
+	#permisos = forms.ModelMultipleChoiceField(queryset = None, widget=forms.CheckboxSelectMultiple, required = False)
+		
+	def clean_nombre(self):
+		if 'nombre' in self.cleaned_data:
+			roles = Rol.objects.all()
+			nombre = self.cleaned_data['nombre']
+			for item in roles: 
+				if nombre == item.nombre:
+					raise forms.ValidationError('Ya existe ese nombre en la base de datos.')
+			return nombre
+
+class PermisosForm(forms.Form):
+	permisos = forms.ModelMultipleChoiceField(queryset = None, widget = forms.CheckboxSelectMultiple, required = False)
+	
+	def __init__(self, cat, *args, **kwargs):
+		super(PermisosForm, self).__init__(*args, **kwargs)
 		self.fields['permisos'].queryset = Permiso.objects.filter(categoria = cat)
     
-class ModRolesForm(forms.ModelForm):
-	class Meta:
-		model = Rol
-		fields = ('nombre', 'descripcion')
+class ModRolesForm(forms.Form):
+	descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
 
 class ItemForm(forms.Form):
-	item = forms.ModelChoiceField(queryset= RolProyecto.objects.all(), empty_label = None)
+	item = forms.ModelChoiceField(queryset= Rol.objects.filter(categoria=2), empty_label = None)
+	
 	def __init__(self, miembro, *args, **kwargs):
 		super(ItemForm, self).__init__(*args, **kwargs)
 		self.fields['item'].label = miembro.username
 
 class UsuarioProyectoForm(forms.Form):
     usuario = forms.ModelChoiceField(queryset = User.objects.all())
-    rol = forms.ModelChoiceField(queryset = RolProyecto.objects.all())
+    rol = forms.ModelChoiceField(queryset = Rol.objects.filter(categoria=2))
     proyecto = Proyecto()
 
     def clean_usuario(self):

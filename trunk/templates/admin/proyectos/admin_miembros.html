@@ -4,7 +4,7 @@
 {% block content %}
 <form id="form_id" action="" method="post">
 <table>
-<tr><td class="titulo">Usuario</td><td class="titulo">Rol asignado</td><td>Acciones</td></tr>
+<tr><td class="titulo">Usuario</td><td class="titulo">Rol asignado</td><td class="titulo">Acciones</td></tr>
 	{% for item in miembros %}
 		<tr><td>{{item.usuario.username}}</td><th>{{item.rol.nombre}}</td><td><a href="/proyectos/miembros/{{proyecto.id}}/cambiar/{{item.usuario.id}}">Cambiar</a></td></tr>
 	{% endfor %}

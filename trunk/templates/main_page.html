@@ -1,15 +1,23 @@
 {% extends "base.html" %}
 {% block title %}P&aacute;gina Principal{% endblock %}
-{% block head %}<center>P&aacute;gina Principal del Sistema</center>{% endblock %}
+{% block head %}<center>Sistema de Administraci&oacute;n de Items de Proyecto</center>{% endblock %}
 {% block content %}
   {% if user.username %}
-    <p>¡Bienvenido/a, {{ user.username }}!</p>
-	<h2>Tareas disponibles</h2>
+    <div class="bienvenida">¡Bienvenido/a, {{ user.username }}!</div>
+	<h2>Administraci&oacute;n del Sistema</h2>
 	<ul>
-	<li><a href ="/usuarios/">Administraci&oacute;n de usuarios</a></li>
-	<li><a href ="/proyectos/">Administraci&oacute;n de proyectos</a></li>
-	<li><a href ="/roles/">Administraci&oacute;n de roles</a></li>
-	<li><a href ="/tipo_artefacto/">Administraci&oacute;n de tipos de artefacto</a></li>
+	<li><a href ="/usuarios/">Usuarios</a></li>
+	<li><a href ="/proyectos/">Proyectos</a></li>
+	<li><a href ="/roles/">Roles</a></li>
+	<li><a href ="/tipo_artefacto/">Tipos de artefacto</a></li>
+	</ul>
+	<h2>Proyectos</h2>
+	<ul>
+	{% for proyecto in proyectos %}
+		<li>{{proyecto.nombre}}</li>
+	{% empty %}
+		<li>No hay proyectos.</li>
+	{% endfor %}
 	</ul>
   {% else %}
     <p>Bienvenido, visitante.</p>

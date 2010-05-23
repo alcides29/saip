@@ -20,9 +20,14 @@ from django.shortcuts import get_object_or_404
 from saip.app.forms import *
 from saip.app.models import *
 
+@login_required
 def principal(request):
     """Muestra la pagina principal."""
-    return render_to_response('main_page.html', RequestContext(request))
+    user = User.objects.get(username=request.user.username)
+    lista = Proyecto.objects.all()
+    print lista
+    return render_to_response('main_page.html', {'user':user, 'proyectos': lista})
+    #return render_to_response('main_page.html', RequestContext(request))
 
 @login_required
 def admin_usuarios_proyecto(request, object_id):
@@ -89,6 +94,80 @@ def add_user(request):
         form = UsuariosForm()
     return render_to_response('admin/usuarios/abm_usuario.html',{'form':form, 'user':user})
 
+@login_required
+def mod_user(request, usuario_id):
+    """Modifica los datos de un usuario."""
+    user = User.objects.get(username=request.user.username)
+    usuario = get_object_or_404(User, id=usuario_id)
+    if request.method == 'POST':
+        form = ModUsuariosForm(request.POST)
+        if form.is_valid():
+            usuario.first_name = form.cleaned_data['first_name']
+            usuario.last_name = form.cleaned_data['last_name']
+            usuario.email = form.cleaned_data['email']
+            return HttpResponseRedirect("/usuarios")
+    else:
+        form = ModUsuariosForm(initial={'first_name':usuario.first_name, 'last_name': usuario.last_name,'email':usuario.email})
+    return render_to_response('admin/usuarios/mod_usuario.html',{'form':form, 'user':user, 'usuario':usuario})
+
+@login_required
+def cambiar_password(request, usuario_id):
+    """Cambia la contrasena de un usuario"""
+    user = User.objects.get(username=request.user.username)
+    usuario = get_object_or_404(User, id=usuario_id)
+    if request.method == 'POST':
+        form = CambiarPasswordForm(request.POST)
+        if form.is_valid():
+            usuario.set_password(form.cleaned_data['password1'])
+            usuario.save()
+            return HttpResponseRedirect("/usuarios")
+    else:
+        form = CambiarPasswordForm()
+    return render_to_response("admin/usuarios/cambiar_password.html", {'form': form, 'usuario': usuario, 'user': user})
+
+@login_required
+def asignar_roles_sistema(request, usuario_id):
+    """Asigna roles de sistema a un usuario"""
+    user = User.objects.get(username=request.user.username)
+    usuario = get_object_or_404(User, id=usuario_id)
+    lista_roles = UsuarioRolSistema.objects.filter(usuario = usuario)
+    if request.method == 'POST':
+        form = AsignarRolesForm(1, request.POST)
+        if form.is_valid():
+            lista_nueva = form.cleaned_data['roles']
+            for item in lista_roles:
+                item.delete()
+            for item in lista_nueva:
+                nuevo = UsuarioRolSistema()
+                nuevo.usuario = usuario
+                nuevo.rol = item
+                nuevo.save()
+            return HttpResponseRedirect("/usuarios")
+    else:
+        dict = {}
+        for item in lista_roles:
+            dict[item.rol.id] = True
+        form = AsignarRolesForm(1,initial = {'roles': dict})
+    return render_to_response("admin/usuarios/asignar_roles.html", {'form':form, 'usuario':usuario, 'user':user})
+
+@login_required
+def borrar_usuario(request, usuario_id):
+    """Borra un usuario, comprobando las dependencias primero"""
+    user = User.objects.get(username=request.user.username)
+    usuario = get_object_or_404(User, id=usuario_id)
+    comprometido = 0
+    #comprobar si el usuario esta asociado a algun proyecto como lider
+    comprometido = Proyecto.objects.filter(usuario_lider = usuario).count()
+    print comprometido
+    if request.method == 'POST':
+        usuario.delete()
+        return HttpResponseRedirect("/usuarios")
+    else:
+        if comprometido > 0:
+            error = "El usuario esta asociado a un proyecto como lider."
+            return render_to_response("admin/usuarios/user_confirm_delete.html", {'mensaje': error,'usuario':usuario, 'user': user})
+    return render_to_response("admin/usuarios/user_confirm_delete.html", {'usuario':usuario, 'user':user})
+            
 def lista(request, tipo):
     """Metodo de prueba para listar items"""
     user = User.objects.get(username=request.user.username)
@@ -120,8 +199,8 @@ def admin_proyectos(request):
 def admin_roles(request):
     """Administracion general de roles"""
     user = User.objects.get(username=request.user.username)
-    lista1 = RolSistema.objects.all()
-    lista2 = RolProyecto.objects.all()
+    lista1 = Rol.objects.filter(categoria=1)
+    lista2 = Rol.objects.filter(categoria=2)
     return render_to_response('admin/roles/roles.html',{'lista1':lista1, 'lista2':lista2, 'user':user})
 
 @login_required
@@ -129,58 +208,53 @@ def crear_rol(request):
     """Agrega un nuevo rol."""
     user = User.objects.get(username=request.user.username)
     if request.method == 'POST':
-        form = ElegirRolForm(request.POST)
+        form = RolesForm(request.POST)
         if form.is_valid():
-            res = form.cleaned_data['categoria']
-            if res == '1':
-                return HttpResponseRedirect("/roles/crears")
-            elif res == '2':
-                return HttpResponseRedirect("/roles/crearp")
+            r = Rol()
+            r.nombre = form.cleaned_data['nombre']
+            r.descripcion = form.cleaned_data['descripcion']
+            r.fecHor_creacion = datetime.datetime.now()
+            r.usuario_creador = user
+            r.categoria = form.cleaned_data['categoria']
+            r.save()
+            return HttpResponseRedirect("/roles")
     else:
-        form = ElegirRolForm()
+        form = RolesForm()
     return render_to_response('admin/roles/crear_rol.html',{'form':form, 'user':user})
 
 @login_required
-def crear_rol_sistema(request):
-    """Agrega un nuevo rol."""
+def admin_permisos(request, rol_id):
     user = User.objects.get(username=request.user.username)
+    actual = get_object_or_404(Rol, id=rol_id)
     if request.method == 'POST':
-        form = RolesForm(1, request.POST)
+        form = PermisosForm(actual.categoria, request.POST)
         if form.is_valid():
-            r = RolSistema()
-            r.nombre = form.cleaned_data['nombre']
-            r.descripcion = form.cleaned_data['descripcion']
-            r.fecHor_creacion = datetime.datetime.now()
-            r.usuario_creador = user
-            r.save()
-            print r.id
-            r.permisos=form.cleaned_data['permisos']
-            r.save()
-            return HttpResponseRedirect('/roles')
+            actual.permisos.clear()
+            lista = form.cleaned_data['permisos']
+            for item in lista:
+                actual.permisos.add(item)
+            actual.save()
+            return HttpResponseRedirect("/roles")
     else:
-        form = RolesForm('1')
-    return render_to_response('admin/roles/abm_rol.html',{'form':form, 'user':user})
+        dict = {}
+        for item in actual.permisos.all():
+            dict[item.id] = True
+        form = PermisosForm(actual.categoria, initial={'permisos': dict})
+    return render_to_response("admin/roles/admin_permisos.html", {'form': form, 'rol': actual, 'user':user})
 
-@login_required
-def crear_rol_proyecto(request):
-    """Agrega un nuevo rol."""
+def mod_rol(request, rol_id):
     user = User.objects.get(username=request.user.username)
+    actual = get_object_or_404(Rol, id=rol_id)
     if request.method == 'POST':
-        form = RolesForm(2, request.POST)
+        form = ModRolesForm(request.POST)
         if form.is_valid():
-            r = RolProyecto()
-            r.nombre = form.cleaned_data['nombre']
-            r.descripcion = form.cleaned_data['descripcion']
-            r.fecHor_creacion = datetime.datetime.now()
-            r.usuario_creador = user
-            r.save()
-            r.permisos.add(form.cleaned_data['permisos'])
-            r.save()
-            return HttpResponseRedirect('/roles')
+            actual.descripcion = form.cleaned_data['descripcion']
+            actual.save()
     else:
-        form = RolesForm('2')
-    return render_to_response('admin/roles/abm_rol.html',{'form':form, 'user':user})
-
+        form = ModRolesForm()
+        form.fields['descripcion'].initial = actual.descripcion
+    return render_to_response("admin/roles/abm_rol.html", {'user':user, 'form':form})
+    
 @login_required
 def crear_proyecto(request):
     """Crea un nuevo proyecto."""
