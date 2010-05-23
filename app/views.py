@@ -493,6 +493,33 @@ def borrar_artefacto(request, proyecto_id, art_id):
     return render_to_response('desarrollo/artefacto/artefacto_confirm_delete.html', variables)
 
 @login_required
+def admin_artefactos_eliminados(request, proyecto_id):
+    """Muestra la lista de artefactos eliminados de un proyecto."""
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
+    lista = Artefacto.objects.filter(proyecto=proyect, habilitado=False)
+    variables = RequestContext(request, {'proyecto': proyect, 'lista': lista})
+    return render_to_response('desarrollo/artefacto/artefactos_eliminados.html', variables)
+
+@login_required
+def restaurar_artefacto_eliminado(request, proyecto_id, art_id):
+    """Metodo que restaura un artefacto eliminado a su ultima version."""
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
+    art = get_object_or_404(Artefacto, id=art_id)
+    
+    if request.method == 'POST':
+        print "segunda ronda" 
+        art.habilitado = True
+        art.save()
+        lista = Artefacto.objects.filter(proyecto=proyect, habilitado=False)
+        variables = RequestContext(request, {'proyecto': proyect, 'lista': lista})
+        return render_to_response('desarrollo/artefacto/artefactos_eliminados.html', variables)
+    print "primera ronda"
+    variables = RequestContext(request, {'proyecto':proyect, 'art': art})
+    return render_to_response('desarrollo/artefacto/artefacto_confirm_restaurar.html', variables)
+
+@login_required
 def ver_historial(request, proyecto_id, art_id):
     art = Artefacto.objects.get(pk=art_id)
     proyect = Proyecto.objects.get(pk=proyecto_id)
