@@ -37,11 +37,12 @@ urlpatterns = patterns('',
     # proyectos
 	(r'^proyectos/$', admin_proyectos),
     (r'^proyectos/crear/$', crear_proyecto),
-	(r'^proyectos/mod/(?P<object_id>\d+)/$', update_object, {'form_class':ModProyectosForm, 'template_name':'admin/proyectos/abm_proyecto.html', 'post_save_redirect':'/proyectos', 'login_required':True}),
-	(r'^proyectos/del/(?P<object_id>\d+)/$', delete_object, {'model':Proyecto, 'template_name':'admin/proyectos/proyecto_confirm_delete.html', 'post_delete_redirect':'/proyectos', 'login_required':True}),
-	(r'^proyectos/miembros/(?P<object_id>\d+)/$', admin_usuarios_proyecto),
-	(r'^proyectos/miembros/(?P<object_id>\d+)/nuevo/$', add_usuario_proyecto),
-    (r'^proyectos/miembros/(?P<proyecto_id>\d+)/cambiar/(?P<user_id>\d+)/$', cambiar_rol_usuario_proyecto),
+	(r'^proyectos/mod&id=(?P<object_id>\d+)/$', update_object, {'form_class':ModProyectosForm, 'template_name':'admin/proyectos/abm_proyecto.html', 'post_save_redirect':'/proyectos', 'login_required':True}),
+	(r'^proyectos/del&id=(?P<object_id>\d+)/$', delete_object, {'model':Proyecto, 'template_name':'admin/proyectos/proyecto_confirm_delete.html', 'post_delete_redirect':'/proyectos', 'login_required':True}),
+	(r'^proyectos/miembros&id=(?P<object_id>\d+)/$', admin_usuarios_proyecto),
+	(r'^proyectos/miembros&id=(?P<object_id>\d+)/nuevo/$', add_usuario_proyecto),
+    (r'^proyectos/miembros&id=(?P<proyecto_id>\d+)/cambiar&id=(?P<user_id>\d+)/$', cambiar_rol_usuario_proyecto),
+    (r'^proyectos/miembros&id=(?P<proyecto_id>\d+)/del&id=(?P<user_id>\d+)/$', eliminar_miembro_proyecto),
     
     #artefactos
     (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/$', admin_artefactos),
@@ -58,13 +59,13 @@ urlpatterns = patterns('',
     (r'^roles/crear/$', crear_rol),
     (r'^roles/mod&id=(?P<rol_id>\d+)/$', mod_rol),
     (r'^roles/permisos&id=(?P<rol_id>\d+)/$', admin_permisos),
-    (r'^roles/del/(?P<object_id>\d+)/$', delete_object, {'model':Rol, 'template_name':'admin/roles/rol_confirm_delete.html', 'post_delete_redirect':'/roles', 'login_required':True}),
+    (r'^roles/del&id=(?P<rol_id>\d+)/$', borrar_rol),
     
     # Tipo de artefacto
     (r'^tipo_artefacto/$', admin_tipo_artefacto),
     (r'^tipo_artefacto/crear/$', create_object, {'form_class': TipoArtefactoForm, 'template_name':'admin/tipo_artefacto/abm_tipo_artefacto.html', 'post_save_redirect':'/tipo_artefacto', 'login_required':True}),
-    (r'^tipo_artefacto/mod/(?P<object_id>\d+)/$', update_object, {'form_class':TipoArtefactoForm, 'template_name':'admin/tipo_artefacto/abm_tipo_artefacto.html', 'post_save_redirect':'/tipo_artefacto', 'login_required':True}),
-    (r'^tipo_artefacto/del/(?P<object_id>\d+)/$', delete_object, {'model':TipoArtefacto, 'template_name':'admin/tipo_artefacto/tipo_artefacto_confirm_delete.html', 'post_delete_redirect':'/tipo_artefacto', 'login_required':True}),
+    (r'^tipo_artefacto/mod&id=(?P<object_id>\d+)/$', update_object, {'form_class':TipoArtefactoForm, 'template_name':'admin/tipo_artefacto/abm_tipo_artefacto.html', 'post_save_redirect':'/tipo_artefacto', 'login_required':True}),
+    (r'^tipo_artefacto/del&id=(?P<tipo_id>\d+)/$', borrar_tipo_artefacto),
 
            
     

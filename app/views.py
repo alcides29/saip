@@ -34,7 +34,11 @@ def admin_usuarios_proyecto(request, object_id):
     user = User.objects.get(username=request.user.username)
     p = Proyecto.objects.get(pk = object_id)
     miembros = UsuarioRolProyecto.objects.filter(proyecto = p)
-    return render_to_response('admin/proyectos/admin_miembros.html',{'user':user, 'proyecto':Proyecto.objects.get(id=object_id), 'miembros': miembros})
+    lista = []
+    for item in miembros:
+        if not item.usuario in lista:
+            lista.append(item.usuario)
+    return render_to_response('admin/proyectos/admin_miembros.html',{'user':user, 'proyecto':Proyecto.objects.get(id=object_id), 'miembros': lista})
 	
 @login_required
 def cambiar_rol_usuario_proyecto(request, proyecto_id, user_id):
@@ -42,33 +46,73 @@ def cambiar_rol_usuario_proyecto(request, proyecto_id, user_id):
     p = Proyecto.objects.get(pk = proyecto_id)
     u = User.objects.get(pk = user_id)
     lista = UsuarioRolProyecto.objects.filter(proyecto = p, usuario = u)
-    item = lista[0]
     if request.method == 'POST':
-        form = ItemForm(item.usuario, request.POST)
+        form = ItemForm(u, request.POST)
         if form.is_valid():
-            if (form.cleaned_data['item'] != item.rol):
-                item.rol = form.cleaned_data['item']
-                item.save()
-            return HttpResponseRedirect("/proyectos/miembros/" + str(proyecto_id))
+            for item in lista:
+                item.delete()
+            lista_nueva = form.cleaned_data['items']
+            if lista_nueva:
+                for item in lista_nueva:
+                    nuevo = UsuarioRolProyecto()
+                    nuevo.usuario = u
+                    nuevo.proyecto = p
+                    nuevo.rol = item
+                    nuevo.save()
+            else:
+                nuevo = UsuarioRolProyecto()
+                nuevo.usuario = u
+                nuevo.proyecto = p
+                nuevo.rol = None
+                nuevo.save()
+            return HttpResponseRedirect("/proyectos/miembros&id=" + str(proyecto_id))
     else:
-        form = ItemForm(item.usuario, initial = {'item':item.rol._get_pk_val()})
+        if len(lista) == 1 and not lista[0].rol:
+            form = ItemForm(u)
+        else:
+            dict = {}
+            for item in lista:
+                dict[item.rol.id] = True
+            form = ItemForm(u, initial = {'items':dict})
     return render_to_response("admin/proyectos/cambiar_usuario_rol.html", {'user': user, 'form':form, 'usuario':u, 'proyecto': p})
 	
 @login_required
 def add_usuario_proyecto(request, object_id):
-	user = User.objects.get(username=request.user.username)
-	if request.method == 'POST':
-		form = UsuarioProyectoForm(request.POST)
-		if form.is_valid():
-			relacion = UsuarioRolProyecto()
-			relacion.usuario = form.cleaned_data['usuario']
-			relacion.proyecto = Proyecto.objects.get(pk = object_id)
-			relacion.rol = form.cleaned_data['rol']
-			relacion.save()
-			return HttpResponseRedirect("/proyectos/miembros/" + str(object_id))
-	else:
-		form = UsuarioProyectoForm()
-	return render_to_response('admin/proyectos/add_miembro.html', {'form':form, 'user':user,  'proyecto': Proyecto.objects.get(pk=object_id)})
+    user = User.objects.get(username=request.user.username)
+    if request.method == 'POST':
+        form = UsuarioProyectoForm(request.POST)
+        if form.is_valid():
+            roles = form.cleaned_data['roles']
+            if not roles:
+                relacion = UsuarioRolProyecto()
+                relacion.usuario = form.cleaned_data['usuario']
+                relacion.proyecto = Proyecto.objects.get(pk = object_id)
+                relacion.rol = None
+                relacion.save()
+            else:
+                for item in roles:
+                    relacion = UsuarioRolProyecto()
+                    relacion.usuario = form.cleaned_data['usuario']
+                    relacion.proyecto = Proyecto.objects.get(pk = object_id)
+                    relacion.rol = item
+                    relacion.save()
+            return HttpResponseRedirect("/proyectos/miembros&id=" + str(object_id))
+    else:
+        form = UsuarioProyectoForm()
+    return render_to_response('admin/proyectos/add_miembro.html', {'form':form, 'user':user,  'proyecto': Proyecto.objects.get(pk=object_id)})
+
+@login_required
+def eliminar_miembro_proyecto(request, proyecto_id, user_id):
+    user = User.objects.get(username=request.user.username)
+    usuario = get_object_or_404(User, pk=user_id)
+    proy = get_object_or_404(Proyecto, pk=proyecto_id)
+    if request.method == 'POST':
+        lista = UsuarioRolProyecto.objects.filter(proyecto = proy, usuario = usuario)
+        for item in lista:
+            item.delete()
+        return HttpResponseRedirect("/proyectos/miembros&id=" + str(proyecto_id))
+    else:
+        return render_to_response("admin/proyectos/eliminar_miembro.html", {'usuario':usuario, 'proyecto':proy, 'user':user})
 
 @login_required
 def add_user(request):
@@ -144,6 +188,9 @@ def asignar_roles_sistema(request, usuario_id):
                 nuevo.save()
             return HttpResponseRedirect("/usuarios")
     else:
+        if usuario.id == 1:
+            error = "No se puede editar roles sobre el superusuario."
+            return render_to_response("admin/usuarios/asignar_roles.html", {'mensaje': error,'usuario':usuario, 'user': user})
         dict = {}
         for item in lista_roles:
             dict[item.rol.id] = True
@@ -158,12 +205,14 @@ def borrar_usuario(request, usuario_id):
     comprometido = 0
     #comprobar si el usuario esta asociado a algun proyecto como lider
     comprometido = Proyecto.objects.filter(usuario_lider = usuario).count()
-    print comprometido
     if request.method == 'POST':
         usuario.delete()
         return HttpResponseRedirect("/usuarios")
     else:
-        if comprometido > 0:
+        if usuario.id == 1:
+            error = "No se puede borrar al superusuario."
+            return render_to_response("admin/usuarios/user_confirm_delete.html", {'mensaje': error,'usuario':usuario, 'user': user})
+        elif comprometido > 0:
             error = "El usuario esta asociado a un proyecto como lider."
             return render_to_response("admin/usuarios/user_confirm_delete.html", {'mensaje': error,'usuario':usuario, 'user': user})
     return render_to_response("admin/usuarios/user_confirm_delete.html", {'usuario':usuario, 'user':user})
@@ -250,11 +299,30 @@ def mod_rol(request, rol_id):
         if form.is_valid():
             actual.descripcion = form.cleaned_data['descripcion']
             actual.save()
+            return HttpResponseRedirect("/roles")
     else:
         form = ModRolesForm()
         form.fields['descripcion'].initial = actual.descripcion
     return render_to_response("admin/roles/abm_rol.html", {'user':user, 'form':form})
-    
+
+@login_required 
+def borrar_rol(request, rol_id):
+    """Borra un rol con las comprobaciones de consistencia"""
+    user = User.objects.get(username=request.user.username)
+    actual = get_object_or_404(Rol, id=rol_id)
+    #Obtener todas las posibles dependencias
+    if actual.categoria == 1:
+        relacionados = UsuarioRolSistema.objects.filter(rol = actual).count()
+    elif actual.categoria == 2:
+        relacionados = UsuarioRolProyecto.objects.filter(rol = actual).count()
+    if request.method == 'POST':
+        actual.delete()
+        return HttpResponseRedirect("/roles")
+    else:
+        if relacionados > 0:
+            error = "El rol se esta utilizando."
+            return render_to_response("admin/roles/rol_confirm_delete.html", {'mensaje': error, 'rol':actual, 'user':user})
+    return render_to_response("admin/roles/rol_confirm_delete.html", {'rol':actual, 'user':user})
 @login_required
 def crear_proyecto(request):
     """Crea un nuevo proyecto."""
@@ -283,6 +351,21 @@ def admin_tipo_artefacto(request):
     lista = TipoArtefacto.objects.all()
     return render_to_response('admin/tipo_artefacto/tipo_artefacto.html',
                               {'lista': lista, 'user':user})
+
+def borrar_tipo_artefacto(request, tipo_id):
+    """Borra un tipo de artefacto comprobando las dependencias"""
+    user = User.objects.get(username=request.user.username)
+    actual = get_object_or_404(TipoArtefacto, id=tipo_id)
+    #comprobar las posibles dependencias
+    relacionados = Artefacto.objects.filter(tipo = actual).count()
+    if request.method == 'POST':
+        actual.delete()
+        return HttpResponseRedirect("/tipo_artefacto")
+    else:
+        if relacionados > 0:
+            error = "Este tipo de artefacto se esta utilizando"
+            return render_to_response("admin/tipo_artefacto/tipo_artefacto_confirm_delete.html", {'mensaje':error,'tipo':actual, 'user':user})
+    return render_to_response("admin/tipo_artefacto/tipo_artefacto_confirm_delete.html", {'tipo':actual, 'user':user})
 
 #desde aqui artefacto
 @login_required

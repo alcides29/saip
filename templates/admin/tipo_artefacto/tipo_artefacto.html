@@ -11,10 +11,10 @@
 	</tr>
 	{%for item in lista%}
 		<tr>
-		<td><a href="/tipo_artefacto/mod/{{item.id}}/">{{item.nombre}}</a></td>
+		<td><a href="/tipo_artefacto/mod&id={{item.id}}/">{{item.nombre}}</a></td>
 		<td>{{item.descripcion}}</td>
 		<td>{{item.fase}}</td>
-		<td><a href="/tipo_artefacto/del/{{item.id}}/">Borrar</a></td>
+		<td><a href="/tipo_artefacto/del&id={{item.id}}/">Borrar</a></td>
 		</tr>
 	{% endfor %}
 	</table>

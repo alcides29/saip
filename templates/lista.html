@@ -1,0 +1,45 @@
+{% extends "base.html"%}
+{%block title%}Lista de {{tipo}}{% endblock %}
+{% block head %} {{tipo}} en el sistema {% endblock %}
+{% block content%}
+{% if user %}
+	{%if lista%}
+		{% ifequal tipo 'usuarios'%}
+			<table>
+			<tr>
+				<td class="titulo">Nombre de usuario</td>
+				<td class="titulo">Nombre</td>
+				<td class="titulo">Apellido</td>
+			</tr>
+			{%for item in lista%}
+				<tr>
+					<td>{{item.username}}</td>
+					<td>{{item.first_name}}</td>
+					<td>{{item.last_name}}</td>
+				</tr>
+			{%endfor%}
+		{% else %}
+			{% ifequal tipo 'proyectos' %}
+				<table>
+				<tr>
+					<td class="titulo">Nombre</td>
+					<td class="titulo">Lider</td>
+					<td class="titulo">Descripcion</td>
+				</tr>
+				{%for item in lista%}
+					<tr>
+						<td>{{item.nombre}}</td>
+						<td>{{item.usuario_lider}}</td>
+						<td>{{item.descripcion}}</td>
+					</tr>
+				{%endfor%}
+			{% endifequal %}
+		{% endifequal %}
+		</table>
+	{%else%}
+		<p>No hay datos.</p>
+	{%endif%}
+{% else %}
+	<p>No se ha logueado a&uacute;n.</p>
+{% endif %}
+{% endblock %}

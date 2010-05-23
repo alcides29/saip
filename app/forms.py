@@ -11,17 +11,25 @@ class UsuariosForm(forms.Form):
 	email = forms.EmailField(max_length=75, label='Correo Electronico')
 	password = forms.CharField(max_length=128, label='Contrasena', widget=forms.PasswordInput())
 	password2 = forms.CharField(max_length=128, label='Confirmar contrasena', widget=forms.PasswordInput())
-	#class Meta:
-	#	model = User
-	#	fields = ('username', 'first_name', 'last_name', 'email', 'password')
 
 	def clean_password2(self):
+		#comprobar que las contrasenas dadas sean iguales
 		if 'password' in self.cleaned_data:
 			password = self.cleaned_data['password']
 			password2 = self.cleaned_data['password2']
 			if password == password2:
 				return password2
 		raise forms.ValidationError('Las contrasenas no coinciden')
+	
+	def clean_username(self):
+		#controlar que ya no existe el nombre de usuario
+		if 'username' in self.cleaned_data:
+			usuarios = User.objects.all()
+			nuevo = self.cleaned_data['username']
+			for item in usuarios:
+				if item.username == nuevo:
+					raise forms.ValidationError('Ya existe ese nombre de usuario. Elija otro.')
+			return nuevo
 
 class ModUsuariosForm(forms.Form):
 	first_name = forms.CharField(max_length=30, label='Nombre')
@@ -55,6 +63,15 @@ class ProyectosForm(forms.Form):
     fecha_inicio = forms.DateField(required=False, label='Fecha de Inicio')
     fecha_fin = forms.DateField(required=False, label='Fecha de Finalizacion')
     cronograma = forms.FileField(required=False, label='Cronograma')
+    
+    def clean_nombre(self):
+    	if 'nombre' in self.cleaned_data:
+    		proyectos = Proyecto.objects.all()
+    		nuevo = self.cleaned_data['nombre']
+    		for proyecto in proyectos:
+    			if proyecto.nombre == nuevo:
+    				raise forms.ValidationError('Ya existe ese nombre. Elija otro.')
+    		return nuevo
 
 class ModProyectosForm(forms.ModelForm):
     """Formulario para la modificacion de proyectos."""
@@ -74,7 +91,7 @@ class RolesForm(forms.Form):
 			nombre = self.cleaned_data['nombre']
 			for item in roles: 
 				if nombre == item.nombre:
-					raise forms.ValidationError('Ya existe ese nombre en la base de datos.')
+					raise forms.ValidationError('Ya existe ese nombre de rol. Elija otro.')
 			return nombre
 
 class PermisosForm(forms.Form):
@@ -88,15 +105,15 @@ class ModRolesForm(forms.Form):
 	descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
 
 class ItemForm(forms.Form):
-	item = forms.ModelChoiceField(queryset= Rol.objects.filter(categoria=2), empty_label = None)
+	items = forms.ModelMultipleChoiceField(queryset= Rol.objects.filter(categoria=2), widget = forms.CheckboxSelectMultiple, required=False)
 	
 	def __init__(self, miembro, *args, **kwargs):
 		super(ItemForm, self).__init__(*args, **kwargs)
-		self.fields['item'].label = miembro.username
+		self.fields['items'].label = miembro.username
 
 class UsuarioProyectoForm(forms.Form):
     usuario = forms.ModelChoiceField(queryset = User.objects.all())
-    rol = forms.ModelChoiceField(queryset = Rol.objects.filter(categoria=2))
+    roles = forms.ModelMultipleChoiceField(queryset = Rol.objects.filter(categoria=2), widget = forms.CheckboxSelectMultiple, required=False)
     proyecto = Proyecto()
 
     def clean_usuario(self):
