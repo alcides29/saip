@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Historial{% endblock %}
+{% block head %}Versiones anteriores de {{ art.nombre }}<br>{% endblock %}
+{% block content %}
+
+<p>Usuario: {{ historial.usuario }}</p>
+<p>Fecha de creacion: {{ historial.fecha_creacion }}</p>
+
+<table>
+	<tr>
+		<td class="titulo">Versi&oacute;n</td>
+        <td class="titulo">Estado</td>
+		<td class="titulo">Complejidad</td>
+		<td class="titulo">Descripci&oacute;n Corta</td>
+		<td class="titulo">Descripci&oacute;n Larga</td>		
+        <td class="titulo">Icono</td>
+        <td class="titulo">Tipo</td>
+        <td class="titulo">Fecha/Modificacion</td>
+		<td class="titulo">Acciones</td>
+	</tr>
+	{% for item in lista %}
+	<tr>
+		<td>{{item.version}}</td>
+		<td>{{item.estado}}</td>        
+		<td>{{item.complejidad}}</td>
+		<td>{{item.descripcion_corta}}</td>
+		<td>{{item.descripcion_larga}}</td>
+		<td>{{item.icono}}</td>			
+		<td>{{item.tipo}}</td>
+        <td>{{item.fecha_modificacion}}</td>
+		<td><a href="/proyectos/artefactos/{{proyecto.id}}/historial/{{art.id}}/volver/{{item.id}}/">Restaurar</a></td>
+	</tr>
+	{% endfor %}
+</table>
+<input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos/{{ proyecto.id }}/'"/>	
+{% endblock%}
