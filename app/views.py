@@ -397,20 +397,17 @@ def modificar_artefacto(request, proyecto_id, art_id):
 
 @login_required
 def borrar_artefacto(request, proyecto_id, art_id):
-    """Dar de baja un artefacto"""
+    """Dar de baja un artefacto."""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     art = get_object_or_404(Artefacto, id=art_id)
-    if (request.POST):
+    
+    if request.method== 'POST':
         art.habilitado= False
         art.save()
         return HttpResponseRedirect("/proyectos/artefactos/" + str(proyecto_id)+"/")
-    
-    variables = RequestContext(request, {'proyecto':proyect,
-                                         'art':art,
-                                        })
+    variables = RequestContext(request, {'proyecto':proyect, 'art': art})
     return render_to_response('desarrollo/artefacto/artefacto_confirm_delete.html', variables)
-
 
 @login_required
 def ver_historial(request, proyecto_id, art_id):
