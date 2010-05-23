@@ -138,7 +138,7 @@ class LineaBase(models.Model):
 
 class UsuarioRolProyecto(models.Model):   
     usuario = models.ForeignKey(User)
-    rol = models.ForeignKey(Rol)
+    rol = models.ForeignKey(Rol, null=True)
     proyecto = models.ForeignKey(Proyecto)
 
     class Meta:
