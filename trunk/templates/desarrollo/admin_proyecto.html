@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Administraci&oacute;n de Proyectos{% endblock %}
+{% block head %}{{proyecto.nombre}}<br>{% endblock %}
+{% block content %}
+<p>{{proyecto.descripcion}}</p>
+<p>L&iacute;der del proyecto: {{proyecto.usuario_lider}}</p>
+<h2>Administraci&oacute;n</h2>
+<ul>
+<li><a href="/proyectos/miembros&id={{proyecto.id}}">Miembros</a></li>
+<li>Gesti&oacute;n de l&iacute;nea base</li>
+</ul>
+<h2>Desarrollo</h2>
+<ul>
+<li><a href="/proyectos/artefactos&id={{proyecto.id}}">Artefactos de la fase actual</a></li>
+</ul>
+{% endblock%}
