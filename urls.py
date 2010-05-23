@@ -44,17 +44,20 @@ urlpatterns = patterns('',
     (r'^proyectos/miembros&id=(?P<proyecto_id>\d+)/cambiar&id=(?P<user_id>\d+)/$', cambiar_rol_usuario_proyecto),
     (r'^proyectos/miembros&id=(?P<proyecto_id>\d+)/del&id=(?P<user_id>\d+)/$', eliminar_miembro_proyecto),
     
+    #desarrollo
+    (r'^proyectos/admin&id=(?P<proyecto_id>\d+)/$', administrar_proyecto),
+    
     #artefactos
-    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/$', admin_artefactos),
-    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/crear/$', crear_artefacto),
-    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/mod/(?P<art_id>\d+)/$', modificar_artefacto),
-    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/del/(?P<art_id>\d+)/$', borrar_artefacto),
-    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/res/$', admin_artefactos_eliminados),
-    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/res/(?P<art_id>\d+)/$', restaurar_artefacto_eliminado),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/$', admin_artefactos),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/crear/$', crear_artefacto),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/mod&id=(?P<art_id>\d+)/$', modificar_artefacto),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/del&id=(?P<art_id>\d+)/$', borrar_artefacto),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/res/$', admin_artefactos_eliminados),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/res&id=(?P<art_id>\d+)/$', restaurar_artefacto_eliminado),
     
     #historial
-    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/historial/(?P<art_id>\d+)/$', ver_historial),
-    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/historial/(?P<art_id>\d+)/volver/(?P<reg_id>\d+)/$', restaurar_artefacto),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/$', ver_historial),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/volver&id=(?P<reg_id>\d+)/$', restaurar_artefacto),
     
     #roles
     (r'^roles/$', admin_roles),

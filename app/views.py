@@ -30,6 +30,12 @@ def principal(request):
     #return render_to_response('main_page.html', RequestContext(request))
 
 @login_required
+def administrar_proyecto(request, proyecto_id):
+    user = User.objects.get(username=request.user.username)
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+    return render_to_response("desarrollo/admin_proyecto.html", {'proyecto':proyecto, 'user':user})
+    
+@login_required
 def admin_usuarios_proyecto(request, object_id):
     user = User.objects.get(username=request.user.username)
     p = Proyecto.objects.get(pk = object_id)
@@ -38,7 +44,7 @@ def admin_usuarios_proyecto(request, object_id):
     for item in miembros:
         if not item.usuario in lista:
             lista.append(item.usuario)
-    return render_to_response('admin/proyectos/admin_miembros.html',{'user':user, 'proyecto':Proyecto.objects.get(id=object_id), 'miembros': lista})
+    return render_to_response('desarrollo/admin_miembros.html',{'user':user, 'proyecto':Proyecto.objects.get(id=object_id), 'miembros': lista})
 	
 @login_required
 def cambiar_rol_usuario_proyecto(request, proyecto_id, user_id):
@@ -74,7 +80,7 @@ def cambiar_rol_usuario_proyecto(request, proyecto_id, user_id):
             for item in lista:
                 dict[item.rol.id] = True
             form = ItemForm(u, initial = {'items':dict})
-    return render_to_response("admin/proyectos/cambiar_usuario_rol.html", {'user': user, 'form':form, 'usuario':u, 'proyecto': p})
+    return render_to_response("desarrollo/cambiar_usuario_rol.html", {'user': user, 'form':form, 'usuario':u, 'proyecto': p})
 	
 @login_required
 def add_usuario_proyecto(request, object_id):
@@ -99,7 +105,7 @@ def add_usuario_proyecto(request, object_id):
             return HttpResponseRedirect("/proyectos/miembros&id=" + str(object_id))
     else:
         form = UsuarioProyectoForm()
-    return render_to_response('admin/proyectos/add_miembro.html', {'form':form, 'user':user,  'proyecto': Proyecto.objects.get(pk=object_id)})
+    return render_to_response('desarrollo/add_miembro.html', {'form':form, 'user':user,  'proyecto': Proyecto.objects.get(pk=object_id)})
 
 @login_required
 def eliminar_miembro_proyecto(request, proyecto_id, user_id):
@@ -112,7 +118,7 @@ def eliminar_miembro_proyecto(request, proyecto_id, user_id):
             item.delete()
         return HttpResponseRedirect("/proyectos/miembros&id=" + str(proyecto_id))
     else:
-        return render_to_response("admin/proyectos/eliminar_miembro.html", {'usuario':usuario, 'proyecto':proy, 'user':user})
+        return render_to_response("desarrollo/eliminar_miembro.html", {'usuario':usuario, 'proyecto':proy, 'user':user})
 
 @login_required
 def add_user(request):
@@ -407,7 +413,7 @@ def crear_artefacto(request, proyecto_id):
             hist.fecha_creacion = datetime.date.today()
             hist.artefacto = art
             hist.save()            
-            return HttpResponseRedirect("/proyectos/artefactos/" + str(proyecto_id)+"/")
+            return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyecto_id)+"/")
     else:
         form = ArtefactoForm()
         
@@ -461,7 +467,7 @@ def modificar_artefacto(request, proyecto_id, art_id):
             art.icono = form.cleaned_data['icono']
             art.tipo = form.cleaned_data['tipo']
             art.save()            
-            return HttpResponseRedirect("/proyectos/artefactos/" + str(proyecto_id)+"/")
+            return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyecto_id)+"/")
     else:
         art = get_object_or_404(Artefacto, id=art_id)
         form = ModArtefactoForm({
@@ -488,7 +494,7 @@ def borrar_artefacto(request, proyecto_id, art_id):
     if request.method== 'POST':
         art.habilitado= False
         art.save()
-        return HttpResponseRedirect("/proyectos/artefactos/" + str(proyecto_id)+"/")
+        return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyecto_id)+"/")
     variables = RequestContext(request, {'proyecto':proyect, 'art': art})
     return render_to_response('desarrollo/artefacto/artefacto_confirm_delete.html', variables)
 
@@ -559,7 +565,7 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
     #art.icono = r.icono
     art.tipo = r.tipo
     art.save()   
-    return HttpResponseRedirect("/proyectos/artefactos/"+ str(proyecto_id)+"/")
+    return HttpResponseRedirect("/proyectos/artefactos&id="+ str(proyecto_id)+"/")
 
 @login_required
 def terminar(peticion):

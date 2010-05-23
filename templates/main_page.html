@@ -14,7 +14,7 @@
 	<h2>Proyectos</h2>
 	<ul>
 	{% for proyecto in proyectos %}
-		<li>{{proyecto.nombre}}</li>
+		<li><a href="/proyectos/admin&id={{proyecto.id}}/">{{proyecto.nombre}}</li>
 	{% empty %}
 		<li>No hay proyectos.</li>
 	{% endfor %}
