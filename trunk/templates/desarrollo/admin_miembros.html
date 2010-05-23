@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Proyectos{% endblock %}
+{% block head %}Miembros del Proyecto {{proyecto.id}}<br>{% endblock %}
+{% block content %}
+<form id="form_id" action="" method="post">
+<table>
+<tr><td class="titulo">Usuario</td><td class="titulo">Acciones</td></tr>
+	{% for item in miembros %}
+		<tr><td>{{item.username}}</td><td><a href="/proyectos/miembros&id={{proyecto.id}}/cambiar&id={{item.id}}">Administrar Roles</a> <a href="/proyectos/miembros&id={{proyecto.id}}/del&id={{item.id}}">Quitar</a></td></tr>
+	{% endfor %}
+</table>
+<p><a href="/proyectos/miembros&id={{proyecto.id}}/nuevo/">Agregar nuevo miembro</a></p>
+<input type="button" value="Volver" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}' "/>	
+</form>
+{% endblock%}
+
