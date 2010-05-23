@@ -197,7 +197,7 @@ def crear_proyecto(request):
             p.cronograma = form.cleaned_data['cronograma']
             p.fase = Fase.objects.get(pk=1)
             p.save()
-            return HttpResponseRedirect('/terminar')
+            return HttpResponseRedirect('/proyectos')
     else:
         form = ProyectosForm()
     return render_to_response('admin/proyectos/abm_proyecto.html',{'form':form, 'user':user})
@@ -213,10 +213,10 @@ def admin_tipo_artefacto(request):
 #desde aqui artefacto
 @login_required
 def admin_artefactos(request, proyecto_id):
-    """Muestra la p√°gina de administracion de artefactos."""
+    """Muestra la p·gina de administracion de artefactos."""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
-    lista = Artefacto.objects.all()
+    lista = Artefacto.objects.filter(proyecto=proyect)
     variables = RequestContext(request, {'proyecto': proyect,
                                         'lista': lista,
                                         })
@@ -232,18 +232,24 @@ def crear_artefacto(request, proyecto_id):
         if form.is_valid():
             art = Artefacto()
             art.nombre = form.cleaned_data['nombre']
-            art.usuario = user
+            art.usuario = user#solo en el historial?
             art.estado = 1
-            art.fecha_creacion = datetime.date.today()
+            art.fecha_creacion = datetime.date.today()#solo en el historial?
             art.version = 1
             art.complejidad = form.cleaned_data['complejidad']
-            art.descripcion_corta = form.cleaned_data['descripcion_corta']
+            art.descripcion_corta = form.cleaned_data['descripcion_corta']#otro widget?
             art.descripcion_larga = form.cleaned_data['descripcion_larga']
-            art.habilitado = True
+            art.habilitado = 1
             art.icono = form.cleaned_data['icono']
             art.proyecto = proyect
             art.tipo = form.cleaned_data['tipo']#hay que ver            
-            art.save()
+            art.save()            
+            #Generacion del historial          
+            hist = Historial()#hacer un constructor
+            hist.usuario = user
+            hist.fecha_creacion = datetime.date.today()
+            hist.artefacto = art
+            hist.save()            
             return HttpResponseRedirect("/proyectos/artefactos/" + str(proyecto_id)+"/")
     else:
         form = ArtefactoForm()
@@ -262,22 +268,46 @@ def modificar_artefacto(request, proyecto_id, art_id):
         art = Artefacto.objects.get(pk=art_id)
         form = ModArtefactoForm(request.POST)
         if (form.is_valid()):
-            #realizar una copia del artefacto antiguo e ir comparando
-            #art.nombre = form.cleaned_data['nombre']
-            art.version = art.version + 1 #comprobar si hubo cambio
+            cambio = False
+            if (form.cleaned_data['complejidad'] != art.complejidad):
+                cambio = True
+            elif (form.cleaned_data['descripcion_corta'] != art.descripcion_corta):
+                cambio = True
+            elif (form.cleaned_data['descripcion_larga'] != art.descripcion_larga):
+                cambio = True
+            elif (form.cleaned_data['icono'] != art.icono):#capaz no funcione
+                cambio = True
+            elif (form.cleaned_data['tipo'] != art.tipo):#capaz no funcione
+                cambio = True
+            
+            if (cambio):
+                """ Se ingresa la version antigua al registro"""
+                reg = RegistroHistorial()
+                reg.version = art.version
+                reg.estado = art.estado
+                reg.complejidad = art.complejidad
+                reg.descripcion_corta = art.descripcion_corta
+                reg.descripcion_larga = art.descripcion_larga
+                reg.habilitado = art.habilitado
+                reg.tipo = art.tipo
+                reg.fecha_modificacion = datetime.datetime.today()
+                historial = Historial.objects.get(artefacto = art)
+                reg.historial = historial
+                reg.save()
+                """Se incrementa la version actual"""
+                art.version = art.version + 1
+                art.save()
+                    
             art.complejidad = form.cleaned_data['complejidad']
             art.descripcion_corta = form.cleaned_data['descripcion_corta']
-            art.descripcion_larga = form.cleaned_data['descripcion_larga']
-            #art.estado = 2
-            #art.habilitado = form.cleaned_data['habilitado']
+            art.descripcion_larga = form.cleaned_data['descripcion_larga']            
             art.icono = form.cleaned_data['icono']
             art.tipo = form.cleaned_data['tipo']
-            art.save()
+            art.save()            
             return HttpResponseRedirect("/proyectos/artefactos/" + str(proyecto_id)+"/")
     else:
         art = get_object_or_404(Artefacto, id=art_id)
         form = ModArtefactoForm({
-                        #'nombre': art.nombre,
                         'complejidad': art.complejidad,
                         'descripcion_corta':art.descripcion_corta,
                         'descripcion_larga':art.descripcion_larga,
@@ -306,6 +336,49 @@ def borrar_artefacto(request, proyecto_id, art_id):
                                          'art':art,
                                         })
     return render_to_response('desarrollo/artefacto/artefacto_confirm_delete.html', variables)
+
+
+@login_required
+def ver_historial(request, proyecto_id, art_id):
+    art = Artefacto.objects.get(pk=art_id)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
+    historial = Historial.objects.get(artefacto=art)
+    versiones = RegistroHistorial.objects.filter(historial=historial)
+    variables = RequestContext(request, {'historial': historial, 
+                                         'lista': versiones,
+                                         'art': art,
+                                         'proyecto': proyect,
+                                           })
+    return render_to_response('desarrollo/artefacto/historial.html', variables)
+
+@login_required
+def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
+    art = Artefacto.objects.get(pk = art_id)
+    reg = RegistroHistorial()
+    reg.version = art.version
+    reg.estado = art.estado
+    reg.complejidad = art.complejidad
+    reg.descripcion_corta = art.descripcion_corta
+    reg.descripcion_larga = art.descripcion_larga
+    reg.habilitado = art.habilitado
+    #reg.icono = art.icono
+    reg.tipo = art.tipo
+    reg.fecha_modificacion = datetime.datetime.today()
+    historial = Historial.objects.get(artefacto = art)
+    reg.historial = historial
+    reg.save()
+    #preguntar por la version incrementada!!!!    
+    r = RegistroHistorial.objects.get(pk=reg_id)
+    art.version = r.version
+    art.estado = r.estado #el estado como va ser!!!
+    art.complejidad = r.complejidad
+    art.descripcion_corta = r.descripcion_corta 
+    art.descripcion_larga = r.descripcion_larga 
+    art.habilitado = r.habilitado
+    #art.icono = r.icono
+    art.tipo = r.tipo
+    art.save()   
+    return HttpResponseRedirect("/proyectos/artefactos/"+ str(proyecto_id)+"/")
 
 @login_required
 def terminar(peticion):
