@@ -6,8 +6,9 @@
 - Permisos
 - Roles
 - Calculo de complejidad
-- Historial - Registro historial
+- Historial - Registro historial---> falta controlar la version una vez restaurado volver a modificar!!
 - Adjunto
 - Linea Base
-
--fecHor_creacion de Rol 
+- fecHor_creacion de Rol 
+- Tipo de artefacto por proyecto
+- null en TextField
