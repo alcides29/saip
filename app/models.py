@@ -85,13 +85,13 @@ class Artefacto(models.Model):
     """Clase que representa a los artefactos."""
     nombre = models.CharField(unique=True, max_length=50)
     usuario = models.ForeignKey(User)
-    estado = models.IntegerField(max_length=1, choices=STATUS_CHOICES, default=1)
-    fecha_creacion = models.DateTimeField(auto_now_add=True, editable = False)
+    fecha_creacion = models.DateField(auto_now_add=True, editable = False)
+    estado = models.IntegerField(max_length=1, choices=STATUS_CHOICES, default=1)    
     version = models.PositiveIntegerField()
     complejidad = models.IntegerField(max_length=1, choices=COMPLEXITY_CHOICES)
     descripcion_corta = models.TextField(null=True, blank=True)
     descripcion_larga = models.TextField(null=True, blank=True)
-    habilitado = models.BooleanField(default=True)
+    habilitado = models.BooleanField(default=1)
     icono = models.FileField(upload_to='icono', null=True, blank=True)
     #relaciones con otras tablas
     #relacionados = models.ManyToManyField("self")
@@ -102,33 +102,45 @@ class Artefacto(models.Model):
     def __unicode__(self):
         return self.nombre
 
+class Historial(models.Model):
+    """Clase que representa el historial de los artefactos"""
+    usuario = models.ForeignKey(User)
+    fecha_creacion = models.DateField(auto_now =False, auto_now_add=True, editable=False)
+    #claves foraneas
+    artefacto = models.OneToOneField(Artefacto, parent_link=False)
+    
+    #def __init__ (self, artefacto):
+     #   self.usuario = artefacto.usuario
+      #  self.fecha_creacion = artefacto.fecha_creacion
+       # self.artefacto = artefacto
+        
+class RegistroHistorial(models.Model):
+    """Clase que representa el Registro de versiones de los artefactos"""
+    version = models.PositiveIntegerField()
+    estado = models.IntegerField()
+    complejidad = models.IntegerField()
+    descripcion_corta = models.TextField(null=True, blank=True)
+    descripcion_larga = models.TextField(null=True, blank=True)
+    habilitado = models.BooleanField()
+    #icono = models.FileField(upload_to='icono', null=True, blank=True)
+    tipo = models.ForeignKey(TipoArtefacto)
+    fecha_modificacion = models.DateTimeField(auto_now=True, auto_now_add=False, editable=False)
+    #claves foraneas
+    historial = models.ForeignKey(Historial)
+   
+    
 class Adjunto(models.Model):
-    #nombre = models.CharField(max_length=50)
     archivo = models.FileField(upload_to='artefactos')
     descripcion = models.TextField(null=True, blank=True)  
     #claves foraneas
     artefacto = models.ForeignKey(Artefacto)
     
-    def __unicode__(self):
-        return self.nombre
-
 class LineaBase(models.Model):
     fecha_creacion = models.DateField(auto_now=False, auto_now_add=True, editable=False)
     #relaciones con otras tablas
     proyectos = models.ForeignKey(Proyecto)
     Fase = models.OneToOneField(Fase, parent_link=False)#ver
 
-class Historial(models.Model):
-    fecha_creacion = models.DateField(auto_now =False, auto_now_add=True, editable=False)
-    #claves foraneas
-    artefacto = models.OneToOneField(Artefacto, parent_link=False)#ojo
-
-class RegistroHistorial(models.Model):
-    version = models.PositiveIntegerField()#ojo
-    descripcion = models.TextField(null=True, blank=True)
-    fecha_modificacion = models.DateField(auto_now=True, auto_now_add=False)#ojo
-    #claves foraneas
-    historial = models.ForeignKey(Historial)
 
 class UsuarioRolProyecto(models.Model):   
     usuario = models.ForeignKey(User)
