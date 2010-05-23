@@ -36,7 +36,7 @@ class Permiso(models.Model):
 
 class Rol(models.Model):
     nombre = models.CharField(unique=True, max_length=50)
-    #categoria = models.IntegerField(max_length=1, choices=CATEGORY_CHOICES)
+    categoria = models.IntegerField(max_length=1, choices=CATEGORY_CHOICES)
     descripcion = models.TextField(null=True, blank=True)
     fecHor_creacion = models.DateTimeField(auto_now=False, auto_now_add=True, null=True, blank=True, editable=False)
     usuario_creador = models.ForeignKey(User)
@@ -44,12 +44,6 @@ class Rol(models.Model):
     
     def __unicode__(self):
         return self.nombre
-
-class RolProyecto(Rol):
-    pass
-
-class RolSistema(Rol):
-    pass
 
 class Fase(models.Model):
     """Esta clase representa la fase del proyecto."""
@@ -144,7 +138,7 @@ class LineaBase(models.Model):
 
 class UsuarioRolProyecto(models.Model):   
     usuario = models.ForeignKey(User)
-    rol = models.ForeignKey(RolProyecto)
+    rol = models.ForeignKey(Rol)
     proyecto = models.ForeignKey(Proyecto)
 
     class Meta:
@@ -152,7 +146,7 @@ class UsuarioRolProyecto(models.Model):
         
 class UsuarioRolSistema(models.Model):
     usuario = models.ForeignKey(User)
-    rol = models.ForeignKey(RolSistema)
+    rol = models.ForeignKey(Rol)
     
     class Meta:
         unique_together = [("usuario", "rol")]

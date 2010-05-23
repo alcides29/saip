@@ -11,12 +11,13 @@
 	</tr>
 	{%for item in lista%}
 		<tr>
-		<td><a href="/usuarios/mod/{{item.id}}/">{{item.username}}</a></td>
+		<td><a href="/usuarios/mod&id={{item.id}}/">{{item.username}}</a></td>
 		<td>{{item.first_name}}</td>
 		<td>{{item.last_name}}</td>
-		<td><a href="/usuarios/del/{{item.id}}/">Borrar</a></td>
+		<td><a href="/usuarios/del&id={{item.id}}/">Borrar</a> <a href="/usuarios/rol&id={{item.id}}/">Asignar roles de sistema</a></td>
 		</tr>
 	{% endfor %}
 	</table>
+	<p></p>
 	<div class="footer"><a href="/usuarios/crear/">Crear un nuevo usuario</a></div>
 {% endblock %}
