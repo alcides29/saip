@@ -88,19 +88,21 @@ class TipoArtefactoForm(forms.ModelForm):
     class Meta:
     	model = TipoArtefacto
 
-class ArtefactoForm(forms.Form):
+class ArtefactoForm(forms.ModelForm):
     nombre = forms.CharField(max_length=50, label='Nombre')
     complejidad = forms.CharField(max_length=1, widget=forms.Select(choices=COMPLEXITY_CHOICES), label='Complejidad')
     descripcion_corta = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Corta')
     descripcion_larga = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Larga')
-    #habilitado = forms.BooleanField(label='Habilitado')
     icono = forms.FileField(required=False, label='Icono/Artefacto')
     #relacionados = forms.ModelMultipleChoiceField(queryset=Artefacto.objects.all(), required=False, label='Artefactos/relacionados')
-    #proyecto = forms.ModelChoiceField(queryset=Proyecto.objects.all(), label='Proyecto')
     tipo = forms.ModelChoiceField(queryset=TipoArtefacto.objects.all(), label='Tipo')
+    class Meta:
+        model = Artefacto
+        fields = ('nombre', 'complejidad', 'descripcion_corta', 'descripcion_larga', 'icono', 'tipo')
 
 class ModArtefactoForm(forms.ModelForm):
     class Meta:
         model = Artefacto
-        #fields = ('nombre', 'complejidad', 'descripcion_corta', 'descripcion_larga', 'habilitado', 'icono', 'proyecto', 'tipo')
         fields = ('complejidad', 'descripcion_corta', 'descripcion_larga', 'icono', 'tipo')
+
+    
