@@ -1,12 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Artefactos{% endblock %}
-{% block head %}Habilitar/Deshabilitar artefacto<br>{% endblock %}
+{% block title %}Artefacto{% endblock %}
+{% block head %}Artefacto<br>{% endblock %}
 {% block content %}
-<form enctype="multipart/form-data" id="form_id" action="/proyectos/artefactos/{{proyecto.id}}/del/{{art.id}}/" method="post">
-	<p>Nombre: {{ nombre }}</p>
-    <p>{{ form.habilitado.errors }}<label for="id_habilitado">Habilitado?:</label>{{ form.habilitado }}</p>
-    
-<input type="submit" value="Guardar" />
+<form action="/proyectos/artefactos/{{proyecto.id}}/del/{{art.id}}/" method="post">
+<p>Est&aacute; seguro que desea borrar el artefacto{{art.nombre}}?</p>
+<input type="submit" value="Aceptar" />
 <input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos/{{proyecto.id}}/' "/>
 </form>
 {% endblock%}
