@@ -47,6 +47,10 @@ urlpatterns = patterns('',
     (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/mod/(?P<art_id>\d+)/$', modificar_artefacto),
     (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/del/(?P<art_id>\d+)/$', borrar_artefacto),
     
+    #historial
+    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/historial/(?P<art_id>\d+)/$', ver_historial),
+    (r'^proyectos/artefactos/(?P<proyecto_id>\d+)/historial/(?P<art_id>\d+)/volver/(?P<reg_id>\d+)/$', restaurar_artefacto),
+    
     #roles
     (r'^roles/$', admin_roles),
     (r'^roles/crear/$', crear_rol),
