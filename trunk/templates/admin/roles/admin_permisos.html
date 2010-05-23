@@ -1,13 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Roles{% endblock %}
-{% block head %}ABM de roles<br>{% endblock %}
+{% block head %}Establecer permisos para {{rol.nombre}}<br>{% endblock %}
 {% block content %}
 <form id="form_id" action="" method="post">
-	<table>
-    {{ form.as_table }}
-	</table>
-<input type="submit" value="Guardar" />
+    {{ form.as_p }}
+<input type="submit" value="OK" />
 <input type="button" value="Cancelar" onClick = "location.href='/roles' "/>
 </form>
-{% endblock%}
-
+{% endblock %}
