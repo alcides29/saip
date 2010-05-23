@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Usuarios{% endblock %}
+{% block head %}Roles de sistema de {{usuario.username}}<br>{% endblock %}
+{% block content %}
+<form id="form_id" action="" method="post">
+	<table>
+    {{ form.as_table }}
+	</table>
+<input type="submit" value="Guardar" />
+<input type="button" value="Cancelar" onClick = "location.href='/usuarios' "/>
+</form>
+{% endblock%}
+
