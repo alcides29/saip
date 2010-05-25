@@ -131,7 +131,7 @@ class ArtefactoForm(forms.ModelForm):
     complejidad = forms.CharField(max_length=1, widget=forms.Select(choices=COMPLEXITY_CHOICES), label='Complejidad')
     descripcion_corta = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Corta')
     descripcion_larga = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Larga')
-    icono = forms.FileField(required=False, label='Icono/Artefacto')
+    icono = forms.FileField(required=False, label='Icono')
     #relacionados = forms.ModelMultipleChoiceField(queryset=Artefacto.objects.all(), required=False, label='Artefactos/relacionados')
     tipo = forms.ModelChoiceField(queryset=TipoArtefacto.objects.all(), label='Tipo')
     class Meta:
