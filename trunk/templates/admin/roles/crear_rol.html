@@ -2,10 +2,14 @@
 {% block title %}Roles{% endblock %}
 {% block head %}ABM de roles<br>{% endblock %}
 {% block content %}
+{% if crear_rol %}
 <form id="form_id" action="" method="post">
     {{ form.as_p }}
 <input type="submit" value="OK" />
 <input type="button" value="Cancelar" onClick = "location.href='/roles' "/>
 </form>
+{% else %}
+<P>¡No tiene permisos para ver esta p&aacute;gina!</p>
+{% endif %}
 {% endblock%}
 

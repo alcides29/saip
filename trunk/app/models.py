@@ -39,7 +39,7 @@ class Rol(models.Model):
     categoria = models.IntegerField(max_length=1, choices=CATEGORY_CHOICES)
     descripcion = models.TextField(null=True, blank=True)
     fecHor_creacion = models.DateTimeField(auto_now=False, auto_now_add=True, null=True, blank=True, editable=False)
-    usuario_creador = models.ForeignKey(User)
+    usuario_creador = models.ForeignKey(User, null=True)
     permisos = models.ManyToManyField(Permiso)
     
     def __unicode__(self):

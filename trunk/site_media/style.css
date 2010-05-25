@@ -7,8 +7,8 @@ div#cabecera{
 }
 
 h2{
-	border-bottom:dotted 2px #42426F;
-}
+	border-top:dotted 1px #42426F;
+	border-bottom:dotted 1px #42426F;}
 a{
 	color: #5D478B
 }

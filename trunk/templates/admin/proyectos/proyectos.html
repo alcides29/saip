@@ -2,6 +2,7 @@
 {% block title %}Proyectos{% endblock %}
 {% block head %}Proyectos<br>{% endblock %}
 {% block content %}
+{% if ver_proyectos or crear_proyecto or mod_proyecto or eliminar_proyecto %}
 	<table>
 	<tr>
 	<td class="titulo">Nombre</td>
@@ -14,15 +15,20 @@
 	</tr>
 	{%for item in lista%}
 		<tr>
-		<td><a href="/proyectos/mod&id={{item.id}}/">{{item.nombre}}</a></td>
+		{% if mod_proyecto %}<td><a href="/proyectos/mod&id={{item.id}}/">{{item.nombre}}</a></td>
+		{% else %}<td>{{item.nombre}}</td>{% endif %}
 		<td>{{item.usuario_lider}}</td>
 		<td>{{item.descripcion}}</td>
 		<td>{{item.fecha_inicio}}</td>
 		<td>{{item.fecha_fin}}</td>
 		<td>{{item.cronograma}}</td>
-		<td><a href="/proyectos/del&id={{item.id}}/">Borrar</a></td>
+		{% if eliminar_proyecto %}<td><a href="/proyectos/del&id={{item.id}}/">Borrar</a></td>
+		{% else %}<td></td>{% endif %}
 		</tr>
 	{% endfor %}
 	</table>
-	<div class="footer"><a href="/proyectos/crear/">Crear un nuevo proyecto</a></div>
+	{% if crear_proyecto %}<div class="footer"><a href="/proyectos/crear/">Crear un nuevo proyecto</a></div>{% endif %}
+{% else %}
+	<p>¡No posee los permisos para ver esta p&aacute;gina!</p>
+{% endif %}
 {% endblock %}

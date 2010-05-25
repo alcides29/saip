@@ -3,6 +3,7 @@
 {% block head %}Roles<br>{% endblock %}
 {% block content %}
 <h2>Roles de Sistema</h2>
+{% if ver_roles or crear_rol or mod_rol or eliminar_rol %}
 	<table>
 	<tr>
 	<td class="titulo">Nombre</td>
@@ -13,11 +14,11 @@
 	</tr>
 	{%for item in lista1%}
 		<tr>
-		<td><a href="/roles/mod/{{item.id}}/">{{item.nombre}}</a></td>
+		{% ifnotequal item.id 1 %}{% if mod_rol %}<td><a href="/roles/mod&id={{item.id}}/">{{item.nombre}}</a></td>{% else %}<td>{{item.nombre}}</td>{% endif %}{% else %}<td>{{item.nombre}}</td>{% endifnotequal %}
 		<td>{{item.descripcion}}</td>
 		<td>{{item.fecHor_creacion}}</td>
 		<td>{{item.usuario_creador}}</td>
-		<td><a href="/roles/del&id={{item.id}}/">Borrar</a> <a href="/roles/permisos&id={{item.id}}">Establecer permisos</a></td>
+		<td>{% ifnotequal item.id 1 %}{% if eliminar_rol%}<a href="/roles/del&id={{item.id}}/">Borrar</a> | {% endif %}<a href="/roles/permisos&id={{item.id}}">Establecer permisos</a>{% endifnotequal %}</td>
 		</tr>
 	{% endfor %}
 	</table>
@@ -32,13 +33,16 @@
 	</tr>
 	{%for item in lista2%}
 		<tr>
-		<td><a href="/roles/mod/{{item.id}}/">{{item.nombre}}</a></td>
+		<td>{% if mod_rol %}<a href="/roles/mod&id={{item.id}}/">{{item.nombre}}</a>{% else %}{{item.nombre}}{% endif %}</td>
 		<td>{{item.descripcion}}</td>
 		<td>{{item.fecHor_creacion}}</td>
 		<td>{{item.usuario_creador}}</td>
-		<td><a href="/roles/del&id={{item.id}}/">Borrar</a> <a href="/roles/permisos&id={{item.id}}">Establecer permisos</a></td>
+		<td>{% ifnotequal item.id 2 %}{% if eliminar_rol %}<a href="/roles/del&id={{item.id}}/">Borrar</a> | {% endif %}<a href="/roles/permisos&id={{item.id}}">Establecer permisos</a>{% endifnotequal %}</td>
 		</tr>
 	{% endfor %}
 	</table>
-	<div class="footer"><a href="/roles/crear/">Crear un nuevo rol</a></div>
+	{% if crear_rol %}<div class="footer"><a href="/roles/crear/">Crear un nuevo rol</a></div>{% endif %}
+{% else %}
+	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+{% endif %}
 {% endblock %}
