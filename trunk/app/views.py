@@ -474,7 +474,7 @@ def crear_proyecto(request):
     print permisos
     #-------------------------------------------------------------------
     if request.method == 'POST':
-        form = ProyectosForm(request.POST)
+        form = ProyectosForm(request.POST, request.FILES)
         if form.is_valid():
             p = Proyecto()
             p.nombre = form.cleaned_data['nombre']
@@ -591,7 +591,7 @@ def crear_artefacto(request, proyecto_id):
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     if (request.POST):
-        form = ArtefactoForm(request.POST)
+        form = ArtefactoForm(request.POST, request.FILES)
         if form.is_valid():
             art = Artefacto()
             art.nombre = form.cleaned_data['nombre']
