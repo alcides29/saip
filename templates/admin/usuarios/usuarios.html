@@ -2,6 +2,7 @@
 {% block title %}Usuarios{% endblock %}
 {% block head %}Usuarios<br>{% endblock %}
 {% block content %}
+{% if ver_usuarios or crear_usuario or mod_usuario or eliminar_usuario %}
 	<table>
 	<tr>
 	<td class="titulo">Usuario</td>
@@ -11,15 +12,23 @@
 	</tr>
 	{%for item in lista%}
 		<tr>
-		<td><a href="/usuarios/mod&id={{item.id}}/">{{item.username}}</a></td>
+		{% if mod_usuario %}<td><a href="/usuarios/mod&id={{item.id}}/">{{item.username}}</a></td>
+		{% else %}<td>{{item.username}}</td>{% endif %}
 		<td>{{item.first_name}}</td>
 		<td>{{item.last_name}}</td>
-		{% ifequal item.id 1 %}<td>Superusuario</td>
-		{% else %}<td>{% ifnotequal item.username user.username %}<a href="/usuarios/del&id={{item.id}}/">Borrar</a>{% endifnotequal %}  <a href="/usuarios/rol&id={{item.id}}/">Asignar roles de sistema</a></td>
+		{% ifequal item.id 1 %}
+			<td>Superusuario</td>
+		{% else %}
+		{% ifnotequal item.username user.username %}
+		<td>{% if eliminar_usuario %}<a href="/usuarios/del&id={{item.id}}/">Borrar</a> {% endif %}<a href="/usuarios/rol&id={{item.id}}/">Asignar roles de sistema</a></td>
+			{% endifnotequal %}
 		{% endifequal %}
 		</tr>
 	{% endfor %}
 	</table>
 	<p></p>
-	<div class="footer"><a href="/usuarios/crear/">Crear un nuevo usuario</a></div>
+	{% if crear_usuario %}<div class="footer"><a href="/usuarios/crear/">Crear un nuevo usuario</a></div>{% endif %}
+{% else %}
+	<p>No tiene permisos para esta secci&oacute;n</p>
+{% endif %}
 {% endblock %}

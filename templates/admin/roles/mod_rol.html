@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Roles{% endblock %}
-{% block head %}Borrar {{rol}}{% endblock %}
+{% block head %}ABM de roles<br>{% endblock %}
 {% block content %}
 {% if mod_rol %}
 {% if mensaje %}
@@ -9,8 +9,10 @@
 	<input type="button" value="Volver" onClick = "location.href='/roles' "/>
 {% else %}
 	<form id="form_id" action="" method="post">
-	<p>¿Est&aacute; seguro?</p>
-	<input type="submit" value="Aceptar" />
+		<table>
+		{{ form.as_table }}
+		</table>
+	<input type="submit" value="Guardar" />
 	<input type="button" value="Cancelar" onClick = "location.href='/roles' "/>
 	</form>
 {% endif %}
@@ -18,3 +20,4 @@
 <P>¡No tiene permisos para ver esta p&aacute;gina!</p>
 {% endif %}
 {% endblock%}
+

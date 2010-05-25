@@ -2,6 +2,7 @@
 {% block title %}Usuarios{% endblock %}
 {% block head %}Borrar Usuario "{{usuario.username}}"<br>{% endblock %}
 {% block content %}
+{% if eliminar_usuario %}
 {% if mensaje %}
 	<p>Se ha producido el siguiente inconveniente:</p><p>{{mensaje}}</p>
 	<input type="button" value="Cancelar" onClick = "location.href='/usuarios' "/>
@@ -11,5 +12,8 @@
 	<input type="submit" value="Aceptar" />
 	<input type="button" value="Cancelar" onClick = "location.href='/usuarios' "/>
 	</form>
+{% endif %}
+{% else %}
+	<p>¡No posee los permisos para ver esta p&aacute;gina!</p>
 {% endif %}
 {% endblock%}

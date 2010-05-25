@@ -72,12 +72,6 @@ class ProyectosForm(forms.Form):
     			if proyecto.nombre == nuevo:
     				raise forms.ValidationError('Ya existe ese nombre. Elija otro.')
     		return nuevo
-
-class ModProyectosForm(forms.ModelForm):
-    """Formulario para la modificacion de proyectos."""
-    class Meta:
-        model = Proyecto
-        fields = ('nombre', 'descripcion','fecha_inicio', 'fecha_fin', 'cronograma')
 	
 class RolesForm(forms.Form):
 	nombre = forms.CharField(max_length=50, label='Nombre')

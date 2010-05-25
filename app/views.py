@@ -39,7 +39,7 @@ def administrar_proyecto(request, proyecto_id):
 def admin_usuarios_proyecto(request, object_id):
     user = User.objects.get(username=request.user.username)
     p = Proyecto.objects.get(pk = object_id)
-    miembros = UsuarioRolProyecto.objects.filter(proyecto = p)
+    miembros = UsuarioRolProyecto.objects.filter(proyecto = p).order_by('id')
     lista = []
     for item in miembros:
         if not item.usuario in lista:
@@ -124,6 +124,15 @@ def eliminar_miembro_proyecto(request, proyecto_id, user_id):
 def add_user(request):
     """Agrega un nuevo usuario."""
     user = User.objects.get(username=request.user.username)
+    #Validacion de permisos----------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    #--------------------------------------------------------------------
     if request.method == 'POST':
         form = UsuariosForm(request.POST)
         if form.is_valid():
@@ -142,12 +151,23 @@ def add_user(request):
             return HttpResponseRedirect("/usuarios")
     else:
         form = UsuariosForm()
-    return render_to_response('admin/usuarios/abm_usuario.html',{'form':form, 'user':user})
+    return render_to_response('admin/usuarios/crear_usuario.html',{'form':form, 
+                                                                 'user':user, 
+                                                                 'crear_usuario': 'Crear usuario' in permisos})
 
 @login_required
 def mod_user(request, usuario_id):
     """Modifica los datos de un usuario."""
     user = User.objects.get(username=request.user.username)
+    #Validacion de permisos----------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    #--------------------------------------------------------------------
     usuario = get_object_or_404(User, id=usuario_id)
     if request.method == 'POST':
         form = ModUsuariosForm(request.POST)
@@ -158,7 +178,10 @@ def mod_user(request, usuario_id):
             return HttpResponseRedirect("/usuarios")
     else:
         form = ModUsuariosForm(initial={'first_name':usuario.first_name, 'last_name': usuario.last_name,'email':usuario.email})
-    return render_to_response('admin/usuarios/mod_usuario.html',{'form':form, 'user':user, 'usuario':usuario})
+    return render_to_response('admin/usuarios/mod_usuario.html',{'form':form, 
+                                                                 'user':user, 
+                                                                 'usuario':usuario, 
+                                                                 'mod_usuario': 'Modificar usuario' in permisos})
 
 @login_required
 def cambiar_password(request, usuario_id):
@@ -207,6 +230,15 @@ def asignar_roles_sistema(request, usuario_id):
 def borrar_usuario(request, usuario_id):
     """Borra un usuario, comprobando las dependencias primero"""
     user = User.objects.get(username=request.user.username)
+    #Validacion de permisos----------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    #--------------------------------------------------------------------
     usuario = get_object_or_404(User, id=usuario_id)
     comprometido = 0
     #comprobar si el usuario esta asociado a algun proyecto como lider
@@ -221,7 +253,9 @@ def borrar_usuario(request, usuario_id):
         elif comprometido > 0:
             error = "El usuario esta asociado a un proyecto como lider."
             return render_to_response("admin/usuarios/user_confirm_delete.html", {'mensaje': error,'usuario':usuario, 'user': user})
-    return render_to_response("admin/usuarios/user_confirm_delete.html", {'usuario':usuario, 'user':user})
+    return render_to_response("admin/usuarios/user_confirm_delete.html", {'usuario':usuario, 
+                                                                          'user':user,
+                                                                          'eliminar_usuario': 'Eliminar usuario' in permisos})
             
 def lista(request, tipo):
     """Metodo de prueba para listar items"""
@@ -239,29 +273,86 @@ def lista(request, tipo):
 @login_required
 def admin_usuarios(request):
     """Administracion general de usuarios"""
+    '''Ya esta la validacion de permisos en este'''
     user = User.objects.get(username=request.user.username)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     lista = User.objects.all()
-    return render_to_response('admin/usuarios/usuarios.html',{'lista':lista, 'user':user})
+    return render_to_response('admin/usuarios/usuarios.html',{'lista':lista,
+                                                               'user':user, 
+                                                               'ver_usuarios': 'Ver usuarios' in permisos,
+                                                               'crear_usuario': 'Crear usuario' in permisos,
+                                                               'mod_usuario': 'Modificar usuario' in permisos,
+                                                               'eliminar_usuario': 'Eliminar usuario' in permisos})
 
 @login_required
 def admin_proyectos(request):
     """Administracion general de proyectos"""
     user = User.objects.get(username=request.user.username)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     lista = Proyecto.objects.all()
-    return render_to_response('admin/proyectos/proyectos.html',{'lista':lista, 'user':user})	
+    return render_to_response('admin/proyectos/proyectos.html',{'lista':lista, 
+                                                                'user':user,
+                                                                'ver_proyectos':'Ver proyectos' in permisos,
+                                                                'crear_proyecto': 'Crear proyecto' in permisos,
+                                                                'mod_proyecto': 'Modificar proyecto' in permisos,
+                                                                'eliminar_proyecto': 'Eliminar proyecto' in permisos})	
 
 @login_required
 def admin_roles(request):
     """Administracion general de roles"""
     user = User.objects.get(username=request.user.username)
-    lista1 = Rol.objects.filter(categoria=1)
-    lista2 = Rol.objects.filter(categoria=2)
-    return render_to_response('admin/roles/roles.html',{'lista1':lista1, 'lista2':lista2, 'user':user})
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
+    lista1 = Rol.objects.filter(categoria=1).order_by('id')
+    lista2 = Rol.objects.filter(categoria=2).order_by('id')
+    return render_to_response('admin/roles/roles.html',{'lista1':lista1,
+                                                        'lista2':lista2,
+                                                        'user':user,
+                                                        'ver_roles':'Ver roles' in permisos,
+                                                        'crear_rol': 'Crear rol' in permisos,
+                                                        'mod_rol': 'Modificar rol' in permisos,
+                                                        'eliminar_rol': 'Eliminar rol' in permisos})
 
 @login_required
 def crear_rol(request):
     """Agrega un nuevo rol."""
     user = User.objects.get(username=request.user.username)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     if request.method == 'POST':
         form = RolesForm(request.POST)
         if form.is_valid():
@@ -275,7 +366,9 @@ def crear_rol(request):
             return HttpResponseRedirect("/roles")
     else:
         form = RolesForm()
-    return render_to_response('admin/roles/crear_rol.html',{'form':form, 'user':user})
+    return render_to_response('admin/roles/crear_rol.html',{'form':form, 
+                                                            'user':user,
+                                                            'crear_rol': 'Crear rol' in permisos})
 
 @login_required
 def admin_permisos(request, rol_id):
@@ -299,6 +392,16 @@ def admin_permisos(request, rol_id):
 
 def mod_rol(request, rol_id):
     user = User.objects.get(username=request.user.username)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     actual = get_object_or_404(Rol, id=rol_id)
     if request.method == 'POST':
         form = ModRolesForm(request.POST)
@@ -307,14 +410,29 @@ def mod_rol(request, rol_id):
             actual.save()
             return HttpResponseRedirect("/roles")
     else:
+        if actual.id == 1:
+            error = "No se puede modificar el rol de superusuario"
+            return render_to_response("admin/roles/abm_rol.html", {'mensaje': error, 'rol':actual, 'user':user})
         form = ModRolesForm()
         form.fields['descripcion'].initial = actual.descripcion
-    return render_to_response("admin/roles/abm_rol.html", {'user':user, 'form':form})
+    return render_to_response("admin/roles/mod_rol.html", {'user':user, 
+                                                           'form':form,
+                                                           'mod_rol':'Modificar rol' in permisos})
 
 @login_required 
 def borrar_rol(request, rol_id):
     """Borra un rol con las comprobaciones de consistencia"""
     user = User.objects.get(username=request.user.username)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------
     actual = get_object_or_404(Rol, id=rol_id)
     #Obtener todas las posibles dependencias
     if actual.categoria == 1:
@@ -325,14 +443,36 @@ def borrar_rol(request, rol_id):
         actual.delete()
         return HttpResponseRedirect("/roles")
     else:
+        if actual.id == 1:
+            error = "No se puede borrar el rol de superusuario"
+            return render_to_response("admin/roles/rol_confirm_delete.html", {'mensaje': error, 
+                                                                              'rol':actual, 
+                                                                              'user':user,
+                                                                              'eliminar_rol':'Eliminar_rol' in permisos})
         if relacionados > 0:
             error = "El rol se esta utilizando."
-            return render_to_response("admin/roles/rol_confirm_delete.html", {'mensaje': error, 'rol':actual, 'user':user})
-    return render_to_response("admin/roles/rol_confirm_delete.html", {'rol':actual, 'user':user})
+            return render_to_response("admin/roles/rol_confirm_delete.html", {'mensaje': error, 
+                                                                              'rol':actual, 
+                                                                              'user':user,
+                                                                              'eliminar_rol':'Eliminar_rol' in permisos})
+    return render_to_response("admin/roles/rol_confirm_delete.html", {'rol':actual, 
+                                                                      'user':user, 
+                                                                      'eliminar_rol':'Eliminar_rol' in permisos})
+
 @login_required
 def crear_proyecto(request):
     """Crea un nuevo proyecto."""
     user = User.objects.get(username=request.user.username)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     if request.method == 'POST':
         form = ProyectosForm(request.POST)
         if form.is_valid():
@@ -348,7 +488,67 @@ def crear_proyecto(request):
             return HttpResponseRedirect('/proyectos')
     else:
         form = ProyectosForm()
-    return render_to_response('admin/proyectos/abm_proyecto.html',{'form':form, 'user':user})
+    return render_to_response('admin/proyectos/crear_proyecto.html',{'form':form, 
+                                                                   'user':user,
+                                                                   'crear_proyecto':'Crear proyecto' in permisos})
+
+@login_required
+def mod_proyecto(request, proyecto_id):
+    user = User.objects.get(username=request.user.username)
+    p = get_object_or_404(Proyecto, id = proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
+    if request.method == 'POST':
+        form = ProyectosForm(request.POST)
+        if form.is_valid():
+            p.nombre = form.cleaned_data['nombre']
+            p.usuario_lider = form.cleaned_data['usuario_lider']
+            p.descripcion = form.cleaned_data['descripcion']
+            p.fecha_inicio = form.cleaned_data['fecha_inicio']
+            p.fecha_fin = form.cleaned_data['fecha_fin']
+            p.cronograma = form.cleaned_data['cronograma']
+            p.save()
+            return HttpResponseRedirect('/proyectos')
+    else:
+        form = ProyectosForm(initial = {'nombre': p.nombre,
+                                        'usuario_lider': p.usuario_lider.id, 
+                                        'descripcion': p.descripcion, 
+                                        'fecha_inicio': p.fecha_inicio, 
+                                        'fecha_fin':p.fecha_fin,
+                                        'cronograma': p.cronograma})
+    return render_to_response('admin/proyectos/mod_proyecto.html',{'form':form, 
+                                                                   'user':user,
+                                                                   'proyecto': p,
+                                                                   'mod_proyecto':'Modificar proyecto' in permisos})
+
+@login_required
+def del_proyecto(request, proyecto_id):
+    user = User.objects.get(username=request.user.username)
+    p = get_object_or_404(Proyecto, id = proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
+    if request.method == 'POST':
+        p.delete()
+        return HttpResponseRedirect("/proyectos")
+    else:
+        return render_to_response("admin/proyectos/proyecto_confirm_delete.html", {'proyecto':p,
+                                                                                   'eliminar_proyecto': 'Eliminar proyecto' in permisos})
 
 @login_required
 def admin_tipo_artefacto(request):
