@@ -69,8 +69,8 @@ urlpatterns = patterns('',
     
     # Tipo de artefacto
     (r'^tipo_artefacto/$', admin_tipo_artefacto),
-    (r'^tipo_artefacto/crear/$', create_object, {'form_class': TipoArtefactoForm, 'template_name':'admin/tipo_artefacto/abm_tipo_artefacto.html', 'post_save_redirect':'/tipo_artefacto', 'login_required':True}),
-    (r'^tipo_artefacto/mod&id=(?P<object_id>\d+)/$', update_object, {'form_class':TipoArtefactoForm, 'template_name':'admin/tipo_artefacto/abm_tipo_artefacto.html', 'post_save_redirect':'/tipo_artefacto', 'login_required':True}),
+    (r'^tipo_artefacto/crear/$', crear_tipo_artefacto),
+    (r'^tipo_artefacto/mod&id=(?P<tipo_id>\d+)/$', mod_tipo_artefacto),
     (r'^tipo_artefacto/del&id=(?P<tipo_id>\d+)/$', borrar_tipo_artefacto),
 
            

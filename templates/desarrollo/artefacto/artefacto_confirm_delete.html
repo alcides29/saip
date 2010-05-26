@@ -2,9 +2,13 @@
 {% block title %}Artefacto{% endblock %}
 {% block head %}Artefacto<br>{% endblock %}
 {% block content %}
+{% if abm_artefactos %}
 <form action="/proyectos/artefactos&id={{proyecto.id}}/del&id={{art.id}}/" method="post">
 <p>Est&aacute; seguro que desea borrar el artefacto {{art.nombre}}?</p>
 <input type="submit" value="Aceptar" />
 <input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>
 </form>
+{% else %}
+	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+{% endif %}
 {% endblock%}

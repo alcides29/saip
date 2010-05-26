@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Usuarios{% endblock %}
+{% block head %}Modificar {{tipo.nombre}}<br>{% endblock %}
+{% block content %}
+{% if mod_tipo_artefacto %}
+<form enctype="multipart/form-data" id="form_id" action="" method="post">
+	<table>
+    {{ form.as_table }}
+	</table>
+<input type="submit" value="Guardar" />
+<input type="button" value="Cancelar" onClick = "location.href='/tipo_artefacto' "/>
+</form>
+{% else %}
+	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+{% endif %}
+{% endblock%}
+

@@ -2,6 +2,7 @@
 {% block title %}Artefactos{% endblock %}
 {% block head %}Artefactos eliminados<br>{% endblock %}
 {% block content %}
+{% if abm_artefactos %}
 <table>
 	<tr>
 		<td class="titulo">Nombre</td>        
@@ -29,4 +30,7 @@
 	{% endfor %}
 </table><br>
 <input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}' "/>	
+{% else %}
+	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+{% endif %}
 {% endblock%}

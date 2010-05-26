@@ -2,6 +2,7 @@
 {% block title %}Tipo de artefacto{% endblock %}
 {% block head %}Tipo de artefacto<br>{% endblock %}
 {% block content %}
+{% if eliminar_tipo_artefacto %}
 {% if mensaje %}
 	<p>Se ha producido el siguiente inconveniente:</p>
 	<p>{{mensaje}}</p>
@@ -9,7 +10,10 @@
 	<form id="form_id" action="" method="post">
 	<p>¿Est&aacute; seguro?</p>
 	<input type="submit" value="Aceptar" />
-	<input type="button" value="Cancelar" onClick = "location.href='/' "/>
+	<input type="button" value="Cancelar" onClick = "location.href='/tipo_artefacto' "/>
 	</form>
+{% endif %}
+{% else %}
+	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
 {% endif %}
 {% endblock%}

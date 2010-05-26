@@ -25,7 +25,7 @@ def principal(request):
     """Muestra la pagina principal."""
     user = User.objects.get(username=request.user.username)
     lista = Proyecto.objects.all()
-    print lista
+    #print lista
     return render_to_response('main_page.html', {'user':user, 'proyectos': lista})
     #return render_to_response('main_page.html', RequestContext(request))
 
@@ -485,6 +485,11 @@ def crear_proyecto(request):
             p.cronograma = form.cleaned_data['cronograma']
             p.fase = Fase.objects.get(pk=1)
             p.save()
+            relacion = UsuarioRolProyecto()
+            relacion.usuario = p.usuario_lider
+            relacion.rol = Rol.objects.get(id=2)
+            relacion.proyecto = p
+            relacion.save()
             return HttpResponseRedirect('/proyectos')
     else:
         form = ProyectosForm()
@@ -510,7 +515,15 @@ def mod_proyecto(request, proyecto_id):
         form = ProyectosForm(request.POST)
         if form.is_valid():
             p.nombre = form.cleaned_data['nombre']
-            p.usuario_lider = form.cleaned_data['usuario_lider']
+            if p.usuario_lider != form.cleaned_data['usuario_lider']:
+                relacion = UsuarioRolProyecto.objects.filter(usuario = User.objects.get(pk = p.usuario_lider), proyecto = p, rol = Rol.objects.get(pk=2))[0]
+                relacion.delete()
+                relacion = UsuarioRolProyecto()
+                relacion.usuario = p.usuario_lider
+                relacion.rol = Rol.objects.get(id=2)
+                relacion.proyecto = p
+                relacion.save()
+                p.usuario_lider != form.cleaned_data['usuario_lider']
             p.descripcion = form.cleaned_data['descripcion']
             p.fecha_inicio = form.cleaned_data['fecha_inicio']
             p.fecha_fin = form.cleaned_data['fecha_fin']
@@ -554,13 +567,98 @@ def del_proyecto(request, proyecto_id):
 def admin_tipo_artefacto(request):
     """Muestra la pÃ¡gina de administracion de tipo de artefactos."""
     user = User.objects.get(username=request.user.username)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     lista = TipoArtefacto.objects.all()
     return render_to_response('admin/tipo_artefacto/tipo_artefacto.html',
-                              {'lista': lista, 'user':user})
+                              {'lista': lista,
+                               'user':user, 
+                               'ver_tipos_artefacto': 'Ver tipos-artefacto' in permisos,
+                               'crear_tipo_artefacto': 'Crear tipo-artefacto' in permisos,
+                               'mod_tipo_artefacto': 'Modificar tipo-artefacto' in permisos,
+                               'eliminar_tipo_artefacto': 'Eliminar tipo-artefacto' in permisos})
 
+@login_required
+def crear_tipo_artefacto(request):
+    user = User.objects.get(username=request.user.username)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
+    if request.method == 'POST':
+        form = TipoArtefactoForm(request.POST)
+        if form.is_valid():
+            nuevo = TipoArtefacto()
+            nuevo.nombre = form.cleaned_data['nombre']
+            nuevo.descripcion = form.cleaned_data['descripcion']
+            nuevo.fase = form.cleaned_data['fase']
+            nuevo.save()
+            return HttpResponseRedirect("/tipo_artefacto")
+    else:
+        form = TipoArtefactoForm()
+    return render_to_response("admin/tipo_artefacto/crear_tipo_artefacto.html", {'form':form, 
+                                                                               'user':user,
+                                                                               'crear_tipo_artefacto': 'Crear tipo-artefacto' in permisos})
+
+@login_required
+def mod_tipo_artefacto(request, tipo_id):
+    user = User.objects.get(username=request.user.username)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
+    actual = get_object_or_404(TipoArtefacto, id=tipo_id)
+    if request.method == 'POST':
+        form = TipoArtefactoForm(request.POST)
+        if form.is_valid():
+            actual.nombre = form.cleaned_data['nombre']
+            actual.descripcion = form.cleaned_data['descripcion']
+            actual.fase = form.cleaned_data['fase']
+            actual.save()
+            return HttpResponseRedirect("/tipo_artefacto")
+    else:
+        form = TipoArtefactoForm(initial = {'nombre': actual.nombre,
+                                            'descripcion': actual.descripcion,
+                                            'fase': actual.fase.id})
+    return render_to_response("admin/tipo_artefacto/mod_tipo_artefacto.html", {'form':form, 
+                                                                               'user':user,
+                                                                               'tipo': actual,
+                                                                               'mod_tipo_artefacto': 'Modificar tipo-artefacto' in permisos})
+
+@login_required
 def borrar_tipo_artefacto(request, tipo_id):
     """Borra un tipo de artefacto comprobando las dependencias"""
     user = User.objects.get(username=request.user.username)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     actual = get_object_or_404(TipoArtefacto, id=tipo_id)
     #comprobar las posibles dependencias
     relacionados = Artefacto.objects.filter(tipo = actual).count()
@@ -570,19 +668,35 @@ def borrar_tipo_artefacto(request, tipo_id):
     else:
         if relacionados > 0:
             error = "Este tipo de artefacto se esta utilizando"
-            return render_to_response("admin/tipo_artefacto/tipo_artefacto_confirm_delete.html", {'mensaje':error,'tipo':actual, 'user':user})
-    return render_to_response("admin/tipo_artefacto/tipo_artefacto_confirm_delete.html", {'tipo':actual, 'user':user})
+            return render_to_response("admin/tipo_artefacto/tipo_artefacto_confirm_delete.html", {'mensaje':error,
+                                                                                                  'tipo':actual, 
+                                                                                                  'user':user,
+                                                                                                  'eliminar_tipo_artefacto': 'Eliminar tipo-artefacto' in permisos})
+    return render_to_response("admin/tipo_artefacto/tipo_artefacto_confirm_delete.html", {'tipo':actual, 
+                                                                                          'user':user,
+                                                                                          'eliminar_tipo_artefacto': 'Eliminar tipo-artefacto' in permisos})
 
 #desde aqui artefacto
 @login_required
 def admin_artefactos(request, proyecto_id):
     """Muestra la página de administracion de artefactos."""
     user = User.objects.get(username=request.user.username)
-    proyect = Proyecto.objects.get(pk=proyecto_id)
+    proyect = get_object_or_404(Proyecto, id=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     lista = Artefacto.objects.filter(proyecto=proyect)
     variables = RequestContext(request, {'proyecto': proyect,
                                         'lista': lista,
-                                        })
+                                        'abm_artefactos': 'ABM artefactos' in permisos,
+                                        'ver_artefactos': 'Ver artefactos' in permisos})
     return render_to_response('desarrollo/artefacto/artefactos.html', variables)
 
 @login_required    
@@ -590,6 +704,16 @@ def crear_artefacto(request, proyecto_id):
     """Crear un artefacto"""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     if (request.POST):
         form = ArtefactoForm(request.POST, request.FILES)
         if form.is_valid():
@@ -619,7 +743,7 @@ def crear_artefacto(request, proyecto_id):
         
     variables = RequestContext(request, {'proyecto': proyect,
                                         'form': form,
-                                        })                
+                                        'abm_artefactos': 'ABM artefactos' in permisos})                
     return render_to_response('desarrollo/artefacto/crear_artefacto.html', variables)
 
 @login_required
@@ -627,6 +751,16 @@ def modificar_artefacto(request, proyecto_id, art_id):
     """Modificar un artefacto"""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     if (request.POST):
         art = Artefacto.objects.get(pk=art_id)
         form = ModArtefactoForm(request.POST)
@@ -681,7 +815,7 @@ def modificar_artefacto(request, proyecto_id, art_id):
                                          'form':form,
                                          'proyecto':proyect,
                                          'art':art,
-                                         })          
+                                         'abm_artefactos': 'ABM artefactos' in permisos})          
     return render_to_response('desarrollo/artefacto/mod_artefacto.html', variables)
 
 @login_required
@@ -689,13 +823,23 @@ def borrar_artefacto(request, proyecto_id, art_id):
     """Dar de baja un artefacto."""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     art = get_object_or_404(Artefacto, id=art_id)
     
     if request.method== 'POST':
         art.habilitado= False
         art.save()
         return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyecto_id)+"/")
-    variables = RequestContext(request, {'proyecto':proyect, 'art': art})
+    variables = RequestContext(request, {'proyecto':proyect, 'art': art, 'abm_artefactos': 'ABM artefactos' in permisos})
     return render_to_response('desarrollo/artefacto/artefacto_confirm_delete.html', variables)
 
 @login_required
@@ -703,8 +847,18 @@ def admin_artefactos_eliminados(request, proyecto_id):
     """Muestra la lista de artefactos eliminados de un proyecto."""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     lista = Artefacto.objects.filter(proyecto=proyect, habilitado=False)
-    variables = RequestContext(request, {'proyecto': proyect, 'lista': lista})
+    variables = RequestContext(request, {'proyecto': proyect, 'lista': lista, 'abm_artefactos': 'ABM artefactos' in permisos})
     return render_to_response('desarrollo/artefacto/artefactos_eliminados.html', variables)
 
 @login_required
@@ -712,6 +866,16 @@ def restaurar_artefacto_eliminado(request, proyecto_id, art_id):
     """Metodo que restaura un artefacto eliminado a su ultima version."""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     art = get_object_or_404(Artefacto, id=art_id)
     
     if request.method == 'POST':
@@ -719,27 +883,50 @@ def restaurar_artefacto_eliminado(request, proyecto_id, art_id):
         art.habilitado = True
         art.save()
         lista = Artefacto.objects.filter(proyecto=proyect, habilitado=False)
-        variables = RequestContext(request, {'proyecto': proyect, 'lista': lista})
+        variables = RequestContext(request, {'proyecto': proyect, 'lista': lista, 'abm_artefactos': 'ABM artefactos' in permisos})
         return render_to_response('desarrollo/artefacto/artefactos_eliminados.html', variables)
     print "primera ronda"
-    variables = RequestContext(request, {'proyecto':proyect, 'art': art})
+    variables = RequestContext(request, {'proyecto':proyect, 'art': art, 'abm_artefactos': 'ABM artefactos' in permisos})
     return render_to_response('desarrollo/artefacto/artefacto_confirm_restaurar.html', variables)
 
 @login_required
 def ver_historial(request, proyecto_id, art_id):
     art = Artefacto.objects.get(pk=art_id)
+    user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     historial = Historial.objects.get(artefacto=art)
     versiones = RegistroHistorial.objects.filter(historial=historial)
     variables = RequestContext(request, {'historial': historial, 
                                          'lista': versiones,
                                          'art': art,
                                          'proyecto': proyect,
-                                           })
+                                         'abm_artefactos': 'ABM artefactos' in permisos})
     return render_to_response('desarrollo/artefacto/historial.html', variables)
 
 @login_required
 def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     art = Artefacto.objects.get(pk = art_id)
     reg = RegistroHistorial()
     reg.version = art.version
