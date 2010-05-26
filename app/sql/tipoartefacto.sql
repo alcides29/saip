@@ -1,6 +1,6 @@
-INSERT INTO app_tipoartefacto(nombre, descripcion, fase_id)
+﻿INSERT INTO app_tipoartefacto(nombre, descripcion, fase_id)
     VALUES ('RF', 'Requerimiento Funcional', 1),
-    ('RNF', 'Requerimiento No Funcional', 1)
+    ('RNF', 'Requerimiento No Funcional', 1),
     ('CUG', 'Casos de Uso General', 1),
     ('DCU', 'Diagrama de Caso de Uso', 2),
     ('DER', 'Diagrama de Entidad Relacion', 2),
@@ -11,5 +11,5 @@ INSERT INTO app_tipoartefacto(nombre, descripcion, fase_id)
     ('DE', 'Diagrama de Estado', 2),
     ('DCM', 'Diagrama de Componente', 2),
     ('DD', 'Diagrama de Despliegue', 2),
-    ('CO', 'Codigo', 3)
-    ('LI', 'Libreria', 3),;
+    ('CO', 'Codigo', 3),
+    ('LI', 'Libreria', 3);
