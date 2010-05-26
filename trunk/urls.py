@@ -56,6 +56,8 @@ urlpatterns = patterns('',
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/res/$', admin_artefactos_eliminados),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/res&id=(?P<art_id>\d+)/$', restaurar_artefacto_eliminado),
     
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/revisar&id=(?P<art_id>\d+)/$', revisar_artefacto),
+    
     #historial
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/$', ver_historial),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/volver&id=(?P<reg_id>\d+)/$', restaurar_artefacto),

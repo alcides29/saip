@@ -19,7 +19,8 @@ INSERT INTO app_permiso(nombre, categoria)
 	('Ver miembros', 2),
 	('ABM artefactos', 2),
 	('Asignar roles', 2),
-	('Generar LB', 2);
+    ('Generar LB', 2),
+    ('Revisar artefactos', 2);
 	
 INSERT INTO app_rol_permisos(rol_id, permiso_id)
     VALUES (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 8), (1, 9),

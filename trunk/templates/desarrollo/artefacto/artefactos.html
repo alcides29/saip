@@ -2,7 +2,7 @@
 {% block title %}Artefactos{% endblock %}
 {% block head %}Artefactos<br>{% endblock %}
 {% block content %}
-{% if abm_artefactos  or ver_artefactos%}
+{% if abm_artefactos  or ver_artefactos %}
 <table>
 	<tr>
 		<td class="titulo">Nombre</td>        
@@ -33,8 +33,7 @@
   <td><a href="/proyectos/artefactos&id={{proyecto.id}}/crear/">Registrar un nuevo artefacto</a></td>
   <td><a href="/proyectos/artefactos&id={{proyecto.id}}/res/">| Ver artefactos eliminados</a></td>
   <td><a href=" ">| Ver artefactos de otra Fase</a></td>
-  <td><a href=" ">| Crear linea base</a></td>
-</div>
+  </div>
 <br>
 <input type="button" value="<< Volver" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}' "/>	
 {% else %}

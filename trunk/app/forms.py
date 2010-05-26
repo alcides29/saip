@@ -149,5 +149,8 @@ class ModArtefactoForm(forms.ModelForm):
     class Meta:
         model = Artefacto
         fields = ('complejidad', 'descripcion_corta', 'descripcion_larga', 'icono', 'tipo')
+        
+class RevisarArtefactoForm(forms.Form):
+    estado = forms.CharField(max_length=1, widget=forms.Select(choices=STATUS_CHOICES), required=False, label='Estado')
 
     
