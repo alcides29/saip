@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Artefactos{% endblock %}
+{% block head %}Establezca el estado del artefacto {{art.nombre}}<br>{% endblock %}
+{% block content %}
+<form id="form_id" action="" method="post">
+  {{ form.as_p }}	
+<input type="submit" value="Guardar" />
+<input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>
+</form>
+{% endblock%}
