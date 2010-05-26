@@ -1003,11 +1003,13 @@ def fases_anteriores(request, proyecto_id):
         
     print permisos
     #-------------------------------------------------------------------
-    if ((proyect.fase)<=3):
-        tipo1 = TipoArtefacto.objects.filter(fase=1)
-        lista1 = Artefactos.objects.filter(proyecto=proyect, tipo_in=tipo1)
-        tipo2 = TipoArtefacto.objects.filter(fase=1)
-        lista1 = Artefactos.objects.filter(proyecto=proyect, tipo_in=tipo2)
+    print "aaaaa"
+    #if ((proyect.fase)<=3):
+    print "aaaaa"
+    tipo1 = TipoArtefacto.objects.filter(fase=1)
+    lista1 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo1)
+    tipo2 = TipoArtefacto.objects.filter(fase=2)
+    lista2 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo2)
     return render_to_response("desarrollo/artefacto/Fases_anteriores.html", {
                                                                               'proyecto':proyect,                                                                       
                                                                               'lista1':lista1,
