@@ -2,9 +2,13 @@
 {% block title %}Artefactos{% endblock %}
 {% block head %}Establezca el estado del artefacto {{art.nombre}}<br>{% endblock %}
 {% block content %}
+{% if revisar_artefacto %}
 <form id="form_id" action="" method="post">
   {{ form.as_p }}	
 <input type="submit" value="Guardar" />
 <input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>
 </form>
+{% else %}
+    <p> No tiene permiso para modificar el estado del artefacto, solo el lider puede hacerlo </p>
+{% endif %}
 {% endblock%}

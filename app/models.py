@@ -86,9 +86,9 @@ class Artefacto(models.Model):
     descripcion_corta = models.TextField(null=True, blank=True)
     descripcion_larga = models.TextField(null=True, blank=True)
     habilitado = models.BooleanField(default=1)
-    icono = models.ImageField(upload_to='icono', null=True, blank=True)
+    icono = models.FileField(upload_to='icono', null=True, blank=True)
     #relaciones con otras tablas
-    #relacionados = models.ManyToManyField("self")
+    #relacionados = models.ManyToManyField("self", null=True, blank=True)
     #claves foraneas
     proyecto = models.ForeignKey(Proyecto)
     tipo = models.ForeignKey(TipoArtefacto)

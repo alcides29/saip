@@ -692,7 +692,7 @@ def admin_artefactos(request, proyecto_id):
         permisos.append(item.nombre)
     print permisos
     #-------------------------------------------------------------------
-    lista = Artefacto.objects.filter(proyecto=proyect)
+    lista = Artefacto.objects.filter(proyecto=proyect, habilitado = True)
     variables = RequestContext(request, {'proyecto': proyect,
                                         'lista': lista,
                                         'abm_artefactos': 'ABM artefactos' in permisos,
@@ -953,6 +953,39 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
     art.tipo = r.tipo
     art.save()   
     return HttpResponseRedirect("/proyectos/artefactos&id="+ str(proyecto_id)+"/")
+
+@login_required
+def revisar_artefacto(request, proyecto_id, art_id):
+    """Asigna roles de sistema a un usuario"""
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(id=proyecto_id)
+    art = Artefacto.objects.get(pk=art_id)
+     #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    
+    permisos = []    
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+        
+    print permisos
+    #-------------------------------------------------------------------
+    if request.method == 'POST':
+        form = RevisarArtefactoForm(request.POST)        
+        if form.is_valid():                        
+            art.estado = form.cleaned_data['estado']         
+            art.save()                
+            return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyect.id)+"/")
+    else:        
+        form = RevisarArtefactoForm({'estado':art.estado})
+    return render_to_response("desarrollo/artefacto/revisar_artefacto.html", {
+                                                                              'form':form, 
+                                                                              'proyecto':proyect,                                                                       
+                                                                              'art':art,
+                                                                              'revisar_artefacto': 'Revisar artefacto' in permisos})
 
 @login_required
 def terminar(peticion):
