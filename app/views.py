@@ -739,7 +739,7 @@ def crear_artefacto(request, proyecto_id):
             hist.save()            
             return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyecto_id)+"/")
     else:
-        form = ArtefactoForm()
+        form = ArtefactoForm(proyect.fase, proyect.id)
         
     variables = RequestContext(request, {'proyecto': proyect,
                                         'form': form,
@@ -763,7 +763,7 @@ def modificar_artefacto(request, proyecto_id, art_id):
     #-------------------------------------------------------------------
     if (request.POST):
         art = Artefacto.objects.get(pk=art_id)
-        form = ModArtefactoForm(request.POST)
+        form = ModArtefactoForm(request.POST, request.FILES)
         if (form.is_valid()):
             cambio = False
             if (form.cleaned_data['complejidad'] != art.complejidad):
@@ -804,12 +804,12 @@ def modificar_artefacto(request, proyecto_id, art_id):
             return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyecto_id)+"/")
     else:
         art = get_object_or_404(Artefacto, id=art_id)
-        form = ModArtefactoForm({
+        form = ModArtefactoForm(proyect.fase, initial={
                         'complejidad': art.complejidad,
                         'descripcion_corta':art.descripcion_corta,
                         'descripcion_larga':art.descripcion_larga,
                         'icono':art.icono,
-                        'tipo':art.tipo,
+                        'tipo':art.tipo._get_pk_val(),
                        })      
     variables = RequestContext(request, {'nombre':art.nombre,
                                          'form':form,
@@ -960,7 +960,7 @@ def revisar_artefacto(request, proyecto_id, art_id):
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     art = Artefacto.objects.get(pk=art_id)
-     #Validacion de permisos---------------------------------------------
+    #Validacion de permisos---------------------------------------------
     roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
     
     permisos_obj = []
@@ -986,6 +986,35 @@ def revisar_artefacto(request, proyecto_id, art_id):
                                                                               'proyecto':proyect,                                                                       
                                                                               'art':art,
                                                                               'revisar_artefacto': 'Revisar artefacto' in permisos})
+
+def fases_anteriores(request, proyecto_id):
+    user = User.objects.get(username = request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    
+    permisos = []    
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+        
+    print permisos
+    #-------------------------------------------------------------------
+    if ((proyect.fase)<=3):
+        tipo1 = TipoArtefacto.objects.filter(fase=1)
+        lista1 = Artefactos.objects.filter(proyecto=proyect, tipo_in=tipo1)
+        tipo2 = TipoArtefacto.objects.filter(fase=1)
+        lista1 = Artefactos.objects.filter(proyecto=proyect, tipo_in=tipo2)
+    return render_to_response("desarrollo/artefacto/Fases_anteriores.html", {
+                                                                              'proyecto':proyect,                                                                       
+                                                                              'lista1':lista1,
+                                                                              'lista2':lista2,
+                                                                              'abm_artefactos': 'ABM artefactos' in permisos})    
+    
+
 
 @login_required
 def terminar(peticion):
