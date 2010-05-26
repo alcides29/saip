@@ -2,6 +2,7 @@ INSERT INTO app_tipoartefacto(nombre, descripcion, fase_id)
     VALUES ('RF', 'Requerimiento Funcional', 1),
     ('RNF', 'Requerimiento No Funcional', 1)
     ('CUG', 'Casos de Uso General', 1),
+    ('DCU', 'Diagrama de Caso de Uso', 2),
     ('DER', 'Diagrama de Entidad Relacion', 2),
     ('DC', 'Diagrama de Clase', 2),
     ('DS', 'Diagrama de Secuencia', 2),
