@@ -133,22 +133,26 @@ class TipoArtefactoForm(forms.Form):
 					raise forms.ValidationError('Ya existe ese nombre de rol. Elija otro.')
 			return nombre
 
-class ArtefactoForm(forms.ModelForm):
+class ArtefactoForm(forms.Form):
     nombre = forms.CharField(max_length=50, label='Nombre')
     complejidad = forms.CharField(max_length=1, widget=forms.Select(choices=COMPLEXITY_CHOICES), label='Complejidad')
     descripcion_corta = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Corta')
     descripcion_larga = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Larga')
-    icono = forms.FileField(required=False, label='Icono')
-    #relacionados = forms.ModelMultipleChoiceField(queryset=Artefacto.objects.all(), required=False, label='Artefactos/relacionados')
-    tipo = forms.ModelChoiceField(queryset=TipoArtefacto.objects.all(), label='Tipo')
-    class Meta:
-        model = Artefacto
-        fields = ('nombre', 'complejidad', 'descripcion_corta', 'descripcion_larga', 'icono', 'tipo')
-
+    icono = forms.FileField(required=False, label='Icono/Artefacto')
+    tipo = forms.ModelChoiceField(queryset=TipoArtefacto.objects.all(), label='Tipo')    
+    
+    def __init__(self, proyect_fase, proyect_id, *args, **kwargs):
+        super(ArtefactoForm, self).__init__(*args, **kwargs)
+        self.fields['tipo'].queryset = TipoArtefacto.objects.filter(fase = proyect_fase)
+        
 class ModArtefactoForm(forms.ModelForm):
     class Meta:
         model = Artefacto
         fields = ('complejidad', 'descripcion_corta', 'descripcion_larga', 'icono', 'tipo')
+        
+    def __init__(self, proyect_fase, *args, **kwargs):
+        super(ModArtefactoForm, self).__init__(*args, **kwargs)
+        self.fields['tipo'].queryset = TipoArtefacto.objects.filter(fase = proyect_fase)
         
 class RevisarArtefactoForm(forms.Form):
     estado = forms.CharField(max_length=1, widget=forms.Select(choices=STATUS_CHOICES), required=False, label='Estado')
