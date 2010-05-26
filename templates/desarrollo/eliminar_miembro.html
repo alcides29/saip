@@ -2,9 +2,13 @@
 {% block title %}Proyecto{% endblock %}
 {% block head %}Eliminar miembro "{{usuario.username}}" de "{{proyecto.nombre}}"<br>{% endblock %}
 {% block content %}
+{% if abm_miembros %}
 <form id="form_id" action="" method="post">
 <p>¿Est&aacute; seguro?</p>
 <input type="submit" value="Aceptar" />
 <input type="button" value="Cancelar" onClick = "location.href='/proyectos/miembros&id={{proyecto.id}}' "/>
 </form>
+{% else %}
+	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+{% endif %}
 {% endblock%}

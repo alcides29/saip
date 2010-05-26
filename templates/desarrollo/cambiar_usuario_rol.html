@@ -2,9 +2,13 @@
 {% block title %}Proyectos{% endblock %}
 {% block head %}Cambiar rol de {{usuario.username}}<br>{% endblock %}
 {% block content %}
+{% if abm_miembros %}
 <form id="form_id" action="" method="post">
 	{{form.as_p}}
 <input type="submit" value="Guardar cambios" />
 <input type="button" value="Volver" onClick = "location.href='/proyectos/miembros&id={{proyecto.id}}' "/>	
 </form>
+{% else %}
+	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+{% endif %}
 {% endblock%}

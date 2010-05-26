@@ -39,17 +39,41 @@ def administrar_proyecto(request, proyecto_id):
 def admin_usuarios_proyecto(request, object_id):
     user = User.objects.get(username=request.user.username)
     p = Proyecto.objects.get(pk = object_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = p).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     miembros = UsuarioRolProyecto.objects.filter(proyecto = p).order_by('id')
     lista = []
     for item in miembros:
         if not item.usuario in lista:
             lista.append(item.usuario)
-    return render_to_response('desarrollo/admin_miembros.html',{'user':user, 'proyecto':Proyecto.objects.get(id=object_id), 'miembros': lista})
+    return render_to_response('desarrollo/admin_miembros.html',{'user':user, 
+                                                                'proyecto':Proyecto.objects.get(id=object_id), 
+                                                                'miembros': lista,
+                                                                'ver_miembros': 'Ver miembros' in permisos,
+                                                                'abm_miembros': 'ABM miembros' in permisos})
 	
 @login_required
 def cambiar_rol_usuario_proyecto(request, proyecto_id, user_id):
     user = User.objects.get(username=request.user.username)
     p = Proyecto.objects.get(pk = proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = p).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     u = User.objects.get(pk = user_id)
     lista = UsuarioRolProyecto.objects.filter(proyecto = p, usuario = u)
     if request.method == 'POST':
@@ -80,11 +104,26 @@ def cambiar_rol_usuario_proyecto(request, proyecto_id, user_id):
             for item in lista:
                 dict[item.rol.id] = True
             form = ItemForm(u, initial = {'items':dict})
-    return render_to_response("desarrollo/cambiar_usuario_rol.html", {'user': user, 'form':form, 'usuario':u, 'proyecto': p})
+    return render_to_response("desarrollo/cambiar_usuario_rol.html", {'user': user, 
+                                                                      'form':form, 
+                                                                      'usuario':u, 
+                                                                      'proyecto': p,
+                                                                      'abm_miembros':'ABM miembros' in permisos})
 	
 @login_required
 def add_usuario_proyecto(request, object_id):
     user = User.objects.get(username=request.user.username)
+    p = get_object_or_404(Proyecto, id = object_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = p).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     if request.method == 'POST':
         form = UsuarioProyectoForm(request.POST)
         if form.is_valid():
@@ -92,7 +131,7 @@ def add_usuario_proyecto(request, object_id):
             if not roles:
                 relacion = UsuarioRolProyecto()
                 relacion.usuario = form.cleaned_data['usuario']
-                relacion.proyecto = Proyecto.objects.get(pk = object_id)
+                relacion.proyecto = p
                 relacion.rol = None
                 relacion.save()
             else:
@@ -105,20 +144,36 @@ def add_usuario_proyecto(request, object_id):
             return HttpResponseRedirect("/proyectos/miembros&id=" + str(object_id))
     else:
         form = UsuarioProyectoForm()
-    return render_to_response('desarrollo/add_miembro.html', {'form':form, 'user':user,  'proyecto': Proyecto.objects.get(pk=object_id)})
+    return render_to_response('desarrollo/add_miembro.html', {'form':form, 
+                                                              'user':user,  
+                                                              'proyecto': p,
+                                                              'abm_miembros': 'ABM miembros' in permisos})
 
 @login_required
 def eliminar_miembro_proyecto(request, proyecto_id, user_id):
     user = User.objects.get(username=request.user.username)
     usuario = get_object_or_404(User, pk=user_id)
     proy = get_object_or_404(Proyecto, pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proy).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     if request.method == 'POST':
         lista = UsuarioRolProyecto.objects.filter(proyecto = proy, usuario = usuario)
         for item in lista:
             item.delete()
         return HttpResponseRedirect("/proyectos/miembros&id=" + str(proyecto_id))
     else:
-        return render_to_response("desarrollo/eliminar_miembro.html", {'usuario':usuario, 'proyecto':proy, 'user':user})
+        return render_to_response("desarrollo/eliminar_miembro.html", {'usuario':usuario, 
+                                                                       'proyecto':proy, 
+                                                                       'user':user,
+                                                                       'abm_miembros': 'ABM miembros' in permisos})
 
 @login_required
 def add_user(request):
@@ -204,6 +259,7 @@ def asignar_roles_sistema(request, usuario_id):
     user = User.objects.get(username=request.user.username)
     usuario = get_object_or_404(User, id=usuario_id)
     lista_roles = UsuarioRolSistema.objects.filter(usuario = usuario)
+    print lista_roles
     if request.method == 'POST':
         form = AsignarRolesForm(1, request.POST)
         if form.is_valid():
@@ -222,6 +278,7 @@ def asignar_roles_sistema(request, usuario_id):
             return render_to_response("admin/usuarios/asignar_roles.html", {'mensaje': error,'usuario':usuario, 'user': user})
         dict = {}
         for item in lista_roles:
+            print item.rol
             dict[item.rol.id] = True
         form = AsignarRolesForm(1,initial = {'roles': dict})
     return render_to_response("admin/usuarios/asignar_roles.html", {'form':form, 'usuario':usuario, 'user':user})
