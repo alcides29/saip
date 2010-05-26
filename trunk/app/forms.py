@@ -118,13 +118,20 @@ class UsuarioProyectoForm(forms.Form):
                     raise forms.ValidationError('Ya existe este usuario')
             return self.cleaned_data['usuario']
         
-class TipoArtefactoForm(forms.ModelForm):
+class TipoArtefactoForm(forms.Form):
     """Form para Tipo de artefacto."""
     nombre = forms.CharField(max_length=50, label='Nombre')
     descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
     fase = forms.ModelChoiceField(queryset=Fase.objects.all(), label='Fase')
-    class Meta:
-    	model = TipoArtefacto
+    
+    def clean_nombre(self):
+    	if 'nombre' in self.cleaned_data:
+			roles = TipoArtefacto.objects.all()
+			nombre = self.cleaned_data['nombre']
+			for item in roles: 
+				if nombre == item.nombre:
+					raise forms.ValidationError('Ya existe ese nombre de rol. Elija otro.')
+			return nombre
 
 class ArtefactoForm(forms.ModelForm):
     nombre = forms.CharField(max_length=50, label='Nombre')

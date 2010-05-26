@@ -2,6 +2,7 @@
 {% block title %}Tipo de artefacto{% endblock %}
 {% block head %}Tipo de artefacto<br>{% endblock %}
 {% block content %}
+{% if ver_tipos_artefacto or crear_tipo_artefacto or mod_tipo_artefacto or eliminar_tipo_artefacto %}
 	<table>
 	<tr>
 	<td class="titulo">Nombre</td>
@@ -11,12 +12,16 @@
 	</tr>
 	{%for item in lista%}
 		<tr>
-		<td><a href="/tipo_artefacto/mod&id={{item.id}}/">{{item.nombre}}</a></td>
+		{% if mod_tipo_artefacto %}<td><a href="/tipo_artefacto/mod&id={{item.id}}/">{{item.nombre}}</a></td>
+		{% else %}<td>{{item.nombre}}</td>{% endif %}
 		<td>{{item.descripcion}}</td>
 		<td>{{item.fase}}</td>
-		<td><a href="/tipo_artefacto/del&id={{item.id}}/">Borrar</a></td>
+		{% if eliminar_tipo_artefacto  %}<td><a href="/tipo_artefacto/del&id={{item.id}}/">Borrar</a></td>{% endif %}
 		</tr>
 	{% endfor %}
 	</table>
-	<div class="footer"><a href="/tipo_artefacto/crear/">Crear un nuevo artefacto</a></div>
+	{% if crear_tipo_artefacto %}<div class="footer"><a href="/tipo_artefacto/crear/">Crear un nuevo artefacto</a></div>{% endif %}
+{% else %}
+	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+{% endif %}
 {% endblock %}
