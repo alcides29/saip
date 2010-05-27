@@ -2,7 +2,7 @@
 {% block title %}Usuarios{% endblock %}
 {% block head %}Usuarios<br>{% endblock %}
 {% block content %}
-{% if ver_usuarios or crear_usuario or mod_usuario or eliminar_usuario %}
+{% if ver_usuarios or crear_usuario or mod_usuario or eliminar_usuario or asignar_roles%}
 	<table>
 	<tr>
 	<td class="titulo">Usuario</td>
@@ -20,7 +20,7 @@
 			<td>Superusuario</td>
 		{% else %}
 		{% ifnotequal item.username user.username %}
-		<td>{% if eliminar_usuario %}<a href="/usuarios/del&id={{item.id}}/">Borrar</a> {% endif %}<a href="/usuarios/rol&id={{item.id}}/">Asignar roles de sistema</a></td>
+		<td>{% if eliminar_usuario %}<a href="/usuarios/del&id={{item.id}}/">Borrar</a> {% endif %}{% if asignar_roles %}<a href="/usuarios/rol&id={{item.id}}/">Asignar roles de sistema</a>{% endif %}</td>
 			{% endifnotequal %}
 		{% endifequal %}
 		</tr>
