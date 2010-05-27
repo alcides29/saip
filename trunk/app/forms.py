@@ -130,9 +130,14 @@ class TipoArtefactoForm(forms.Form):
 			nombre = self.cleaned_data['nombre']
 			for item in roles: 
 				if nombre == item.nombre:
-					raise forms.ValidationError('Ya existe ese nombre de rol. Elija otro.')
+					raise forms.ValidationError('Ya existe este nombre.')
 			return nombre
 
+class TipoArtefactoFaseForm(forms.Form):
+    """Form para asociar un tipo de artefacto a una fase de un proyecto."""
+    #tipo_artefacto = 
+    fase = forms.ModelChoiceField(queryset = Fase.objects.all(), widget=forms.RadioSelect(), required=True)
+        
 class ArtefactoForm(forms.Form):
     nombre = forms.CharField(max_length=50, label='Nombre')
     complejidad = forms.CharField(max_length=1, widget=forms.Select(choices=COMPLEXITY_CHOICES), label='Complejidad')

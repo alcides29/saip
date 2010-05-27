@@ -547,6 +547,16 @@ def crear_proyecto(request):
             relacion.rol = Rol.objects.get(id=2)
             relacion.proyecto = p
             relacion.save()
+            
+            # Asociacion inicial de TipoArtefacto a fase por proyecto
+            lista = TipoArtefacto.objects.all()
+            for item in lista:
+                rel = TipoArtefactoFaseProyecto()
+                rel.proyecto = p
+                rel.fase = item.fase
+                rel.tipo_artefacto = item
+                rel.save()
+            
             return HttpResponseRedirect('/proyectos')
     else:
         form = ProyectosForm()
@@ -732,6 +742,34 @@ def borrar_tipo_artefacto(request, tipo_id):
     return render_to_response("admin/tipo_artefacto/tipo_artefacto_confirm_delete.html", {'tipo':actual, 
                                                                                           'user':user,
                                                                                           'eliminar_tipo_artefacto': 'Eliminar tipo-artefacto' in permisos})
+@login_required
+def admin_tipo_artefacto_fase(request, proyecto_id):
+    """Metodo que permite asignar tipos de artefacto por fase."""
+    # Aun falta terminar
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(id=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    #-------------------------------------------------------------------
+    if request.method == 'POST':
+        form = TipoArtefactoFaseForm()
+        # clean data
+    else:
+        form = TipoArtefactoFaseForm()
+        # cargar los valores
+        
+    lista = TipoArtefactoFaseProyecto.objects.filter(proyecto=proyect)
+    variables = RequestContext(request, {'proyecto': proyect,
+                                        'lista': lista,
+                                        'abm_artefactos': 'ABM artefactos' in permisos,
+                                        'ver_artefactos': 'Ver artefactos' in permisos})
+    return render_to_response('desarrollo/tipo_artefacto_fase.html', variables)
 
 #desde aqui artefacto
 @login_required

@@ -44,6 +44,7 @@ urlpatterns = patterns('',
 	(r'^proyectos/miembros&id=(?P<object_id>\d+)/nuevo/$', add_usuario_proyecto),
     (r'^proyectos/miembros&id=(?P<proyecto_id>\d+)/cambiar&id=(?P<user_id>\d+)/$', cambiar_rol_usuario_proyecto),
     (r'^proyectos/miembros&id=(?P<proyecto_id>\d+)/del&id=(?P<user_id>\d+)/$', eliminar_miembro_proyecto),
+    (r'^proyectos/tipoArtefacto&id=(?P<object_id>\d+)/$', admin_tipo_artefacto_fase),
     
     #desarrollo
     (r'^proyectos/admin&id=(?P<proyecto_id>\d+)/$', administrar_proyecto),

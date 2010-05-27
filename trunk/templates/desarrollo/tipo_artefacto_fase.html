@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Proyectos{% endblock %}
+{% block head %}Tipo de Artefactos por fase para el proyecto: {{proyecto.nombre}}<br>{% endblock %}
+{% block content %}
+<form id="form_id" action="" method="post">
+<table>
+<tr><td class="titulo">An&acutea;lisis de Requerimientos</td><td class="titulo">Dise&tilden;o</td><td class="titulo">Implementaci&acuteo;n</td></tr>
+
+<!--
+	{% for item in miembros %}
+		<tr><td>{{item.username}}</td><td><a href="/proyectos/miembros&id={{proyecto.id}}/cambiar&id={{item.id}}">Administrar Roles</a> <a href="/proyectos/miembros&id={{proyecto.id}}/del&id={{item.id}}">Quitar</a></td></tr>
+	{% endfor %}
+-->
+</table>
+</form>
+{% endblock%}
