@@ -151,3 +151,11 @@ class UsuarioRolSistema(models.Model):
     class Meta:
         unique_together = [("usuario", "rol")]
 
+class TipoArtefactoFaseProyecto(models.Model):
+    """Tabla que relaciona el tipo de artefacto a una fase por proyecto."""
+    proyecto = models.ForeignKey(Proyecto)
+    fase = models.ForeignKey(Fase)
+    tipo_artefacto = models.ForeignKey(TipoArtefacto)
+    
+    class Meta:
+        unique_together = [("tipo_artefacto", "fase", "proyecto")]
