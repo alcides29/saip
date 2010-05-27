@@ -3,7 +3,7 @@
 {% block head %}Artefactos de Fases Anteriores<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos %}
-{% ifequal proyecto.fase 1 %}
+{% ifnotequal proyecto.fase.id 1 %}
 <p>Artefactos de la Fase de Analisis de requerimientos</p>
 <table>
 	<tr>
@@ -57,9 +57,10 @@
 </table>
 {% else %}
     <p> El proyecto {{proyecto.nombre}} a&uacute;n se encuentra en su primera fase </p>
-{% endifequal %}
+{% endifnotequal %}
 {% else %}
-	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+    <p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+    <input type="button" value="Aceptar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>	
 {% endif %}
 <input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>	
 {% endblock%}
