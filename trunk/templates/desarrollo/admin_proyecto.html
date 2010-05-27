@@ -9,7 +9,7 @@
 <ul>
 {% if ver_miembros or abm_miembros or asignar_roles %}<li><a href="/proyectos/miembros&id={{proyecto.id}}/">Miembros</a></li>{% endif %}
 <li><a href="">Tipos de Artefacto</a></li>
-{% if generarlb %}<li><a href="">Gesti&oacute;n de l&iacute;nea base</a></li>{% endif %}
+{% if generarlb %}<li><a href="/proyectos/lineabase&id={{proyecto.id}}/">Gesti&oacute;n de l&iacute;nea base</a></li>{% endif %}
 </ul>
 <h2>Desarrollo</h2>
 <ul> 
@@ -17,5 +17,6 @@
 </ul>
 {% else %}
 	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+    <input type="button" value="Aceptar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/' "/>
 {% endif %}
 {% endblock%}

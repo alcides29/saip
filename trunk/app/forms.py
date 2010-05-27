@@ -171,7 +171,7 @@ class ArtefactoForm(forms.Form):
     icono = forms.FileField(required=False, label='Icono/Artefacto')
     tipo = forms.ModelChoiceField(queryset=TipoArtefacto.objects.all(), label='Tipo')    
     
-    def __init__(self, proyect_fase, proyect_id, *args, **kwargs):
+    def __init__(self, proyect_fase, *args, **kwargs):
         super(ArtefactoForm, self).__init__(*args, **kwargs)
         self.fields['tipo'].queryset = TipoArtefacto.objects.filter(fase = proyect_fase)
         
