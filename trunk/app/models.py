@@ -77,7 +77,7 @@ class TipoArtefacto(models.Model):
 
 class Artefacto(models.Model):
     """Clase que representa a los artefactos."""
-    nombre = models.CharField(unique=True, max_length=50)
+    nombre = models.CharField(max_length=50)
     usuario = models.ForeignKey(User)
     fecha_creacion = models.DateField(auto_now_add=True, editable = False)
     estado = models.IntegerField(max_length=1, choices=STATUS_CHOICES, default=1)    
@@ -133,7 +133,7 @@ class LineaBase(models.Model):
     fecha_creacion = models.DateField(auto_now=False, auto_now_add=True, editable=False)
     #relaciones con otras tablas
     proyectos = models.ForeignKey(Proyecto)
-    Fase = models.OneToOneField(Fase, parent_link=False)#ver
+    fase = models.OneToOneField(Fase, parent_link=False)#ver
 
 
 class UsuarioRolProyecto(models.Model):   
