@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Linea Base{% endblock %}
+{% block head %}Gesti&oacute;n de linea Base<br>{% endblock %}
+{% block content %}
+{% if lineabase %}
+<form action="/proyectos/lineabase&id={{proyecto.id}}/" method="post">
+{% if fin %}
+    <p> Todas las lineas bases del proyecto han sido generadas...</p>
+    <input type="button" value="Aceptar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/'"/>
+{% else %}
+<p>Est&aacute; seguro que desea generar la l&iacute;nea base de {{ fase.nombre }} de {{ proyecto.nombre }}?</p>
+<input type="submit" value="Aceptar" />
+<input type="button" value="Cancelar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/'"/>
+{% endif %}
+</form>
+{% else %}
+    <p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+    <input type="button" value="Aceptar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/'"/>
+{% endif %}
+{% endblock%}

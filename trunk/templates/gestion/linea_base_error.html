@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Linea Base{% endblock %}
+{% block head %}La generaci&oacute;n de la l&iacute;nea base no es posible...<br>{% endblock %}
+{% block content %}
+{% if lineabase %}
+<p>{{msg}}</p>
+<input type="button" value="Aceptar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/'"/>
+{% else %}
+	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+{% endif %}
+{% endblock %}
