@@ -1,6 +1,4 @@
 # -*- coding: iso-8859-15 -*-
-import hashlib
-
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
@@ -8,7 +6,6 @@ from django.http import Http404
 from django.contrib.auth import logout
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from django.forms.formsets import formset_factory
 
 from django.template import Context
 from django.template.loader import get_template
@@ -24,16 +21,61 @@ from saip.app.models import *
 def principal(request):
     """Muestra la pagina principal."""
     user = User.objects.get(username=request.user.username)
+     #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos_sistema = []
+    for item in permisos_obj:
+        permisos_sistema.append(item.nombre)
+    variables ={}
+    for item in permisos_sistema:
+        if item == 'Ver roles' or item == 'Crear rol' or item == 'Modificar rol' or item == 'Eliminar rol' or item == 'Asignar rol':
+            variables['roles'] = True 
+        if item == 'Ver proyectos' or item == 'Crear proyecto' or item == 'Modificar proyecto' or item == 'Eliminar proyecto':
+            variables['proyectos'] = True
+        if item == 'Ver usuarios' or item == 'Crear usuario' or item == 'Modificar usuario' or item == 'Eliminar usuario':
+            variables['usuarios'] = True
+        if item == 'Ver tipos-artefacto' or item == 'Crear tipo-artefacto' or item == 'Modificar tipo-artefacto' or item == 'Eliminar tipo-artefacto':
+            variables['tipos_artefacto'] = True
+    roles = UsuarioRolProyecto.objects.filter(usuario = user).only('rol')
+    lista_proyectos = []
+    for item in roles:
+        lista_proyectos.append(item.proyecto.id)
+    print lista_proyectos
+    variables['permisos_proyecto'] = lista_proyectos
+    #-------------------------------------------------------------------
     lista = Proyecto.objects.all()
     #print lista
-    return render_to_response('main_page.html', {'user':user, 'proyectos': lista})
+    variables['user'] = user
+    variables['lista'] = lista
+    print variables
+    return render_to_response('main_page.html', variables)
     #return render_to_response('main_page.html', RequestContext(request))
 
 @login_required
 def administrar_proyecto(request, proyecto_id):
     user = User.objects.get(username=request.user.username)
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
-    return render_to_response("desarrollo/admin_proyecto.html", {'proyecto':proyecto, 'user':user})
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyecto).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
+    return render_to_response("desarrollo/admin_proyecto.html", {'proyecto':proyecto, 
+                                                                 'user':user,
+                                                                 'ver_artefactos': 'Ver artefactos' in permisos,
+                                                                 'abm_artefactos': 'ABM artefactos' in permisos,
+                                                                 'ver_miembros': 'Ver miembros' in permisos,
+                                                                 'abm_miembros': 'ABM miembros' in permisos,
+                                                                 'asignar_roles': 'Asignar roles' in permisos,
+                                                                 'generarlb':'Generar LB' in permisos})
     
 @login_required
 def admin_usuarios_proyecto(request, object_id):
@@ -257,6 +299,16 @@ def cambiar_password(request, usuario_id):
 def asignar_roles_sistema(request, usuario_id):
     """Asigna roles de sistema a un usuario"""
     user = User.objects.get(username=request.user.username)
+    #Validacion de permisos----------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #--------------------------------------------------------------------
     usuario = get_object_or_404(User, id=usuario_id)
     lista_roles = UsuarioRolSistema.objects.filter(usuario = usuario)
     print lista_roles
@@ -275,13 +327,16 @@ def asignar_roles_sistema(request, usuario_id):
     else:
         if usuario.id == 1:
             error = "No se puede editar roles sobre el superusuario."
-            return render_to_response("admin/usuarios/asignar_roles.html", {'mensaje': error,'usuario':usuario, 'user': user})
+            return render_to_response("admin/usuarios/asignar_roles.html", {'mensaje': error,
+                                                                            'usuario':usuario, 
+                                                                            'user': user, 
+                                                                            'asignar_roles': 'Asignar rol' in permisos})
         dict = {}
         for item in lista_roles:
             print item.rol
             dict[item.rol.id] = True
         form = AsignarRolesForm(1,initial = {'roles': dict})
-    return render_to_response("admin/usuarios/asignar_roles.html", {'form':form, 'usuario':usuario, 'user':user})
+    return render_to_response("admin/usuarios/asignar_roles.html", {'form':form, 'usuario':usuario, 'user':user, 'asignar_roles': 'Asignar rol' in permisos})
 
 @login_required
 def borrar_usuario(request, usuario_id):
@@ -348,7 +403,8 @@ def admin_usuarios(request):
                                                                'ver_usuarios': 'Ver usuarios' in permisos,
                                                                'crear_usuario': 'Crear usuario' in permisos,
                                                                'mod_usuario': 'Modificar usuario' in permisos,
-                                                               'eliminar_usuario': 'Eliminar usuario' in permisos})
+                                                               'eliminar_usuario': 'Eliminar usuario' in permisos,
+                                                               'asignar_roles': 'Asignar rol' in permisos})
 
 @login_required
 def admin_proyectos(request):
@@ -364,7 +420,7 @@ def admin_proyectos(request):
         permisos.append(item.nombre)
     print permisos
     #-------------------------------------------------------------------
-    lista = Proyecto.objects.all()
+    lista = Proyecto.objects.all().order_by('id')
     return render_to_response('admin/proyectos/proyectos.html',{'lista':lista, 
                                                                 'user':user,
                                                                 'ver_proyectos':'Ver proyectos' in permisos,
@@ -430,6 +486,16 @@ def crear_rol(request):
 @login_required
 def admin_permisos(request, rol_id):
     user = User.objects.get(username=request.user.username)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
     actual = get_object_or_404(Rol, id=rol_id)
     if request.method == 'POST':
         form = PermisosForm(actual.categoria, request.POST)
@@ -445,7 +511,10 @@ def admin_permisos(request, rol_id):
         for item in actual.permisos.all():
             dict[item.id] = True
         form = PermisosForm(actual.categoria, initial={'permisos': dict})
-    return render_to_response("admin/roles/admin_permisos.html", {'form': form, 'rol': actual, 'user':user})
+    return render_to_response("admin/roles/admin_permisos.html", {'form': form, 
+                                                                  'rol': actual, 
+                                                                  'user':user,
+                                                                  'mod_rol':'Modificar rol' in permisos})
 
 def mod_rol(request, rol_id):
     user = User.objects.get(username=request.user.username)
@@ -579,7 +648,7 @@ def mod_proyecto(request, proyecto_id):
     print permisos
     #-------------------------------------------------------------------
     if request.method == 'POST':
-        form = ProyectosForm(request.POST)
+        form = ModProyectosForm(p, request.POST)
         if form.is_valid():
             p.nombre = form.cleaned_data['nombre']
             if p.usuario_lider != form.cleaned_data['usuario_lider']:
@@ -598,7 +667,7 @@ def mod_proyecto(request, proyecto_id):
             p.save()
             return HttpResponseRedirect('/proyectos')
     else:
-        form = ProyectosForm(initial = {'nombre': p.nombre,
+        form = ModProyectosForm(p, initial = {'nombre': p.nombre,
                                         'usuario_lider': p.usuario_lider.id, 
                                         'descripcion': p.descripcion, 
                                         'fecha_inicio': p.fecha_inicio, 
@@ -1021,6 +1090,8 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
     for item in permisos_obj:
         permisos.append(item.nombre)
     print permisos
+    if not ('ABM artefactos' in permisos):
+        return render_to_response('error.html')
     #-------------------------------------------------------------------
     art = Artefacto.objects.get(pk = art_id)
     reg = RegistroHistorial()

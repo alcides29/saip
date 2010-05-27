@@ -4,21 +4,27 @@
 {% block content %}
   {% if user.username %}
     <div class="bienvenida">¡Bienvenido/a, {{ user.username }}!</div>
+	{% if roles or usuarios or proyectos or tipos_artefacto %}
 	<h2>Administraci&oacute;n del Sistema</h2>
 	<ul>
-	<li><a href ="/usuarios/">Usuarios</a></li>
-	<li><a href ="/proyectos/">Proyectos</a></li>
-	<li><a href ="/roles/">Roles</a></li>
-	<li><a href ="/tipo_artefacto/">Tipos de artefacto</a></li>
+	{% if usuarios %}<li><a href ="/usuarios/">Usuarios</a></li>{% endif %}
+	{% if proyectos %}<li><a href ="/proyectos/">Proyectos</a></li>{% endif %}
+	{% if roles %}<li><a href ="/roles/">Roles</a></li>{% endif %}
+	{% if tipos_artefacto %}<li><a href ="/tipo_artefacto/">Tipos de artefacto</a></li>{% endif %}
 	</ul>
+	{% endif %}
+	{% if permisos_proyecto %}
 	<h2>Proyectos</h2>
 	<ul>
-	{% for proyecto in proyectos %}
-		<li><a href="/proyectos/admin&id={{proyecto.id}}/">{{proyecto.nombre}}</li>
+	{% for proyecto in lista %}
+		{% for item in permisos_proyecto %}
+		{% ifequal proyecto.id item %}<li><a href="/proyectos/admin&id={{proyecto.id}}/">{{proyecto.nombre}}</li> {% endifequal %}
+		{% endfor %}
 	{% empty %}
 		<li>No hay proyectos.</li>
 	{% endfor %}
 	</ul>
+	{% endif %}
   {% else %}
     <p>Bienvenido, visitante.</p>
     <p>Puedes iniciar sesi&oacute;n <a href="/login/">aqu&iacute;</a>.</p>
