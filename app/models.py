@@ -85,7 +85,7 @@ class Artefacto(models.Model):
     complejidad = models.IntegerField(max_length=1, choices=COMPLEXITY_CHOICES)
     descripcion_corta = models.TextField(null=True, blank=True)
     descripcion_larga = models.TextField(null=True, blank=True)
-    habilitado = models.BooleanField(default=1)
+    habilitado = models.BooleanField(default=True)
     icono = models.FileField(upload_to='icono', null=True, blank=True)
     #claves foraneas
     proyecto = models.ForeignKey(Proyecto)
