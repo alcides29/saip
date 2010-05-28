@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Artefacto{% endblock %}
+{% block head %}Calcular complejidad de &lt;{{art.nombre}}&gt;{% endblock %}
+{% block content %}
+	<p>La complejidad del artefacto es {{impacto}}</p>
+	<a href="/proyectos/artefactos&id={{proyecto.id}}/">&lt;&lt;Volver</a>
+{% endblock %}
