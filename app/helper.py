@@ -14,24 +14,30 @@ def validar_fase(proyecto, fase):
         return False
     return False
 
-def obtener_relaciones_izq(art):
+def obtener_relaciones_izq(art, lista_existentes):
     relaciones = RelArtefacto.objects.filter(hijo = art)
     if relaciones:
         ret =[]
+        if art.id in lista_existentes:
+            return None
+        lista_existentes.append(art.id)
         for item in relaciones:
-            aux = obtener_relaciones_izq(item.padre)
+            aux = obtener_relaciones_izq(item.padre, lista_existentes)
             if aux:
                 ret.extend(aux)
         return ret
     else: 
         return [art]
 
-def obtener_relaciones_der(art):
+def obtener_relaciones_der(art, lista_existentes):
     relaciones = RelArtefacto.objects.filter(padre = art)
     if relaciones:
         ret =[]
+        if art.id in lista_existentes:
+            return None
+        lista_existentes.append(art.id)
         for item in relaciones:
-            aux = obtener_relaciones_der(item.hijo)
+            aux = obtener_relaciones_der(item.hijo, lista_existentes)
             if aux:
                 ret.extend(aux)
         return ret
