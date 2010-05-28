@@ -1193,6 +1193,41 @@ def revisar_artefacto(request, proyecto_id, art_id):
                                                                               'proyecto':proyect,                                                                       
                                                                               'art':art,
                                                                               'revisar_artefacto': 'Revisar artefactos' in permisos})
+    
+@login_required
+def calcular_impacto(request, proyecto_id, art_id):
+    """Calculo del impacto de un artefacto"""
+    user = User.objects.get(username=request.user.username)
+    proyect = get_object_or_404(Proyecto, id=proyecto_id)
+    art = get_object_or_404(Artefacto, id=art_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')    
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())    
+    permisos = []    
+    for item in permisos_obj:
+        permisos.append(item.nombre)        
+    print permisos
+    #-------------------------------------------------------------------
+    relaciones_izq = obtener_relaciones_izq(art)
+    print relaciones_izq
+    relaciones_der = obtener_relaciones_der(art)
+    print relaciones_der
+    impacto = 0
+    if relaciones_izq:
+        for item in relaciones_izq:
+            impacto = impacto + item.complejidad
+            print impacto
+    if relaciones_der:
+        for item in relaciones_der:
+            impacto = impacto + item.complejidad
+            print impacto
+    #impacto = impacto + art.complejidad
+    return render_to_response("desarrollo/artefacto/complejidad.html", {'art': art, 'user': user, 'impacto': impacto,
+                                                                        'izq': relaciones_izq, 'der': relaciones_der,
+                                                                        'proyecto': proyect})
+    
 @login_required
 def fases_anteriores(request, proyecto_id):
     user = User.objects.get(username = request.user.username)
