@@ -164,7 +164,6 @@ class TipoArtefactoFaseForm(forms.Form):
     fase = forms.ModelChoiceField(queryset = Fase.objects.all(), widget=forms.RadioSelect(), required=True)
         
 class ArtefactoForm(forms.Form):
-    nombre = forms.CharField(max_length=50, label='Nombre')
     complejidad = forms.CharField(max_length=1, widget=forms.Select(choices=COMPLEXITY_CHOICES), label='Complejidad')
     descripcion_corta = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Corta')
     descripcion_larga = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Larga')
@@ -176,9 +175,10 @@ class ArtefactoForm(forms.Form):
         self.fields['tipo'].queryset = TipoArtefacto.objects.filter(fase = proyect_fase)
         
 class ModArtefactoForm(forms.ModelForm):
+    tipo = forms.ModelChoiceField(queryset=TipoArtefacto.objects.all(), required=False)    
     class Meta:
         model = Artefacto
-        fields = ('complejidad', 'descripcion_corta', 'descripcion_larga', 'icono', 'tipo')
+        fields = ('complejidad', 'descripcion_corta', 'descripcion_larga', 'icono')
         
     def __init__(self, proyect_fase, *args, **kwargs):
         super(ModArtefactoForm, self).__init__(*args, **kwargs)

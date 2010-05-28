@@ -859,8 +859,9 @@ def admin_artefactos(request, proyecto_id):
         permisos.append(item.nombre)
     print permisos
     #-------------------------------------------------------------------
-    lista = Artefacto.objects.filter(proyecto=proyect, habilitado=True, tipo__in=tipoArtefactos)
+    lista = Artefacto.objects.filter(proyecto=proyect, habilitado=True, tipo__in=tipoArtefactos).order_by('nombre')
     variables = RequestContext(request, {'proyecto': proyect,
+                                         'linea': linea,
                                         'lista': lista,
                                         'abm_artefactos': 'ABM artefactos' in permisos,
                                         'ver_artefactos': 'Ver artefactos' in permisos})
@@ -881,11 +882,10 @@ def crear_artefacto(request, proyecto_id):
         permisos.append(item.nombre)
     print permisos
     #-------------------------------------------------------------------
-    if (request.POST):
+    if request.method == 'POST':
         form = ArtefactoForm(proyect.fase, request.POST)
         if form.is_valid():
             art = Artefacto()
-            art.nombre = form.cleaned_data['nombre']
             art.usuario = user#solo en el historial?
             art.estado = 1
             art.fecha_creacion = datetime.date.today()#solo en el historial?
@@ -893,25 +893,30 @@ def crear_artefacto(request, proyecto_id):
             art.complejidad = form.cleaned_data['complejidad']
             art.descripcion_corta = form.cleaned_data['descripcion_corta']#otro widget?
             art.descripcion_larga = form.cleaned_data['descripcion_larga']
-            art.habilitado = 1
+            art.habilitado = True
             art.icono = form.cleaned_data['icono']
             art.proyecto = proyect
             art.tipo = form.cleaned_data['tipo']#hay que ver  
-            art.fase = proyect.fase          
+            art.fase = proyect.fase  
+            lis = Artefacto.objects.filter(proyecto=proyect, tipo=form.cleaned_data['tipo'])
+            cont = 1
+            for item in lis:
+                cont = cont+1
+            art.nombre = (form.cleaned_data['tipo']).nombre + str(cont)                   
             art.save()            
             #Generacion del historial          
-            hist = Historial()#hacer un constructor
+            hist = Historial()
             hist.usuario = user
             hist.fecha_creacion = datetime.date.today()
             hist.artefacto = art
             hist.save()            
             return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyecto_id)+"/")
     else:
-        form = ArtefactoForm(proyect.fase)
-        
+        form = ArtefactoForm(proyect.fase)        
     variables = RequestContext(request, {'proyecto': proyect,
                                         'form': form,
-                                        'abm_artefactos': 'ABM artefactos' in permisos})                
+                                        'abm_artefactos': 'ABM artefactos' in permisos,
+                                        'ver_artefactos': 'Ver artefactos' in permisos})                
     return render_to_response('desarrollo/artefacto/crear_artefacto.html', variables)
 
 @login_required
@@ -931,20 +936,19 @@ def modificar_artefacto(request, proyecto_id, art_id):
     #-------------------------------------------------------------------
     if (request.POST):
         art = Artefacto.objects.get(pk=art_id)
-        form = ModArtefactoForm(request.POST, request.FILES)
+        form = ModArtefactoForm(proyect.fase, request.POST)
         if (form.is_valid()):
-            cambio = False
+            cambio = False            
             if (form.cleaned_data['complejidad'] != art.complejidad):
                 cambio = True
             elif (form.cleaned_data['descripcion_corta'] != art.descripcion_corta):
                 cambio = True
             elif (form.cleaned_data['descripcion_larga'] != art.descripcion_larga):
                 cambio = True
-            elif (form.cleaned_data['icono'] != art.icono):#capaz no funcione
+            elif (form.cleaned_data['icono'] != art.icono):
                 cambio = True
-            elif (form.cleaned_data['tipo'] != art.tipo):#capaz no funcione
-                cambio = True
-            
+            elif (form.cleaned_data['tipo'] != art.tipo):
+                cambio = True            
             if (cambio):
                 """ Se ingresa la version antigua al registro"""
                 reg = RegistroHistorial()
@@ -961,14 +965,22 @@ def modificar_artefacto(request, proyecto_id, art_id):
                 reg.save()
                 """Se incrementa la version actual"""
                 art.version = art.version + 1
-                art.save()
-                    
+                art.save()                    
             art.complejidad = form.cleaned_data['complejidad']
             art.descripcion_corta = form.cleaned_data['descripcion_corta']
             art.descripcion_larga = form.cleaned_data['descripcion_larga']            
             art.icono = form.cleaned_data['icono']
-            art.tipo = form.cleaned_data['tipo']
-            art.save()            
+            
+            if (form.cleaned_data['tipo'] != art.tipo):
+                lis = Artefacto.objects.filter(proyecto=proyect, tipo=form.cleaned_data['tipo'])
+                cont = 1
+                for item in lis:
+                    cont = cont+1
+                art.nombre = (form.cleaned_data['tipo']).nombre + str(cont)
+                art.save()
+                
+            art.tipo = form.cleaned_data['tipo']           
+            art.save()                          
             return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyecto_id)+"/")
     else:
         art = get_object_or_404(Artefacto, id=art_id)
@@ -1043,8 +1055,8 @@ def borrar_artefacto(request, proyecto_id, art_id):
     #-------------------------------------------------------------------
     art = get_object_or_404(Artefacto, id=art_id)
     
-    if request.method== 'POST':
-        art.habilitado= False
+    if request.method == 'POST':
+        art.habilitado = False
         art.save()
         return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyecto_id)+"/")
     variables = RequestContext(request, {'proyecto':proyect, 'art': art, 'abm_artefactos': 'ABM artefactos' in permisos})
