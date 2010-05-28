@@ -6,6 +6,7 @@ from django.http import Http404
 from django.contrib.auth import logout
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 from django.template import Context
 from django.template.loader import get_template
@@ -16,6 +17,7 @@ from django.shortcuts import get_object_or_404
 
 from saip.app.forms import *
 from saip.app.models import *
+from saip.app.helper import *
 
 @login_required
 def principal(request):
@@ -281,19 +283,18 @@ def mod_user(request, usuario_id):
                                                                  'mod_usuario': 'Modificar usuario' in permisos})
 
 @login_required
-def cambiar_password(request, usuario_id):
-    """Cambia la contrasena de un usuario"""
+def cambiar_password(request):
+    """Cambia la contrasena del usuario logueado"""
     user = User.objects.get(username=request.user.username)
-    usuario = get_object_or_404(User, id=usuario_id)
     if request.method == 'POST':
         form = CambiarPasswordForm(request.POST)
         if form.is_valid():
-            usuario.set_password(form.cleaned_data['password1'])
-            usuario.save()
+            user.set_password(form.cleaned_data['password1'])
+            user.save()
             return HttpResponseRedirect("/usuarios")
     else:
         form = CambiarPasswordForm()
-    return render_to_response("admin/usuarios/cambiar_password.html", {'form': form, 'usuario': usuario, 'user': user})
+    return render_to_response("cambiar_password.html", {'form': form, 'user': user})
 
 @login_required
 def asignar_roles_sistema(request, usuario_id):
@@ -895,7 +896,8 @@ def crear_artefacto(request, proyecto_id):
             art.habilitado = 1
             art.icono = form.cleaned_data['icono']
             art.proyecto = proyect
-            art.tipo = form.cleaned_data['tipo']#hay que ver            
+            art.tipo = form.cleaned_data['tipo']#hay que ver  
+            art.fase = proyect.fase          
             art.save()            
             #Generacion del historial          
             hist = Historial()#hacer un constructor
@@ -983,6 +985,46 @@ def modificar_artefacto(request, proyecto_id, art_id):
                                          'art':art,
                                          'abm_artefactos': 'ABM artefactos' in permisos})          
     return render_to_response('desarrollo/artefacto/mod_artefacto.html', variables)
+
+@login_required
+def definir_dependencias(request, proyecto_id, art_id, fase):
+    """Definir las relaciones de un artefacto."""
+    user = User.objects.get(username=request.user.username)
+    p = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = p).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
+    art = get_object_or_404(Artefacto, id=art_id)
+    relaciones = RelArtefacto.objects.filter(Q(padre = art) | Q(hijo = art))
+    if request.method == 'POST':
+        form = RelacionArtefactoForm(fase, request.POST)
+        if form.is_valid():
+            relaciones_nuevas = form.cleaned_data['artefactos']
+            for item in relaciones:
+                item.delete()
+            for item in relaciones_nuevas:
+                nuevo = RelArtefacto()
+                nuevo.padre = item
+                nuevo.hijo = art
+                nuevo.save()
+                return HttpResponseRedirect("/proyectos/artefactos&id=" + str(p.id) + "/")
+    else:
+        if not validar_fase(p, fase):
+            mensaje = "Se paso un parametro invalido"
+            return render_to_response("desarrollo/artefacto/relacion_artefacto.html", {'mensaje': mensaje})
+        dic = {}
+        for item in relaciones:
+            dic[item.padre.id] = True
+        form = RelacionArtefactoForm(fase, initial = {'artefactos': dic})
+        return render_to_response("desarrollo/artefacto/relacion_artefacto.html", {'form': form, 'user':user, 'art':art, 'proyecto': p})
+    
 
 @login_required
 def borrar_artefacto(request, proyecto_id, art_id):
