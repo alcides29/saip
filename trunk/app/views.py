@@ -6,7 +6,6 @@ from django.http import Http404
 from django.contrib.auth import logout
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 
 from django.template import Context
 from django.template.loader import get_template
@@ -649,7 +648,7 @@ def mod_proyecto(request, proyecto_id):
     print permisos
     #-------------------------------------------------------------------
     if request.method == 'POST':
-        form = ModProyectosForm(p, request.POST)
+        form = ModProyectosForm(p, request.POST, request.FILES)
         if form.is_valid():
             p.nombre = form.cleaned_data['nombre']
             if p.usuario_lider != form.cleaned_data['usuario_lider']:
@@ -1016,7 +1015,7 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
     art = get_object_or_404(Artefacto, id=art_id)
     relaciones = RelArtefacto.objects.filter(Q(padre = art) | Q(hijo = art))
     if request.method == 'POST':
-        form = RelacionArtefactoForm(fase, request.POST)
+        form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, request.POST)
         if form.is_valid():
             relaciones_nuevas = form.cleaned_data['artefactos']
             for item in relaciones:
@@ -1034,7 +1033,7 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
         dic = {}
         for item in relaciones:
             dic[item.padre.id] = True
-        form = RelacionArtefactoForm(fase, initial = {'artefactos': dic})
+        form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, initial = {'artefactos': dic})
         return render_to_response("desarrollo/artefacto/relacion_artefacto.html", {'form': form, 'user':user, 'art':art, 'proyecto': p})
     
 
@@ -1222,9 +1221,9 @@ def calcular_impacto(request, proyecto_id, art_id):
         permisos.append(item.nombre)        
     print permisos
     #-------------------------------------------------------------------
-    relaciones_izq = obtener_relaciones_izq(art)
+    relaciones_izq = obtener_relaciones_izq(art, [])
     print relaciones_izq
-    relaciones_der = obtener_relaciones_der(art)
+    relaciones_der = obtener_relaciones_der(art, [])
     print relaciones_der
     impacto = 0
     if relaciones_izq:

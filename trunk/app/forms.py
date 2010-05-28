@@ -1,5 +1,6 @@
 # -*- coding: iso-8859-15 -*-
 from django import forms
+from django.db.models import Q
 from django.contrib.auth.models import User
 from saip.app.models import *
 import datetime
@@ -187,9 +188,9 @@ class ModArtefactoForm(forms.ModelForm):
 class RelacionArtefactoForm(forms.Form):
 	artefactos = forms.ModelMultipleChoiceField(queryset = None, widget = forms.CheckboxSelectMultiple, required=False)
 	
-	def __init__(self, art_fase, *args, **kwargs):
+	def __init__(self, art_fase, art, *args, **kwargs):
 		super(RelacionArtefactoForm, self).__init__(*args, **kwargs)
-		self.fields['artefactos'].queryset = Artefacto.objects.filter(fase = art_fase)
+		self.fields['artefactos'].queryset = Artefacto.objects.filter(Q(fase = art_fase), ~Q(id = art.id), Q(proyecto = art.proyecto))
         
 class RevisarArtefactoForm(forms.Form):
     estado = forms.CharField(max_length=1, widget=forms.Select(choices=STATUS_CHOICES), required=False, label='Estado')
