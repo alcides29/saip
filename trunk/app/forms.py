@@ -184,6 +184,13 @@ class ModArtefactoForm(forms.ModelForm):
         super(ModArtefactoForm, self).__init__(*args, **kwargs)
         self.fields['tipo'].queryset = TipoArtefacto.objects.filter(fase = proyect_fase)
         
+class RelacionArtefactoForm(forms.Form):
+	artefactos = forms.ModelMultipleChoiceField(queryset = None, widget = forms.CheckboxSelectMultiple, required=False)
+	
+	def __init__(self, art_fase, *args, **kwargs):
+		super(RelacionArtefactoForm, self).__init__(*args, **kwargs)
+		self.fields['artefactos'].queryset = Artefacto.objects.filter(fase = art_fase)
+        
 class RevisarArtefactoForm(forms.Form):
     estado = forms.CharField(max_length=1, widget=forms.Select(choices=STATUS_CHOICES), required=False, label='Estado')
 

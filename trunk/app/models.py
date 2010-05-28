@@ -87,14 +87,20 @@ class Artefacto(models.Model):
     descripcion_larga = models.TextField(null=True, blank=True)
     habilitado = models.BooleanField(default=1)
     icono = models.FileField(upload_to='icono', null=True, blank=True)
-    #relaciones con otras tablas
-    #relacionados = models.ManyToManyField("self", null=True, blank=True)
     #claves foraneas
     proyecto = models.ForeignKey(Proyecto)
     tipo = models.ForeignKey(TipoArtefacto)
+    fase = models.ForeignKey(Fase)
     
     def __unicode__(self):
         return self.nombre
+
+class RelArtefacto(models.Model):
+    padre = models.ForeignKey(Artefacto, related_name = 'padre')
+    hijo = models.ForeignKey(Artefacto, related_name = 'hijo')
+    
+    class Meta:
+        unique_together = [("padre", "hijo")]
 
 class Historial(models.Model):
     """Clase que representa el historial de los artefactos"""
@@ -107,7 +113,7 @@ class Historial(models.Model):
      #   self.usuario = artefacto.usuario
       #  self.fecha_creacion = artefacto.fecha_creacion
        # self.artefacto = artefacto
-        
+            
 class RegistroHistorial(models.Model):
     """Clase que representa el Registro de versiones de los artefactos"""
     version = models.PositiveIntegerField()
