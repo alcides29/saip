@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Artefactos{% endblock %}
-{% block head %}Modificar nuevo artefacto<br>{% endblock %}
+{% block head %}Modificar el artefacto {{ art.nombre }}<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos %}
+{% if aprobado %}
+    <p>Este artefacto no puede ser modificado... Ha sido aprobado!</p>
+    <input type="button" value="Aceptar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>
+{% else %}
 <form enctype="multipart/form-data" id="form_id" action="/proyectos/artefactos&id={{proyecto.id}}/mod&id={{art.id}}/" method="post">
-	<p>Nombre: {{ nombre }}</p>
+	<p>Nombre: {{ art.nombre }}</p>
     <p>{{ form.complejidad.errors }}<label for="id_complejidad">Complejidad:</label>{{ form.complejidad }}</p>
     <p>{{ form.descripcion_corta.errors }}<label for="id_descripcion_corta">Descripci&oacute;n Corta:</label>{{ form.descripcion_corta }}</p>
 	<p>{{ form.descripcion_larga.errors }}<label for="id_descripcion_larga">Descripci&oacute;n Larga:</label>{{ form.descripcion_larga }}</p>
@@ -13,7 +17,9 @@
 <input type="submit" value="Guardar" />
 <input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>
 </form>
+{% endif %}
 {% else %}
 	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+    <input type="button" value="Aceptar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>
 {% endif %}
 {% endblock%}
