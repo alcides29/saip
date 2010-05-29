@@ -962,7 +962,7 @@ def modificar_artefacto(request, proyecto_id, art_id):
         permisos.append(item.nombre)
     print permisos
     #-------------------------------------------------------------------
-    if (request.POST):
+    if request.method == 'POST':
         art = Artefacto.objects.get(pk=art_id)
         form = ModArtefactoForm(proyect.fase, request.POST)
         if (form.is_valid()):
@@ -986,11 +986,14 @@ def modificar_artefacto(request, proyecto_id, art_id):
                 reg.descripcion_corta = art.descripcion_corta
                 reg.descripcion_larga = art.descripcion_larga
                 reg.habilitado = art.habilitado
+                reg.icono = art.icono
                 reg.tipo = art.tipo
                 reg.fecha_modificacion = datetime.datetime.today()
                 historial = Historial.objects.get(artefacto = art)
                 reg.historial = historial
                 reg.save()
+                """Se cambia el estado del artefacto"""
+                art.estado = 2            
                 """Se incrementa la version actual"""
                 art.version = art.version + 1
                 art.save()                    
@@ -998,7 +1001,6 @@ def modificar_artefacto(request, proyecto_id, art_id):
             art.descripcion_corta = form.cleaned_data['descripcion_corta']
             art.descripcion_larga = form.cleaned_data['descripcion_larga']            
             art.icono = form.cleaned_data['icono']
-            
             if (form.cleaned_data['tipo'] != art.tipo):
                 lis = Artefacto.objects.filter(proyecto=proyect, tipo=form.cleaned_data['tipo'])
                 cont = 1
@@ -1006,12 +1008,14 @@ def modificar_artefacto(request, proyecto_id, art_id):
                     cont = cont+1
                 art.nombre = (form.cleaned_data['tipo']).nombre + str(cont)
                 art.save()
-                
             art.tipo = form.cleaned_data['tipo']           
             art.save()                          
             return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyecto_id)+"/")
     else:
         art = get_object_or_404(Artefacto, id=art_id)
+        aprobado = False
+        if (art.estado == 3):
+            aprobado = True
         form = ModArtefactoForm(proyect.fase, initial={
                         'complejidad': art.complejidad,
                         'descripcion_corta':art.descripcion_corta,
@@ -1019,10 +1023,10 @@ def modificar_artefacto(request, proyecto_id, art_id):
                         'icono':art.icono,
                         'tipo':art.tipo._get_pk_val(),
                        })      
-    variables = RequestContext(request, {'nombre':art.nombre,
-                                         'form':form,
+    variables = RequestContext(request, {'form':form,
                                          'proyecto':proyect,
                                          'art':art,
+                                         'aprobado':aprobado,
                                          'abm_artefactos': 'ABM artefactos' in permisos})          
     return render_to_response('desarrollo/artefacto/mod_artefacto.html', variables)
 
@@ -1152,10 +1156,9 @@ def ver_historial(request, proyecto_id, art_id):
     permisos = []
     for item in permisos_obj:
         permisos.append(item.nombre)
-    print permisos
     #-------------------------------------------------------------------
     historial = Historial.objects.get(artefacto=art)
-    versiones = RegistroHistorial.objects.filter(historial=historial)
+    versiones = RegistroHistorial.objects.filter(historial=historial).order_by('version')
     variables = RequestContext(request, {'historial': historial, 
                                          'lista': versiones,
                                          'art': art,
@@ -1167,6 +1170,7 @@ def ver_historial(request, proyecto_id, art_id):
 def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
+    art = Artefacto.objects.get(pk = art_id)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
     permisos_obj = []
@@ -1175,36 +1179,41 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
     permisos = []
     for item in permisos_obj:
         permisos.append(item.nombre)
-    print permisos
-    if not ('ABM artefactos' in permisos):
-        return render_to_response('error.html')
+    #if not ('ABM artefactos' in permisos):
+     #   return render_to_response('error.html')
     #-------------------------------------------------------------------
-    art = Artefacto.objects.get(pk = art_id)
-    reg = RegistroHistorial()
-    reg.version = art.version
-    reg.estado = art.estado
-    reg.complejidad = art.complejidad
-    reg.descripcion_corta = art.descripcion_corta
-    reg.descripcion_larga = art.descripcion_larga
-    reg.habilitado = art.habilitado
-    #reg.icono = art.icono
-    reg.tipo = art.tipo
-    reg.fecha_modificacion = datetime.datetime.today()
-    historial = Historial.objects.get(artefacto = art)
-    reg.historial = historial
-    reg.save()
-    #preguntar por la version incrementada!!!!    
-    r = RegistroHistorial.objects.get(pk=reg_id)
-    art.version = r.version
-    art.estado = r.estado #el estado como va ser!!!
-    art.complejidad = r.complejidad
-    art.descripcion_corta = r.descripcion_corta 
-    art.descripcion_larga = r.descripcion_larga 
-    art.habilitado = r.habilitado
-    #art.icono = r.icono
-    art.tipo = r.tipo
-    art.save()   
-    return HttpResponseRedirect("/proyectos/artefactos&id="+ str(proyecto_id)+"/")
+    if request.method == 'POST':
+        art = Artefacto.objects.get(pk = art_id)
+        reg = RegistroHistorial()
+        reg.version = art.version
+        #reg.estado = art.estado
+        reg.complejidad = art.complejidad
+        reg.descripcion_corta = art.descripcion_corta
+        reg.descripcion_larga = art.descripcion_larga
+        reg.habilitado = art.habilitado
+        reg.icono = art.icono
+        reg.tipo = art.tipo
+        reg.fecha_modificacion = datetime.datetime.today()
+        historial = Historial.objects.get(artefacto = art)
+        reg.historial = historial
+        reg.save()
+        
+        r = RegistroHistorial.objects.get(pk=reg_id)
+        art.version = art.version + 1
+        #art.estado = r.estado
+        art.complejidad = r.complejidad
+        art.descripcion_corta = r.descripcion_corta 
+        art.descripcion_larga = r.descripcion_larga 
+        art.habilitado = r.habilitado
+        art.icono = r.icono
+        art.tipo = r.tipo
+        art.save()   
+        return HttpResponseRedirect("/proyectos/artefactos&id="+ str(proyecto_id)+"/")
+           
+    variables = RequestContext(request,{'proyecto': proyect,
+                          'art': art,
+                          'abm_artefactos': 'ABM artefactos' in permisos})
+    return render_to_response('desarrollo/artefacto/restaurar_version.html', variables)
 
 @login_required
 def revisar_artefacto(request, proyecto_id, art_id):
@@ -1223,16 +1232,11 @@ def revisar_artefacto(request, proyecto_id, art_id):
     print permisos
     #-------------------------------------------------------------------
     if request.method == 'POST':
-        form = RevisarArtefactoForm(request.POST)        
-        if form.is_valid():                        
-            art.estado = form.cleaned_data['estado']         
+            art.estado = 3        
             art.save()                
             return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyect.id)+"/")
-    else:        
-        form = RevisarArtefactoForm({'estado':art.estado})
-    return render_to_response("desarrollo/artefacto/revisar_artefacto.html", {
-                                                                              'form':form, 
-                                                                              'proyecto':proyect,                                                                       
+   
+    return render_to_response("desarrollo/artefacto/revisar_artefacto.html", {'proyecto':proyect,                                                                       
                                                                               'art':art,
                                                                               'revisar_artefacto': 'Revisar artefactos' in permisos})
     
