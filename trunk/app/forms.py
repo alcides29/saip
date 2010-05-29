@@ -161,12 +161,7 @@ class TipoArtefactoForm(forms.Form):
 
 class TipoArtefactoFaseForm(forms.Form):
     """Form para asociar un tipo de artefacto a una fase de un proyecto."""
-    fase = forms.ModelMultipleChoiceField(queryset = Fase.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
-    """
-    def __init__(self, tipo_artefacto_id, *args, **kwargs):
-        super(TipoArtefactoFaseForm, self).__init__(*args, **kwargs)
-        self.fields['fase'].queryset = TipoArtefactoFaseForm.objects.filter(tipo_artefacto = tipo_artefacto_id)
-        """
+    fase = forms.ModelChoiceField(queryset = Fase.objects.all(), widget=forms.RadioSelect, required=False)
         
 class ArtefactoForm(forms.Form):
     complejidad = forms.CharField(max_length=1, widget=forms.Select(choices=COMPLEXITY_CHOICES), label='Complejidad')
