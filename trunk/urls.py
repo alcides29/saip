@@ -38,23 +38,22 @@ urlpatterns = patterns('',
 	(r'^proyectos/$', admin_proyectos),
     (r'^proyectos/crear/$', crear_proyecto),
     (r'^proyectos/mod&id=(?P<proyecto_id>\d+)/$', mod_proyecto),
-	#(r'^proyectos/mod&id=(?P<object_id>\d+)/$', update_object, {'form_class':ModProyectosForm, 'template_name':'admin/proyectos/abm_proyecto.html', 'post_save_redirect':'/proyectos', 'login_required':True}),
 	(r'^proyectos/del&id=(?P<proyecto_id>\d+)/$', del_proyecto),
 	(r'^proyectos/miembros&id=(?P<object_id>\d+)/$', admin_usuarios_proyecto),
 	(r'^proyectos/miembros&id=(?P<object_id>\d+)/nuevo/$', add_usuario_proyecto),
     (r'^proyectos/miembros&id=(?P<proyecto_id>\d+)/cambiar&id=(?P<user_id>\d+)/$', cambiar_rol_usuario_proyecto),
     (r'^proyectos/miembros&id=(?P<proyecto_id>\d+)/del&id=(?P<user_id>\d+)/$', eliminar_miembro_proyecto),
     
-    #gestion
+    # gestion
     (r'^proyectos/lineabase&id=(?P<proyecto_id>\d+)/$', linea_base),
     
     
-    #desarrollo
+    # desarrollo
     (r'^proyectos/admin&id=(?P<proyecto_id>\d+)/$', administrar_proyecto),
     (r'^proyectos/tipoArtefacto&id=(?P<proyecto_id>\d+)/$', admin_tipo_artefacto_fase),
     (r'^proyectos/mod_tipoArtefacto_fase&id=(?P<proyecto_id>\d+)/(?P<tipo_art_id>\d+)/$', mod_tipo_artefacto_fase),
     
-    #artefactos
+    # artefactos
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/$', admin_artefactos),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/crear/$', crear_artefacto),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/mod&id=(?P<art_id>\d+)/$', modificar_artefacto),
@@ -67,11 +66,11 @@ urlpatterns = patterns('',
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/rel&id=(?P<art_id>\d+)&fase=(?P<fase>\d+)/$', definir_dependencias),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/imp&id=(?P<art_id>\d+)/$',calcular_impacto),
     
-    #historial
+    # historial
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/$', ver_historial),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/volver&id=(?P<reg_id>\d+)/$', restaurar_artefacto),
     
-    #roles
+    # roles
     (r'^roles/$', admin_roles),
     (r'^roles/crear/$', crear_rol),
     (r'^roles/mod&id=(?P<rol_id>\d+)/$', mod_rol),
@@ -84,6 +83,4 @@ urlpatterns = patterns('',
     (r'^tipo_artefacto/mod&id=(?P<tipo_id>\d+)/$', mod_tipo_artefacto),
     (r'^tipo_artefacto/del&id=(?P<tipo_id>\d+)/$', borrar_tipo_artefacto),
 
-           
-    
 )
