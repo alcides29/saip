@@ -9,8 +9,7 @@
 <table>
 	<tr>
 		<td class="titulo">Versi&oacute;n</td>
-        <td class="titulo">Estado</td>
-		<td class="titulo">Complejidad</td>
+       	<td class="titulo">Complejidad</td>
 		<td class="titulo">Descripci&oacute;n Corta</td>
 		<td class="titulo">Descripci&oacute;n Larga</td>		
         <td class="titulo">Icono</td>
@@ -21,18 +20,21 @@
 	{% for item in lista %}
 	<tr>
 		<td>{{item.version}}</td>
-		<td>{{item.estado}}</td>        
 		<td>{{item.complejidad}}</td>
 		<td>{{item.descripcion_corta}}</td>
 		<td>{{item.descripcion_larga}}</td>
 		<td>{{item.icono}}</td>			
 		<td>{{item.tipo}}</td>
         <td>{{item.fecha_modificacion}}</td>
-		<td><a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{art.id}}/volver&id={{item.id}}/">Restaurar</a></td>
+		<td><a href="">| Relaciones con la fase actual</a><a href="">| Relaciones con la fase anterior</a><a href=" ">| Adjuntos</a>{% ifequal art.fase proyecto.fase %}{% ifnotequal art.estado 3%}<a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{art.id}}/volver&id={{item.id}}/">| Restaurar</a>{% endifnotequal %}{% endifequal %}</td>
 	</tr>
 	{% endfor %}
 </table>
+{% ifequal art.fase proyecto.fase %}
 <input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/'"/>
+{% else %}
+<input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/fasesAnt/'"/>
+{% endifequal %}
 {% else %}
 	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
 {% endif %}
