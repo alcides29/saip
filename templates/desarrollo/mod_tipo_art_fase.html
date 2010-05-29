@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Proyectos{% endblock %}
-{% block head %}Cambiar fase: {{lista.proyecto.nombre}}<br>{% endblock %}
+{% block head %}Cambiar fase a {{tipo_artefacto.nombre}}{% endblock %}<br>
 {% block content %}
 {% if asignar_tipoArt %}
   <form id="form_id" action="" method="post">
