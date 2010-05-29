@@ -44,7 +44,6 @@ urlpatterns = patterns('',
 	(r'^proyectos/miembros&id=(?P<object_id>\d+)/nuevo/$', add_usuario_proyecto),
     (r'^proyectos/miembros&id=(?P<proyecto_id>\d+)/cambiar&id=(?P<user_id>\d+)/$', cambiar_rol_usuario_proyecto),
     (r'^proyectos/miembros&id=(?P<proyecto_id>\d+)/del&id=(?P<user_id>\d+)/$', eliminar_miembro_proyecto),
-    (r'^proyectos/tipoArtefacto&id=(?P<object_id>\d+)/$', admin_tipo_artefacto_fase),
     
     #gestion
     (r'^proyectos/lineabase&id=(?P<proyecto_id>\d+)/$', linea_base),
@@ -52,6 +51,8 @@ urlpatterns = patterns('',
     
     #desarrollo
     (r'^proyectos/admin&id=(?P<proyecto_id>\d+)/$', administrar_proyecto),
+    (r'^proyectos/tipoArtefacto&id=(?P<proyecto_id>\d+)/$', admin_tipo_artefacto_fase),
+    (r'^proyectos/mod_tipoArtefacto_fase&id=(?P<proyecto_id>\d+)/(?P<tipo_art_id>\d+)/$', mod_tipo_artefacto_fase),
     
     #artefactos
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/$', admin_artefactos),

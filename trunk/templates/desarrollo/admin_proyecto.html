@@ -8,7 +8,9 @@
 <h2>Administraci&oacute;n</h2>
 <ul>
 {% if ver_miembros or abm_miembros or asignar_roles %}<li><a href="/proyectos/miembros&id={{proyecto.id}}/">Miembros</a></li>{% endif %}
-<li><a href="">Tipos de Artefacto</a></li>
+{% if asignar_tipoArt %}
+  <li><a href="/proyectos/tipoArtefacto&id={{proyecto.id}}">Tipos de Artefacto</a></li>
+{% endif %}
 {% if generarlb %}<li><a href="/proyectos/lineabase&id={{proyecto.id}}/">Gesti&oacute;n de l&iacute;nea base</a></li>{% endif %}
 </ul>
 <h2>Desarrollo</h2>
