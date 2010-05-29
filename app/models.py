@@ -109,20 +109,14 @@ class Historial(models.Model):
     #claves foraneas
     artefacto = models.OneToOneField(Artefacto, parent_link=False)
     
-    #def __init__ (self, artefacto):
-     #   self.usuario = artefacto.usuario
-      #  self.fecha_creacion = artefacto.fecha_creacion
-       # self.artefacto = artefacto
-            
 class RegistroHistorial(models.Model):
     """Clase que representa el Registro de versiones de los artefactos"""
     version = models.PositiveIntegerField()
-    estado = models.IntegerField()
     complejidad = models.IntegerField()
     descripcion_corta = models.TextField(null=True, blank=True)
     descripcion_larga = models.TextField(null=True, blank=True)
     habilitado = models.BooleanField()
-    #icono = models.FileField(upload_to='icono', null=True, blank=True)
+    icono = models.FileField(upload_to='icono', null=True, blank=True)
     tipo = models.ForeignKey(TipoArtefacto)
     fecha_modificacion = models.DateTimeField(auto_now=True, auto_now_add=False, editable=False)
     #claves foraneas
