@@ -57,6 +57,7 @@ def principal(request):
 
 @login_required
 def administrar_proyecto(request, proyecto_id):
+    """Administracion de proyecto para el modulo de desarrollo."""
     user = User.objects.get(username=request.user.username)
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
     #Validacion de permisos---------------------------------------------
@@ -76,7 +77,8 @@ def administrar_proyecto(request, proyecto_id):
                                                                  'ver_miembros': 'Ver miembros' in permisos,
                                                                  'abm_miembros': 'ABM miembros' in permisos,
                                                                  'asignar_roles': 'Asignar roles' in permisos,
-                                                                 'generarlb':'Generar LB' in permisos})
+                                                                 'generarlb':'Generar LB' in permisos,
+                                                                 'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
     
 @login_required
 def admin_usuarios_proyecto(request, object_id):
@@ -813,12 +815,11 @@ def borrar_tipo_artefacto(request, tipo_id):
                                                                                           'eliminar_tipo_artefacto': 'Eliminar tipo-artefacto' in permisos})
 @login_required
 def admin_tipo_artefacto_fase(request, proyecto_id):
-    """Metodo que permite asignar tipos de artefacto por fase."""
-    # Aun falta terminar
-    user = User.objects.get(username=request.user.username)
-    proyect = Proyecto.objects.get(id=proyecto_id)
+    """Lista de tipos de artefacto con fase para el proyecto actual."""
+    user = User.objects.get(username = request.user.username)
+    p = Proyecto.objects.get(pk = proyecto_id)
     #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyecto_id).only('rol')
     permisos_obj = []
     for item in roles:
         permisos_obj.extend(item.rol.permisos.all())
@@ -826,19 +827,51 @@ def admin_tipo_artefacto_fase(request, proyecto_id):
     for item in permisos_obj:
         permisos.append(item.nombre)
     #-------------------------------------------------------------------
-    if request.method == 'POST':
-        form = TipoArtefactoFaseForm()
-        # clean data
-    else:
-        form = TipoArtefactoFaseForm()
-        # cargar los valores
-        
-    lista = TipoArtefactoFaseProyecto.objects.filter(proyecto=proyect)
-    variables = RequestContext(request, {'proyecto': proyect,
-                                        'lista': lista,
-                                        'abm_artefactos': 'ABM artefactos' in permisos,
-                                        'ver_artefactos': 'Ver artefactos' in permisos})
+    lista = TipoArtefactoFaseProyecto.objects.filter(proyecto=proyecto_id)
+    variables = RequestContext(request,
+                               {'lista': lista,
+                                'proyecto': p,
+                                'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
     return render_to_response('desarrollo/tipo_artefacto_fase.html', variables)
+
+@login_required
+def mod_tipo_artefacto_fase(request, proyecto_id, tipo_art_id):
+    """Permite asignar tipos de artefacto a una fase por proyecto."""
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyecto_id).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    #-------------------------------------------------------------------
+    rel = get_object_or_404(TipoArtefactoFaseProyecto, id=proyecto_id)
+    if request.method == 'POST':
+        form = TipoArtefactoFaseForm(proyecto_id, tipo_art_id, request.POST)
+        if form.is_valid():
+        	print 'valida el form'
+        	rel.fase.clear()
+        	lista = form.cleaned_data['fase']
+        	for item in lista:
+        		rel.fase = item.fase
+        	rel.save()
+        	return HttpResponseRedirect("/proyectos/admin&id="+str(proyecto_id))
+    else:
+        dict = {}
+        for item in TipoArtefacto.objects.all():
+            dict[item.id] = True
+        form = TipoArtefactoFaseForm(proyecto_id, tipo_art_id, initial={'fase': dict})
+        
+    lista = TipoArtefactoFaseProyecto.objects.filter(proyecto=proyecto_id)
+    variables = RequestContext(request,
+                               {'form': form,
+                                'proyecto': proyect,
+                                'lista': lista,
+                                'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
+    return render_to_response('desarrollo/mod_tipo_art_fase.html', variables)
 
 #desde aqui artefacto
 @login_required
