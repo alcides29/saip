@@ -164,7 +164,7 @@ class TipoArtefactoFaseForm(forms.Form):
     fase = forms.ModelChoiceField(queryset = Fase.objects.all(), widget=forms.RadioSelect, required=False)
         
 class ArtefactoForm(forms.Form):
-    complejidad = forms.CharField(max_length=1, widget=forms.Select(choices=COMPLEXITY_CHOICES), label='Complejidad')
+    complejidad = forms.CharField(max_length=2, widget=forms.Select(choices=COMPLEXITY_CHOICES), label='Complejidad')
     descripcion_corta = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Corta')
     descripcion_larga = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Larga')
     icono = forms.FileField(required=False, label='Icono/Artefacto')
@@ -191,7 +191,4 @@ class RelacionArtefactoForm(forms.Form):
 		super(RelacionArtefactoForm, self).__init__(*args, **kwargs)
 		self.fields['artefactos'].queryset = Artefacto.objects.filter(Q(fase = art_fase), ~Q(id = art.id), Q(proyecto = art.proyecto))
         
-class RevisarArtefactoForm(forms.Form):
-    estado = forms.CharField(max_length=1, widget=forms.Select(choices=STATUS_CHOICES), required=False, label='Estado')
-
-    
+  
