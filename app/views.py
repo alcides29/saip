@@ -104,7 +104,7 @@ def admin_usuarios_proyecto(request, object_id):
                                                                 'miembros': lista,
                                                                 'ver_miembros': 'Ver miembros' in permisos,
                                                                 'abm_miembros': 'ABM miembros' in permisos})
-	
+    
 @login_required
 def cambiar_rol_usuario_proyecto(request, proyecto_id, user_id):
     user = User.objects.get(username=request.user.username)
@@ -154,7 +154,7 @@ def cambiar_rol_usuario_proyecto(request, proyecto_id, user_id):
                                                                       'usuario':u, 
                                                                       'proyecto': p,
                                                                       'abm_miembros':'ABM miembros' in permisos})
-	
+    
 @login_required
 def add_usuario_proyecto(request, object_id):
     user = User.objects.get(username=request.user.username)
@@ -381,7 +381,7 @@ def lista(request, tipo):
     elif tipo == 'tipo_artefactos':    
         lista = TipoArtefactos.objects.all()
     else:
-		return render_to_response('error.html');
+        return render_to_response('error.html');
     return render_to_response('lista.html',{'lista':lista, 'user':user, 'tipo':tipo})
 
 @login_required
@@ -428,7 +428,7 @@ def admin_proyectos(request):
                                                                 'ver_proyectos':'Ver proyectos' in permisos,
                                                                 'crear_proyecto': 'Crear proyecto' in permisos,
                                                                 'mod_proyecto': 'Modificar proyecto' in permisos,
-                                                                'eliminar_proyecto': 'Eliminar proyecto' in permisos})	
+                                                                'eliminar_proyecto': 'Eliminar proyecto' in permisos})    
 
 @login_required
 def admin_roles(request):
@@ -848,26 +848,26 @@ def mod_tipo_artefacto_fase(request, proyecto_id, tipo_art_id):
     for item in permisos_obj:
         permisos.append(item.nombre)
     #-------------------------------------------------------------------
-    tipo_art = get_object_or_404(TipoArtefactoFaseProyecto, id=proyecto_id, tipo_artefacto = tipo_art_id)
+    rel = get_object_or_404(TipoArtefactoFaseProyecto, id=tipo_art_id)
     if request.method == 'POST':
-        form = TipoArtefactoFaseForm(proyecto_id, rel.tipo_artefacto, request.POST)
+        form = TipoArtefactoFaseForm(request.POST)
         if form.is_valid():
-        	tipo_art.fase.clear()
-        	lista = form.cleaned_data['fase']
-        	for item in lista:
-        		tipo_art.fase = item.fase
-        	tipo_art.save()
-        	return HttpResponseRedirect("/proyectos/tipoArtefacto&id="+str(proyecto_id))
+            tipo_art.fase.clear()
+            lista = form.cleaned_data['fase']
+            for item in lista:
+                tipo_art.fase = item.fase
+            tipo_art.save()
+            return HttpResponseRedirect("/proyectos/tipoArtefacto&id="+str(proyecto_id))
     else:
-        dict = {}
-        for item in tipo_art.fase.all():
-            dict[item.id] = True
-        form = TipoArtefactoFaseForm(proyecto_id, rel.tipo_artefacto, initial={'fase': dict})
-    
-    return render_to_response('desarrollo/mod_tipo_art_fase.html', {'form': form,
-                                                                    'tipo_artefacto': tipo_art,
-                                                                    'proyecto': proyect,
-                                                                    'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
+        form = TipoArtefactoFaseForm(initial={'fase': tipo_art_id})
+        
+    lista = TipoArtefactoFaseProyecto.objects.filter(proyecto=proyecto_id)
+    variables = RequestContext(request,
+                               {'form': form,
+                                'proyecto': proyect,
+                                'lista': lista,
+                                'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
+    return render_to_response('desarrollo/mod_tipo_art_fase.html', variables)
 
 #desde aqui artefacto
 @login_required
@@ -1063,7 +1063,9 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
         for item in relaciones:
             dic[item.padre.id] = True
         form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, initial = {'artefactos': dic})
-        return render_to_response("desarrollo/artefacto/relacion_artefacto.html", {'form': form, 'user':user, 'art':art, 'proyecto': p})
+        return render_to_response("desarrollo/artefacto/relacion_artefacto.html", {'form': form, 'user':user, 'art':art, 
+                                                                                   'proyecto': p,
+                                                                                   'abm_artefactos': 'ABM artefactos' in permisos})
     
 
 @login_required
@@ -1266,7 +1268,8 @@ def calcular_impacto(request, proyecto_id, art_id):
     #impacto = impacto + art.complejidad
     return render_to_response("desarrollo/artefacto/complejidad.html", {'art': art, 'user': user, 'impacto': impacto,
                                                                         'izq': relaciones_izq, 'der': relaciones_der,
-                                                                        'proyecto': proyect})
+                                                                        'proyecto': proyect,
+                                                                        'abm_artefactos': 'ABM artefactos' in permisos})
     
 @login_required
 def fases_anteriores(request, proyecto_id):
