@@ -817,7 +817,7 @@ def borrar_tipo_artefacto(request, tipo_id):
 def admin_tipo_artefacto_fase(request, proyecto_id):
     """Lista de tipos de artefacto con fase para el proyecto actual."""
     user = User.objects.get(username = request.user.username)
-    p = Proyecto.objects.get(pk = proyecto_id)
+    p = Proyecto.objects.get(id = proyecto_id)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyecto_id).only('rol')
     permisos_obj = []
@@ -848,30 +848,26 @@ def mod_tipo_artefacto_fase(request, proyecto_id, tipo_art_id):
     for item in permisos_obj:
         permisos.append(item.nombre)
     #-------------------------------------------------------------------
-    rel = get_object_or_404(TipoArtefactoFaseProyecto, id=proyecto_id)
+    tipo_art = get_object_or_404(TipoArtefactoFaseProyecto, id=proyecto_id, tipo_artefacto = tipo_art_id)
     if request.method == 'POST':
-        form = TipoArtefactoFaseForm(proyecto_id, tipo_art_id, request.POST)
+        form = TipoArtefactoFaseForm(proyecto_id, rel.tipo_artefacto, request.POST)
         if form.is_valid():
-        	print 'valida el form'
-        	rel.fase.clear()
+        	tipo_art.fase.clear()
         	lista = form.cleaned_data['fase']
         	for item in lista:
-        		rel.fase = item.fase
-        	rel.save()
-        	return HttpResponseRedirect("/proyectos/admin&id="+str(proyecto_id))
+        		tipo_art.fase = item.fase
+        	tipo_art.save()
+        	return HttpResponseRedirect("/proyectos/tipoArtefacto&id="+str(proyecto_id))
     else:
         dict = {}
-        for item in TipoArtefacto.objects.all():
+        for item in tipo_art.fase.all():
             dict[item.id] = True
-        form = TipoArtefactoFaseForm(proyecto_id, tipo_art_id, initial={'fase': dict})
-        
-    lista = TipoArtefactoFaseProyecto.objects.filter(proyecto=proyecto_id)
-    variables = RequestContext(request,
-                               {'form': form,
-                                'proyecto': proyect,
-                                'lista': lista,
-                                'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
-    return render_to_response('desarrollo/mod_tipo_art_fase.html', variables)
+        form = TipoArtefactoFaseForm(proyecto_id, rel.tipo_artefacto, initial={'fase': dict})
+    
+    return render_to_response('desarrollo/mod_tipo_art_fase.html', {'form': form,
+                                                                    'tipo_artefacto': tipo_art,
+                                                                    'proyecto': proyect,
+                                                                    'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
 
 #desde aqui artefacto
 @login_required
