@@ -1,4 +1,4 @@
-﻿INSERT INTO app_permiso(nombre, categoria)
+INSERT INTO app_permiso(nombre, categoria)
     VALUES ('Ver roles', 1),
 	('Crear rol', 1),
 	('Modificar rol', 1),

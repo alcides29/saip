@@ -75,6 +75,19 @@ class TipoArtefacto(models.Model):
     def __unicode__(self):
         return self.nombre
 
+class TipoArtefactoFaseProyecto(models.Model):
+    """Tabla que relaciona el tipo de artefacto a una fase por proyecto."""
+    proyecto = models.ForeignKey(Proyecto)
+    fase = models.ForeignKey(Fase)
+    tipo_artefacto = models.ForeignKey(TipoArtefacto)
+    cant = models.IntegerField(max_length = 4)
+    
+    def __unicode__(self):
+        return self.tipo_artefacto.nombre
+
+    class Meta:
+        unique_together = [("tipo_artefacto", "fase", "proyecto")]
+
 class Artefacto(models.Model):
     """Clase que representa a los artefactos."""
     nombre = models.CharField(max_length=50)
@@ -89,7 +102,7 @@ class Artefacto(models.Model):
     icono = models.FileField(upload_to='icono', null=True, blank=True)
     #claves foraneas
     proyecto = models.ForeignKey(Proyecto)
-    tipo = models.ForeignKey(TipoArtefacto)
+    tipo = models.ForeignKey(TipoArtefactoFaseProyecto)
     fase = models.ForeignKey(Fase)
     
     def __unicode__(self):
@@ -152,11 +165,3 @@ class UsuarioRolSistema(models.Model):
     class Meta:
         unique_together = [("usuario", "rol")]
 
-class TipoArtefactoFaseProyecto(models.Model):
-    """Tabla que relaciona el tipo de artefacto a una fase por proyecto."""
-    proyecto = models.ForeignKey(Proyecto)
-    fase = models.ForeignKey(Fase)
-    tipo_artefacto = models.ForeignKey(TipoArtefacto)
-    
-    class Meta:
-        unique_together = [("tipo_artefacto", "fase", "proyecto")]
