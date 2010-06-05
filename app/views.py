@@ -1102,7 +1102,7 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
         form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, request.POST)
         if form.is_valid():
             relaciones_nuevas = form.cleaned_data['artefactos']
-            relaciones = RelArtefacto.objects.filter(Q(padre = art) | Q(hijo = art))
+            relaciones = RelArtefacto.objects.filter(hijo = art)
             print relaciones
             for item in relaciones:
                 item.habilitado = False
@@ -1153,6 +1153,10 @@ def borrar_artefacto(request, proyecto_id, art_id):
     
     if request.method == 'POST':
         art.habilitado = False
+        r = RelArtefacto.objects.filter(Q(padre = art) | Q(hijo = art))
+        for item in r:
+            r.habilitado = False
+            r.save()
         art.save()
         return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyecto_id)+"/")
     variables = RequestContext(request, {'proyecto':proyect, 'art': art, 'abm_artefactos': 'ABM artefactos' in permisos})
@@ -1316,7 +1320,6 @@ def calcular_impacto(request, proyecto_id, art_id):
     permisos = []    
     for item in permisos_obj:
         permisos.append(item.nombre)        
-    print permisos
     #-------------------------------------------------------------------
     relaciones_izq = obtener_relaciones_izq(art, [])
     print relaciones_izq
@@ -1331,7 +1334,7 @@ def calcular_impacto(request, proyecto_id, art_id):
         for item in relaciones_der:
             impacto = impacto + item.complejidad
             print impacto
-    #impacto = impacto + art.complejidad
+    impacto = impacto - art.complejidad
     return render_to_response("desarrollo/artefacto/complejidad.html", {'art': art, 'user': user, 'impacto': impacto,
                                                                         'izq': relaciones_izq, 'der': relaciones_der,
                                                                         'proyecto': proyect,
