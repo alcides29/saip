@@ -3,6 +3,7 @@ from django import forms
 from django.db.models import Q
 from django.contrib.auth.models import User
 from saip.app.models import *
+from saip.app.helper import *
 import datetime
 
 class UsuariosForm(forms.Form):
@@ -189,17 +190,12 @@ class RelacionArtefactoForm(forms.Form):
 	
 	def __init__(self, art_fase, art, *args, **kwargs):
 		super(RelacionArtefactoForm, self).__init__(*args, **kwargs)
-		r = RelArtefacto.objects.filter(padre = art, habilitado = True)
+		#r = RelArtefacto.objects.filter(padre = art, habilitado = True)
 		lista = []
-		for item in r:
-			lista.append(item.hijo.id)
+		rel = obtener_relaciones_der(art, [])
+		for item in rel:
+			lista.append(item.id)
 		print lista
-		queryset = Artefacto.objects.filter(Q(fase = art_fase), ~Q(id = art.id), ~Q(pk__in=lista), Q(proyecto = art.proyecto))
-		#print queryset
-		#for item in queryset:
-		#	if item in lista:
-		#		print item.id
-		#		queryset.exclude(pk = item.id)
-		self.fields['artefactos'].queryset = queryset  
+		self.fields['artefactos'].queryset = Artefacto.objects.filter(Q(fase = art_fase), ~Q(id = art.id), ~Q(pk__in=lista), Q(proyecto = art.proyecto)) 
         
   
