@@ -189,6 +189,17 @@ class RelacionArtefactoForm(forms.Form):
 	
 	def __init__(self, art_fase, art, *args, **kwargs):
 		super(RelacionArtefactoForm, self).__init__(*args, **kwargs)
-		self.fields['artefactos'].queryset = Artefacto.objects.filter(Q(fase = art_fase), ~Q(id = art.id), Q(proyecto = art.proyecto))
+		r = RelArtefacto.objects.filter(padre = art, habilitado = True)
+		lista = []
+		for item in r:
+			lista.append(item.hijo.id)
+		print lista
+		queryset = Artefacto.objects.filter(Q(fase = art_fase), ~Q(id = art.id), ~Q(pk__in=lista), Q(proyecto = art.proyecto))
+		#print queryset
+		#for item in queryset:
+		#	if item in lista:
+		#		print item.id
+		#		queryset.exclude(pk = item.id)
+		self.fields['artefactos'].queryset = queryset  
         
   
