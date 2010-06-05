@@ -161,18 +161,18 @@ class TipoArtefactoForm(forms.Form):
 
 class TipoArtefactoFaseForm(forms.Form):
     """Form para asociar un tipo de artefacto a una fase de un proyecto."""
-    fase = forms.ModelChoiceField(queryset = Fase.objects.all(), widget=forms.RadioSelect, required=False)
+    fase = forms.ModelChoiceField(queryset = Fase.objects.all(), widget=forms.RadioSelect, required=False, empty_label=None)
         
 class ArtefactoForm(forms.Form):
     complejidad = forms.CharField(max_length=2, widget=forms.Select(choices=COMPLEXITY_CHOICES), label='Complejidad')
     descripcion_corta = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Corta')
     descripcion_larga = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Larga')
     icono = forms.FileField(required=False, label='Icono/Artefacto')
-    tipo = forms.ModelChoiceField(queryset=TipoArtefacto.objects.all(), label='Tipo')    
+    tipo = forms.ModelChoiceField(queryset=None, label='Tipo')    
     
-    def __init__(self, proyect_fase, *args, **kwargs):
+    def __init__(self, proyect_fase, proyecto_id, *args, **kwargs):
         super(ArtefactoForm, self).__init__(*args, **kwargs)
-        self.fields['tipo'].queryset = TipoArtefacto.objects.filter(fase = proyect_fase)
+        self.fields['tipo'].queryset = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyecto_id, fase = proyect_fase)
         
 class ModArtefactoForm(forms.ModelForm):
     tipo = forms.ModelChoiceField(queryset=TipoArtefacto.objects.all(), required=False)    
