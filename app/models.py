@@ -98,6 +98,7 @@ class Artefacto(models.Model):
 class RelArtefacto(models.Model):
     padre = models.ForeignKey(Artefacto, related_name = 'padre')
     hijo = models.ForeignKey(Artefacto, related_name = 'hijo')
+    habilitado = models.BooleanField(default=True)
     
     class Meta:
         unique_together = [("padre", "hijo")]

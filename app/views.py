@@ -1046,19 +1046,30 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
     print permisos
     #-------------------------------------------------------------------
     art = get_object_or_404(Artefacto, id=art_id)
-    relaciones = RelArtefacto.objects.filter(Q(padre = art) | Q(hijo = art))
+    relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
     if request.method == 'POST':
         form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, request.POST)
         if form.is_valid():
             relaciones_nuevas = form.cleaned_data['artefactos']
+            relaciones = RelArtefacto.objects.filter(Q(padre = art) | Q(hijo = art))
+            print relaciones
             for item in relaciones:
-                item.delete()
+                item.habilitado = False
+                item.save()
             for item in relaciones_nuevas:
-                nuevo = RelArtefacto()
-                nuevo.padre = item
-                nuevo.hijo = art
-                nuevo.save()
-                return HttpResponseRedirect("/proyectos/artefactos&id=" + str(p.id) + "/")
+                print item
+                aux = RelArtefacto.objects.filter(padre = item, hijo = art)
+                if aux:
+                    nuevo = aux[0]
+                    nuevo.habilitado = True
+                    nuevo.save()
+                else:
+                    r = RelArtefacto()
+                    r.padre = item
+                    r.hijo = art
+                    r.habilitado = True
+                    r.save()
+            return HttpResponseRedirect("/proyectos/artefactos&id=" + str(p.id) + "/")
     else:
         if not validar_fase(p, fase):
             mensaje = "Se paso un parametro invalido"
