@@ -17,8 +17,7 @@
 	</tr>
       {% endfor %}
     </table>
-    <br><a href="">Agregar tipo de artefacto para el proyecto</a>
-    <br><br><input type="button" value="Volver" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/' "/>
+    <br><input type="button" value="Volver" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/' "/>
 {% else %}
   <P>¡No tiene permisos para ver esta p&aacute;gina!</p>
 {% endif %}

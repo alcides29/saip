@@ -67,13 +67,13 @@ class Proyecto(models.Model):
     
 class TipoArtefacto(models.Model):
     """"Esta clase representa a que tipo pertenece un artefacto."""
-    nombre = models.CharField(unique=True, max_length=50)
-    descripcion = models.TextField(null=True, blank=True)
+    Abreviatura = models.CharField(unique=True, max_length=50)
+    descripcion = models.TextField()
     #claves foraneas
     fase = models.ForeignKey(Fase)
     
     def __unicode__(self):
-        return self.nombre
+        return self.abreviatura
 
 class TipoArtefactoFaseProyecto(models.Model):
     """Tabla que relaciona el tipo de artefacto a una fase por proyecto."""
