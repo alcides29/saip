@@ -1293,6 +1293,7 @@ def add_adjunto(request, proyecto_id, art_id):
                 nuevo.artefacto = art
                 nuevo.save()
             return HttpResponseRedirect("/proyectos/artefactos&id="+ str(proyect.id) + "/adj&id=" + str(art_id) + "/")
+        return render_to_response('error.html', {'form': form})
     else:
         formset = AdjuntoFormSet()
         return render_to_response('desarrollo/artefacto/adjunto/crear_adjunto.html', {'formset':formset,
