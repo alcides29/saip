@@ -1,4 +1,4 @@
-INSERT INTO app_tipoartefacto(abreviatura, descripcion, fase_id)
+INSERT INTO app_tipoartefacto(nombre, descripcion, fase_id)
     VALUES ('RF', 'Requerimiento Funcional', 1),
     ('RNF', 'Requerimiento No Funcional', 1),
     ('CUG', 'Casos de Uso General', 1),

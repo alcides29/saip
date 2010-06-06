@@ -147,8 +147,8 @@ class UsuarioProyectoForm(forms.Form):
         
 class TipoArtefactoForm(forms.Form):
     """Form para Tipo de artefacto."""
-    nombre = forms.CharField(max_length=50, label='Nombre')
-    descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
+    nombre = forms.CharField(max_length=5, label='Abreviatura')
+    descripcion = forms.CharField(max_length=100, label='Nombre')
     fase = forms.ModelChoiceField(queryset=Fase.objects.all(), label='Fase')
     
     def clean_nombre(self):
