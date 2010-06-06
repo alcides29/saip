@@ -68,8 +68,9 @@ urlpatterns = patterns('',
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/verrel&id=(?P<art_id>\d+)&fase=(?P<fase>\d+)/$', ver_dependencias),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/imp&id=(?P<art_id>\d+)/$',calcular_impacto),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/adj&id=(?P<art_id>\d+)/$',admin_adjuntos),
-    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/adj&id=(?P<art_id>\d+)/nuevo/',add_adjunto),
-    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/adj&id=(?P<art_id>\d+)/get&id=(?P<arch_id>\d+)/',retornar_archivo),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/adj&id=(?P<art_id>\d+)/nuevo/$',add_adjunto),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/adj&id=(?P<art_id>\d+)/get&id=(?P<arch_id>\d+)/$',retornar_archivo),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/adj&id=(?P<art_id>\d+)/quitar&id=(?P<arch_id>\d+)/$',quitar_archivo),
     
     # historial
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/$', ver_historial),
