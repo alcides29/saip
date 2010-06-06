@@ -138,10 +138,14 @@ class RegistroHistorial(models.Model):
    
     
 class Adjunto(models.Model):
-    archivo = models.FileField(upload_to='artefactos')
-    descripcion = models.TextField(null=True, blank=True)  
+    #archivo = models.FileField(upload_to='artefactos')
+    nombre = models.CharField(max_length = 100)
+    contenido = models.TextField(null=True)
+    tamanho = models.IntegerField()
+    mimetype = models.CharField(max_length = 255)  
     #claves foraneas
     artefacto = models.ForeignKey(Artefacto)
+    habilitado = models.BooleanField(default = True)
     
 class LineaBase(models.Model):
     fecha_creacion = models.DateField(auto_now=False, auto_now_add=True, editable=False)

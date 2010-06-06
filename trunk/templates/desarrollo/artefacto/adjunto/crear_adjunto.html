@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Artefactos{% endblock %}
+{% block head %}Archivos adjuntos en {{ art.nombre }}<br>{% endblock %}
+{% block content %}
+<form enctype="multipart/form-data" id="form_id" action="" method="post">
+	{{ formset.management_form }}
+    {% for form in formset.forms %}
+    {{ form.as_p }}
+    {% endfor %}
+<input type="submit" value="Aceptar" />
+<input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/adj&id={{art.id}}/' "/>
+</form>	
+{% endblock %}

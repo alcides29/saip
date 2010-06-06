@@ -1,4 +1,6 @@
 # -*- coding: iso-8859-15 -*-
+import base64
+
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
@@ -12,6 +14,7 @@ from django.template.loader import get_template
 from django.contrib.auth.models import User
 from django.shortcuts import render_to_response
 from django.shortcuts import get_object_or_404
+from django.forms.formsets import formset_factory
 
 from saip.app.forms import *
 from saip.app.models import *
@@ -992,7 +995,7 @@ def crear_artefacto(request, proyecto_id):
             hist.save()            
             return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyecto_id)+"/")
     else:
-        form = ArtefactoForm(proyect.fase, proyecto_id)
+        form = ArtefactoForm(proyect.fase, proyect)
                 
     variables = RequestContext(request, {'proyecto': proyect,
                                         'form': form,
@@ -1256,6 +1259,56 @@ def admin_artefactos_eliminados(request, proyecto_id):
     lista = Artefacto.objects.filter(proyecto=proyect, habilitado=False)
     variables = RequestContext(request, {'proyecto': proyect, 'lista': lista, 'abm_artefactos': 'ABM artefactos' in permisos})
     return render_to_response('desarrollo/artefacto/artefactos_eliminados.html', variables)
+
+@login_required
+def admin_adjuntos(request, proyecto_id, art_id):
+    """Administracion de archivos de un artefacto dado"""
+    user = User.objects.get(username=request.user.username)
+    art = get_object_or_404(Artefacto, id = art_id)
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+    archivos = Adjunto.objects.filter(artefacto = art)
+    return render_to_response('desarrollo/artefacto/adjunto/adjuntos.html', {'art':art, 'lista': archivos, 
+                                                                             'proyecto': proyecto,'user':user})
+
+@login_required
+def add_adjunto(request, proyecto_id, art_id):
+    user = User.objects.get(username=request.user.username)
+    proyect = get_object_or_404(Proyecto, id=proyecto_id)
+    art = get_object_or_404(Artefacto, id=art_id)
+    AdjuntoFormSet = formset_factory(AdjuntoForm, extra=5)
+    if request.method == 'POST':
+        #form = AdjuntoForm(request.POST, request.FILES)
+        formset = AdjuntoFormSet(request.POST, request.FILES)
+        if formset.is_valid():
+            for form in formset.forms:
+                nuevo = Adjunto()
+                #file = request.FILES['archivo']
+                file = form.cleaned_data['archivo']
+                nuevo.nombre = file.name
+                nuevo.tamanho = file.size
+                nuevo.mimetype = file.content_type
+                nuevo.contenido = base64.b64encode(file.read())
+                nuevo.artefacto = art
+                nuevo.save()
+            return HttpResponseRedirect("/proyectos/artefactos&id="+ str(proyect.id) + "/adj&id=" + str(art_id) + "/")
+    else:
+        formset = AdjuntoFormSet()
+        return render_to_response('desarrollo/artefacto/adjunto/crear_adjunto.html', {'formset':formset,
+                                                                                      'art':art, 
+                                                                                      'user':user, 
+                                                                                      'proyecto':proyect})
+
+@login_required
+def retornar_archivo(request, proyecto_id, art_id, arch_id):
+    proyect = get_object_or_404(Proyecto, id=proyecto_id)
+    art = get_object_or_404(Artefacto, id=art_id)
+    adjunto = get_object_or_404(Adjunto, id=arch_id)
+    if request.method == 'GET':
+        respuesta = HttpResponse(base64.b64decode(adjunto.contenido), content_type= adjunto.mimetype)
+        respuesta['Content-Disposition'] = 'attachment; filename=' + adjunto.nombre
+        respuesta['Content-Length'] = adjunto.tamanho
+        return respuesta
+    return HttpResponseRedirect('proyectos/artefactos&id=' + str(art.id))
 
 @login_required
 def restaurar_artefacto_eliminado(request, proyecto_id, art_id):
