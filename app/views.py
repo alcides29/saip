@@ -296,7 +296,7 @@ def cambiar_password(request):
         if form.is_valid():
             user.set_password(form.cleaned_data['password1'])
             user.save()
-            return HttpResponseRedirect("/usuarios")
+            return HttpResponseRedirect("/")
     else:
         form = CambiarPasswordForm()
     return render_to_response("cambiar_password.html", {'form': form, 'user': user})
@@ -750,6 +750,16 @@ def crear_tipo_artefacto(request):
             nuevo.descripcion = form.cleaned_data['descripcion']
             nuevo.fase = form.cleaned_data['fase']
             nuevo.save()
+            
+            # Agregamos en cada uno de los proyectos
+            p = Proyecto.objects.all()
+            for item in p:
+                tipo_art = TipoArtefactoFaseProyecto()
+                tipo_art.proyecto = item
+                tipo_art.fase = nuevo.fase
+                tipo_art.tipo_artefacto = nuevo
+                tipo_art.cant = 1
+                tipo_art.save()
             return HttpResponseRedirect("/tipo_artefacto")
     else:
         form = TipoArtefactoForm()
@@ -834,37 +844,6 @@ def admin_tipo_artefacto_fase(request, proyecto_id):
         permisos.append(item.nombre)
     #-------------------------------------------------------------------
     lista = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyecto_id)
-    variables = RequestContext(request,
-                               {'lista': lista,
-                                'proyecto': p,
-                                'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
-    return render_to_response('desarrollo/tipo_artefacto_fase.html', variables)
-
-@login_required
-def agregar_tipo_artefacto_fase(request, proyecto_id):
-    """Permite agregar un tipo de artefacto a un proyecto."""
-    user = User.objects.get(username=request.user.username)
-    p = Proyecto.objects.get(id = proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyecto_id).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    #-------------------------------------------------------------------
-    if request.method == 'POST':
-        form = TipoArtefactoFaseForm(request.POST)
-        if form.is_valid():
-            tipo_art.fase = form.cleaned_data['fase']
-            tipo_art.save()
-            return HttpResponseRedirect("/proyectos/tipoArtefacto&id="+str(proyecto_id))
-    else:
-        form = TipoArtefactoFaseForm(initial={'fase': tipo_art.fase.id})
-    
-    lista = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyecto_id)
-    
     variables = RequestContext(request,
                                {'lista': lista,
                                 'proyecto': p,

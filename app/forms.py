@@ -39,7 +39,7 @@ class ModUsuariosForm(forms.Form):
 	email = forms.EmailField(max_length=75, label='Correo Electronico')
 
 class CambiarPasswordForm(forms.Form):
-	password1 = forms.CharField(widget = forms.PasswordInput, max_length=128, label = 'Escriba su contrasena')
+	password1 = forms.CharField(widget = forms.PasswordInput, max_length=128, label = 'Escriba su nueva contrasena')
 	password2 = forms.CharField(widget = forms.PasswordInput, max_length=128, label = 'Repita la contrasena')
 	
 	def clean_password2(self):
@@ -163,7 +163,7 @@ class TipoArtefactoForm(forms.Form):
 class TipoArtefactoFaseForm(forms.Form):
     """Form para asociar un tipo de artefacto a una fase de un proyecto."""
     fase = forms.ModelChoiceField(queryset = Fase.objects.all(), widget=forms.RadioSelect, required=False, empty_label=None)
-        
+    
 class ArtefactoForm(forms.Form):
     complejidad = forms.CharField(max_length=2, widget=forms.Select(choices=COMPLEXITY_CHOICES), label='Complejidad')
     descripcion_corta = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Corta')
