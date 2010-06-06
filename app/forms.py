@@ -199,5 +199,5 @@ class RelacionArtefactoForm(forms.Form):
 		self.fields['artefactos'].queryset = Artefacto.objects.filter(Q(fase = art_fase), ~Q(id = art.id), ~Q(pk__in=lista), Q(proyecto = art.proyecto)) 
         
 class AdjuntoForm(forms.Form):
-	archivo = forms.FileField()
+	archivo = forms.FileField(required = False)
 

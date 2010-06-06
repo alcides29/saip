@@ -1275,19 +1275,21 @@ def add_adjunto(request, proyecto_id, art_id):
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     art = get_object_or_404(Artefacto, id=art_id)
-    AdjuntoFormSet = formset_factory(AdjuntoForm, extra=5)
+    AdjuntoFormSet = formset_factory(AdjuntoForm, extra=2)
     if request.method == 'POST':
         #form = AdjuntoForm(request.POST, request.FILES)
         formset = AdjuntoFormSet(request.POST, request.FILES)
+        i=0
         if formset.is_valid():
-            for form in formset.forms:
+            #for form in formset.forms:
+            for f in request.FILES.values():
                 nuevo = Adjunto()
                 #file = request.FILES['archivo']
-                file = form.cleaned_data['archivo']
-                nuevo.nombre = file.name
-                nuevo.tamanho = file.size
-                nuevo.mimetype = file.content_type
-                nuevo.contenido = base64.b64encode(file.read())
+                file = f
+                nuevo.nombre = f.name
+                nuevo.tamanho = f.size
+                nuevo.mimetype = f.content_type
+                nuevo.contenido = base64.b64encode(f.read())
                 nuevo.artefacto = art
                 nuevo.save()
             return HttpResponseRedirect("/proyectos/artefactos&id="+ str(proyect.id) + "/adj&id=" + str(art_id) + "/")
