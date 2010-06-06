@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Relaciones{% endblock %}
+{% block head %}Relaciones de {{art.nombre}}<br>{% endblock %}
+{% block content %}
+{% if abm_artefactos %}
+    
+    {% for item in lista %}
+    <p> {{ item.nombre }} </p>
+    {% endfor %}
+
+<input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/fasesAnt/' "/>
+
+{% else %}
+	<p>¡No tiene los permisos para ver esta p&aacute;gina!</p>
+{% endif %}
+{% endblock %}
