@@ -1250,6 +1250,16 @@ def admin_adjuntos(request, proyecto_id, art_id):
                                                                              'proyecto': proyecto,'user':user})
 
 @login_required
+def adjuntos_eliminados(request, proyecto_id, art_id):
+    """Administracion de archivos de un artefacto dado"""
+    user = User.objects.get(username=request.user.username)
+    art = get_object_or_404(Artefacto, id = art_id)
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+    archivos = Adjunto.objects.filter(artefacto = art, habilitado = False)
+    return render_to_response('desarrollo/artefacto/adjunto/adjuntos_eliminados.html', {'art':art, 'lista': archivos, 
+                                                                             'proyecto': proyecto,'user':user})
+
+@login_required
 def add_adjunto(request, proyecto_id, art_id):
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
@@ -1305,7 +1315,17 @@ def retornar_archivo(request, proyecto_id, art_id, arch_id):
         respuesta['Content-Disposition'] = 'attachment; filename=' + adjunto.nombre
         respuesta['Content-Length'] = adjunto.tamanho
         return respuesta
-    return HttpResponseRedirect('/proyectos/artefactos&id=' + str(proyecto_id) + 'adj&id=' + str(art_id))
+    return HttpResponseRedirect('/proyectos/artefactos&id=' + str(proyecto_id) + '/adj&id=' + str(art_id) +'/')
+
+@login_required
+def restaurar_archivo(request, proyecto_id, art_id, arch_id):
+    #proyect = get_object_or_404(Proyecto, id=proyecto_id)
+    #art = get_object_or_404(Artefacto, id=art_id)
+    adjunto = get_object_or_404(Adjunto, id=arch_id)
+    if request.method == 'GET':
+        adjunto.habilitado = True
+        adjunto.save()
+    return HttpResponseRedirect('/proyectos/artefactos&id=' + str(proyecto_id) + '/adj&id=' + str(art_id) + '/')
 
 @login_required
 def restaurar_artefacto_eliminado(request, proyecto_id, art_id):
