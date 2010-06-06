@@ -1,14 +1,2 @@
-
-- Ver para poner el rol por defecto que le corresponde a un usuario de proyecto(proyecto--> usuario-->rol)
 - Verificar el formato de entrada de fechas.
-- Cambiar contrasenha de usuario
-- Artefacto
-- Permisos
-- Roles
-- Calculo de complejidad
-- Historial - Registro historial---> falta controlar la version una vez restaurado volver a modificar!!
-- Adjunto
-- Linea Base
-- fecHor_creacion de Rol 
-- Tipo de artefacto por proyecto
-- null en TextField
+-  
