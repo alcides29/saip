@@ -67,7 +67,7 @@ class Proyecto(models.Model):
     
 class TipoArtefacto(models.Model):
     """"Esta clase representa a que tipo pertenece un artefacto."""
-    Abreviatura = models.CharField(unique=True, max_length=50)
+    abreviatura = models.CharField(unique=True, max_length=50)
     descripcion = models.TextField()
     #claves foraneas
     fase = models.ForeignKey(Fase)
