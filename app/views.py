@@ -1245,7 +1245,7 @@ def admin_adjuntos(request, proyecto_id, art_id):
     user = User.objects.get(username=request.user.username)
     art = get_object_or_404(Artefacto, id = art_id)
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
-    archivos = Adjunto.objects.filter(artefacto = art)
+    archivos = Adjunto.objects.filter(artefacto = art, habilitado = True)
     return render_to_response('desarrollo/artefacto/adjunto/adjuntos.html', {'art':art, 'lista': archivos, 
                                                                              'proyecto': proyecto,'user':user})
 
@@ -1254,14 +1254,16 @@ def add_adjunto(request, proyecto_id, art_id):
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     art = get_object_or_404(Artefacto, id=art_id)
-    AdjuntoFormSet = formset_factory(AdjuntoForm, extra=2)
+    AdjuntoFormSet = formset_factory(AdjuntoForm, extra=5)
     if request.method == 'POST':
         #form = AdjuntoForm(request.POST, request.FILES)
         formset = AdjuntoFormSet(request.POST, request.FILES)
         i=0
         if formset.is_valid():
             #for form in formset.forms:
-            for f in request.FILES.values():
+            archivos = request.FILES.values()
+            print archivos
+            for f in archivos: 
                 nuevo = Adjunto()
                 #file = request.FILES['archivo']
                 file = f
@@ -1279,7 +1281,20 @@ def add_adjunto(request, proyecto_id, art_id):
                                                                                       'art':art, 
                                                                                       'user':user, 
                                                                                       'proyecto':proyect})
-
+@login_required
+def quitar_archivo(request, proyecto_id, art_id, arch_id):
+    user = User.objects.get(username=request.user.username)
+    proyect = get_object_or_404(Proyecto, id=proyecto_id)
+    art = get_object_or_404(Artefacto, id=art_id)
+    adjunto = get_object_or_404(Adjunto, id=arch_id)
+    if request.method == 'POST':
+        adjunto.habilitado = False
+        adjunto.save()
+        return HttpResponseRedirect('/proyectos/artefactos&id=' + str(proyecto_id) + '/adj&id=' + str(art_id) + '/')
+    else:
+        return render_to_response('desarrollo/artefacto/adjunto/quitar_adjunto.html', {'art':art, 
+                                                                                      'user':user, 
+                                                                                      'proyecto':proyect})
 @login_required
 def retornar_archivo(request, proyecto_id, art_id, arch_id):
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
@@ -1290,7 +1305,7 @@ def retornar_archivo(request, proyecto_id, art_id, arch_id):
         respuesta['Content-Disposition'] = 'attachment; filename=' + adjunto.nombre
         respuesta['Content-Length'] = adjunto.tamanho
         return respuesta
-    return HttpResponseRedirect('proyectos/artefactos&id=' + str(art.id))
+    return HttpResponseRedirect('/proyectos/artefactos&id=' + str(proyecto_id) + 'adj&id=' + str(art_id))
 
 @login_required
 def restaurar_artefacto_eliminado(request, proyecto_id, art_id):
