@@ -66,10 +66,12 @@ urlpatterns = patterns('',
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/fasesAnt/$', fases_anteriores),    
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/revisar&id=(?P<art_id>\d+)/$', revisar_artefacto),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/rel&id=(?P<art_id>\d+)&fase=(?P<fase>\d+)/$', definir_dependencias),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/verrel&id=(?P<art_id>\d+)&fase=(?P<fase>\d+)/$', ver_dependencias),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/imp&id=(?P<art_id>\d+)/$',calcular_impacto),
     
     # historial
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/$', ver_historial),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/historel&id=(?P<reg_id>\d+)&fase=(?P<fase>\d+)/$', historial_relaciones),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/volver&id=(?P<reg_id>\d+)/$', restaurar_artefacto),
     
     # roles

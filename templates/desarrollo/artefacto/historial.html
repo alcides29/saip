@@ -26,12 +26,13 @@
 		<td>{{item.icono}}</td>			
 		<td>{{item.tipo}}</td>
         <td>{{item.fecha_modificacion}}</td>
-		<td><a href="">| Relaciones con la fase actual</a><a href="">| Relaciones con la fase anterior</a><a href=" ">| Adjuntos</a>{% ifequal art.fase proyecto.fase %}{% ifnotequal art.estado 3%}<a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{art.id}}/volver&id={{item.id}}/">| Restaurar</a>{% endifnotequal %}{% endifequal %}</td>
+		<td><a href="/proyectos/artefactos&id={{ proyecto.id }}/historial&id={{ art.id }}/historel&id={{ item.id }}&fase={{ art.fase.id }}/">| Relaciones con la fase actual</a>{% ifnotequal art.fase.id 1 %}<a href="/proyectos/artefactos&id={{ proyecto.id }}/historial&id={{ art.id }}/historel&id={{ item.id }}&fase={{ art.fase.id|add:"-1" }}/">| Relaciones con la fase anterior</a>{% endifnotequal %}<a href=" ">| Adjuntos</a>{% ifequal art.fase proyecto.fase %}{% ifnotequal art.estado 3%}<a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{art.id}}/volver&id={{item.id}}/">| Restaurar</a>{% endifnotequal %}{% endifequal %}</td>
 	</tr>
 	{% endfor %}
 </table>
 {% ifequal art.fase proyecto.fase %}
-<input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/'"/>
+{% if fin %}<input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/fasesAnt/'"/>{% else %}
+<input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/'"/>{% endif%}
 {% else %}
 <input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/fasesAnt/'"/>
 {% endifequal %}

@@ -69,8 +69,10 @@ def administrar_proyecto(request, proyecto_id):
         permisos.append(item.nombre)
     print permisos
     #-------------------------------------------------------------------
+    linea = LineaBase.objects.filter(proyectos=proyecto, fase=3)
     return render_to_response("desarrollo/admin_proyecto.html", {'proyecto':proyecto, 
                                                                  'user':user,
+                                                                 'fin':linea,
                                                                  'ver_artefactos': 'Ver artefactos' in permisos,
                                                                  'abm_artefactos': 'ABM artefactos' in permisos,
                                                                  'ver_miembros': 'Ver miembros' in permisos,
@@ -1099,16 +1101,61 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
     art = get_object_or_404(Artefacto, id=art_id)
     relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
     if request.method == 'POST':
+        art = get_object_or_404(Artefacto, id=art_id)
         form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, request.POST)
-        if form.is_valid():
+        if form.is_valid():            
+            cambio = False            
             relaciones_nuevas = form.cleaned_data['artefactos']
             relaciones = RelArtefacto.objects.filter(hijo = art)
             print relaciones
+            lista = []
             for item in relaciones:
-                item.habilitado = False
-                item.save()
+                if ( item.padre.fase == Fase.objects.get(pk=fase)):
+                    lista.append(item.padre)
+                      
+            if (lista):            
+               for item in lista:
+                   if (item in relaciones_nuevas) == 0:
+                        cambio = True
+               for item in relaciones_nuevas:
+                    if (item in lista) == 0:
+                        cambio =True
+                    	
+            if (cambio):
+                """Se ingresa la version antigua al registro"""
+                reg = RegistroHistorial()
+                reg.version = art.version
+                reg.estado = art.estado
+                reg.complejidad = art.complejidad
+                reg.descripcion_corta = art.descripcion_corta
+                reg.descripcion_larga = art.descripcion_larga
+                reg.habilitado = art.habilitado
+                reg.icono = art.icono
+                reg.tipo = art.tipo
+                reg.fecha_modificacion = datetime.datetime.today()
+                historial = Historial.objects.get(artefacto = art)
+                reg.historial = historial
+                reg.save()
+                for item in relaciones:
+                    nuevo = RegHistoRel()
+                    nuevo.art_padre = item.padre
+                    nuevo.art_hijo = item.hijo
+                    nuevo.registro = reg
+                    nuevo.save()
+                """Se cambia el estado del artefacto"""
+                art.estado = 2            
+                """Se incrementa la version actual"""
+                art.version = art.version + 1
+                art.save()             	
+                  
+            for item in lista:
+                auxi = RelArtefacto.objects.filter(padre = item, hijo = art)
+                if auxi:
+                    nuevo = auxi[0]
+                    nuevo.habilitado = False
+                    nuevo.save()
+                
             for item in relaciones_nuevas:
-                print item
                 aux = RelArtefacto.objects.filter(padre = item, hijo = art)
                 if aux:
                     nuevo = aux[0]
@@ -1120,6 +1167,7 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
                     r.hijo = art
                     r.habilitado = True
                     r.save()
+                    
             return HttpResponseRedirect("/proyectos/artefactos&id=" + str(p.id) + "/")
     else:
         if not validar_fase(p, fase):
@@ -1129,9 +1177,37 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
         for item in relaciones:
             dic[item.padre.id] = True
         form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, initial = {'artefactos': dic})
-        return render_to_response("desarrollo/artefacto/relacion_artefacto.html", {'form': form, 'user':user, 'art':art, 
+        return render_to_response("desarrollo/artefacto/relacion_artefacto.html", {'form': form,
+                                                                                   'user':user,
+                                                                                   'art':art, 
                                                                                    'proyecto': p,
                                                                                    'abm_artefactos': 'ABM artefactos' in permisos})
+        
+@login_required
+def ver_dependencias(request, proyecto_id, art_id, fase):
+    """ver las relaciones de un artefacto."""
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
+    art = get_object_or_404(Artefacto, id=art_id)
+    relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
+    lista = []
+    for item in relaciones:
+        if ( item.padre.fase == Fase.objects.get(pk=fase)):
+            lista.append(item.padre)
+    return render_to_response("desarrollo/artefacto/ver_relacion.html", {'art':art, 
+                                                                         'proyecto':proyect,
+                                                                         'lista':lista,
+                                                                         'abm_artefactos':'ABM artefactos' in permisos})
     
 
 @login_required
@@ -1225,12 +1301,42 @@ def ver_historial(request, proyecto_id, art_id):
     #-------------------------------------------------------------------
     historial = Historial.objects.get(artefacto=art)
     versiones = RegistroHistorial.objects.filter(historial=historial).order_by('version')
+    linea = LineaBase.objects.filter(proyectos=proyect, fase=3)
     variables = RequestContext(request, {'historial': historial, 
                                          'lista': versiones,
                                          'art': art,
+                                         'fin':linea,
                                          'proyecto': proyect,
                                          'abm_artefactos': 'ABM artefactos' in permisos})
     return render_to_response('desarrollo/artefacto/historial.html', variables)
+
+@login_required
+def historial_relaciones(request, proyecto_id, art_id, reg_id, fase):
+    art = Artefacto.objects.get(pk=art_id)
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    #-------------------------------------------------------------------
+    reg = RegistroHistorial.objects.get (pk=reg_id)
+    relaciones = RegHistoRel.objects.filter (registro = reg)
+    lista = []
+    for item in relaciones:
+        if (item.art_padre.fase == Fase.objects.get(pk=fase)):
+            lista.append(item.art_padre)
+    variables = RequestContext(request, {'registro': reg,
+                                         'lista': lista,
+                                         'art': art,
+                                         'proyecto': proyect,
+                                         'abm_artefactos': 'ABM artefactos' in permisos})
+    return render_to_response('desarrollo/artefacto/historial_relaciones.html', variables)
+
 
 @login_required
 def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
@@ -1245,14 +1351,12 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
     permisos = []
     for item in permisos_obj:
         permisos.append(item.nombre)
-    #if not ('ABM artefactos' in permisos):
-     #   return render_to_response('error.html')
+   
     #-------------------------------------------------------------------
     if request.method == 'POST':
         art = Artefacto.objects.get(pk = art_id)
         reg = RegistroHistorial()
         reg.version = art.version
-        #reg.estado = art.estado
         reg.complejidad = art.complejidad
         reg.descripcion_corta = art.descripcion_corta
         reg.descripcion_larga = art.descripcion_larga
@@ -1263,17 +1367,46 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
         historial = Historial.objects.get(artefacto = art)
         reg.historial = historial
         reg.save()
+        relaciones = RelArtefacto.objects.filter(Q(padre = art) | Q(hijo = art), habilitado = True)
+        if (relaciones):             
+            for item in relaciones:
+                nuevo=  RegHistoRel()
+                nuevo.art_padre = item.padre
+                nuevo.art_hijo = item.hijo
+                nuevo.registro = reg
+                nuevo.save()     
         
         r = RegistroHistorial.objects.get(pk=reg_id)
         art.version = art.version + 1
-        #art.estado = r.estado
         art.complejidad = r.complejidad
         art.descripcion_corta = r.descripcion_corta 
         art.descripcion_larga = r.descripcion_larga 
         art.habilitado = r.habilitado
         art.icono = r.icono
         art.tipo = r.tipo
-        art.save()   
+        art.save()
+        relaciones_nuevas= RegHistoRel.objects.filter(registro=r)
+        """hijos_nuevos = RegHistoRel.objects.filter(registro=r).only('art_hijo')
+        for item in relaciones:
+            item.habilitado = False
+            item.save()
+        relacion = RelArtefacto.objects.filter(Q(padre__in = padres_nuevos)|Q( hijo__in = hijos_nuevos))
+        for item in relacion:            
+            item.habilitado = True
+            item.save()"""
+        for item in relaciones:
+                item.habilitado = False
+                item.save()
+                
+        for item in relaciones_nuevas:
+            print item
+            aux = RelArtefacto.objects.filter(padre = item.art_padre, hijo = item.art_hijo, habilitado = False)
+            if aux:
+                nuevo = aux[0]
+                nuevo.habilitado = True
+                nuevo.save()
+                  
+               
         return HttpResponseRedirect("/proyectos/artefactos&id="+ str(proyecto_id)+"/")
            
     variables = RequestContext(request,{'proyecto': proyect,
@@ -1356,13 +1489,23 @@ def fases_anteriores(request, proyecto_id):
     #-------------------------------------------------------------------
     linea1 = LineaBase.objects.filter(proyectos=proyect, fase=1)
     linea2 = LineaBase.objects.filter(proyectos=proyect, fase=2)
+   
     tipo1 = TipoArtefacto.objects.filter(fase=1)
-    lista1 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo1)
+    lista1 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo1).order_by('nombre')
     tipo2 = TipoArtefacto.objects.filter(fase=2)
-    lista2 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo2)
+    lista2 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo2).order_by('nombre')
+    
+    linea3 = LineaBase.objects.filter(proyectos=proyect, fase=3)
+    tipo3 = TipoArtefacto.objects.filter(fase=3)
+    lista3 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo3).order_by('nombre')
+    
+    
+    
     return render_to_response("desarrollo/artefacto/Fases_anteriores.html", { 'proyecto':proyect,                                                                       
                                                                               'lista1':lista1,
                                                                               'lista2':lista2,
+                                                                              'fin':linea3,
+                                                                              'lista3':lista3,
                                                                               'abm_artefactos': 'ABM artefactos' in permisos
                                                                               })    
     

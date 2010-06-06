@@ -131,7 +131,7 @@ class RegistroHistorial(models.Model):
     descripcion_larga = models.TextField(null=True, blank=True)
     habilitado = models.BooleanField()
     icono = models.FileField(upload_to='icono', null=True, blank=True)
-    tipo = models.ForeignKey(TipoArtefacto)
+    tipo = models.ForeignKey(TipoArtefactoFaseProyecto)
     fecha_modificacion = models.DateTimeField(auto_now=True, auto_now_add=False, editable=False)
     #claves foraneas
     historial = models.ForeignKey(Historial)
@@ -147,7 +147,7 @@ class LineaBase(models.Model):
     fecha_creacion = models.DateField(auto_now=False, auto_now_add=True, editable=False)
     #relaciones con otras tablas
     proyectos = models.ForeignKey(Proyecto)
-    fase = models.OneToOneField(Fase, parent_link=False)#ver
+    fase = models.ForeignKey(Fase)
 
 
 class UsuarioRolProyecto(models.Model):   
@@ -164,4 +164,13 @@ class UsuarioRolSistema(models.Model):
     
     class Meta:
         unique_together = [("usuario", "rol")]
+        
+class RegHistoRel(models.Model):
+    art_padre = models.ForeignKey(Artefacto, related_name = 'art_padre')
+    art_hijo = models.ForeignKey(Artefacto, related_name = 'art_hijo')
+    registro = models.ForeignKey(RegistroHistorial)
+    
+    class Meta:
+        unique_together = [("art_padre", "art_hijo", "registro")]
+
 
