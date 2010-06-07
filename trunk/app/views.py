@@ -947,7 +947,7 @@ def crear_artefacto(request, proyecto_id):
         permisos.append(item.nombre)
     #-------------------------------------------------------------------
     if request.method == 'POST':
-        form = ArtefactoForm(proyect.fase, proyecto_id, request.FILES, request.POST)
+        form = ArtefactoForm(proyect.fase, proyecto_id, request.POST, request.FILES)
         if form.is_valid():
             art = Artefacto()
             art.usuario = user#solo en el historial?
@@ -1001,10 +1001,10 @@ def modificar_artefacto(request, proyecto_id, art_id):
     #-------------------------------------------------------------------
     if request.method == 'POST':
         art = Artefacto.objects.get(pk=art_id)
-        form = ModArtefactoForm(proyect.fase, request.FILES, request.POST)
+        form = ModArtefactoForm(proyect.fase, request.POST, request.FILES)
         if (form.is_valid()):
             
-            archivos = Adjuntos.objects.filter(artefacto=art)
+            archivos = Adjunto.objects.filter(artefacto=art)
             relaciones = RelArtefacto.objects.filter(hijo = art)            
             
             cambio = False            
@@ -1051,7 +1051,7 @@ def modificar_artefacto(request, proyecto_id, art_id):
     variables = RequestContext(request, {'form':form,
                                          'proyecto':proyect,
                                          'art':art,
-                                         'aprobado':aprobado,
+#                                         'aprobado':aprobado,
                                          'abm_artefactos': 'ABM artefactos' in permisos})          
     return render_to_response('desarrollo/artefacto/mod_artefacto.html', variables)
 
