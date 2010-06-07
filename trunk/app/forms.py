@@ -183,7 +183,7 @@ class ModArtefactoForm(forms.ModelForm):
         
     def __init__(self, proyect_fase, *args, **kwargs):
         super(ModArtefactoForm, self).__init__(*args, **kwargs)
-        self.fields['tipo'].queryset = TipoArtefacto.objects.filter(fase = proyect_fase)
+        self.fields['tipo'].queryset = TipoArtefactoFaseProyecto.objects.filter(fase = proyect_fase)
         
 class RelacionArtefactoForm(forms.Form):
 	artefactos = forms.ModelMultipleChoiceField(queryset = None, widget = forms.CheckboxSelectMultiple, required=False)

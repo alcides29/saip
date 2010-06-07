@@ -11,18 +11,18 @@
 		<td class="titulo">Complejidad</td>
 		<td class="titulo">Descripci&oacute;n Corta</td>
 		<td class="titulo">Descripci&oacute;n Larga</td>
-        <td class="titulo">Tipo</td>
+		<td class="titulo">Tipo</td>
 		<td class="titulo">Acciones</td>
 	</tr>
 	{% for item in lista %}
 	<tr>
 		<td>{% if not linea %}<a href="/proyectos/artefactos&id={{proyecto.id}}/mod&id={{item.id}}/">{% endif %}{{item.nombre}}</a></td>
-        <td>{{item.version}}</td>
+		<td>{{item.version}}</td>
 		<td>{{item.estado}}</td>        
 		<td>{{item.complejidad}}</td>
 		<td>{{item.descripcion_corta}}</td>
 		<td>{{item.descripcion_larga}}</td>
-       	<td>{{item.tipo}}</td>
+		<td>{{item.tipo}}</td>
 		<td>{% if not linea %}<a href="/proyectos/artefactos&id={{proyecto.id}}/del&id={{item.id}}/">Borrar</a>{% endif %}<a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">| Historial</a><a href="/proyectos/artefactos&id={{proyecto.id}}/rel&id={{item.id}}&fase={{proyecto.fase.id}}/">| Relaciones con la fase actual</a>{% ifnotequal proyecto.fase.id 1 %}<a href="/proyectos/artefactos&id={{proyecto.id}}/rel&id={{item.id}}&fase={{proyecto.fase.id|add:"-1" }}/">| Relaciones con la fase anterior</a>{% endifnotequal %}<a href="/proyectos/artefactos&id={{proyecto.id}}/adj&id={{item.id}}/">| Adjuntos</a><a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/">| Impacto</a>{% if not linea %}<a href="/proyectos/artefactos&id={{proyecto.id}}/revisar&id={{item.id}}/ ">| Revisar</a>{% endif %}</td>
 	</tr>
 	{% endfor %}
