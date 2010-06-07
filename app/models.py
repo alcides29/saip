@@ -83,7 +83,7 @@ class TipoArtefactoFaseProyecto(models.Model):
     cant = models.IntegerField(max_length = 4)
     
     def __unicode__(self):
-        return self.tipo_artefacto.nombre
+        return self.tipo_artefacto.descripcion
 
     class Meta:
         unique_together = [("tipo_artefacto", "fase", "proyecto")]
