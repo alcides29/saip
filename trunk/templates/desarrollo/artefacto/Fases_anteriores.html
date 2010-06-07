@@ -3,7 +3,7 @@
 {% block head %}{% if fin %}Artefactos de {{proyecto.nombre}}{% else %}Artefactos de Fases Anteriores{% endif %}<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos %}
-<h2>Fase de Analisis de requerimientos</h2>
+<h2>Analisis de requerimientos</h2>
 <table>
 	<tr>
 		<td class="titulo">Nombre</td>        
@@ -25,7 +25,7 @@
 		<td>{{item.descripcion_larga}}</td>
 		<td>{{item.icono}}</td>	
         <td>{{item.tipo}}</td>
-        <td><a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">| Historial</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id}}/">| Relaciones con la misma fase</a><a href="">| Adjuntos</a><a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/">| Impacto</a></td>
+        <td><a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">| Historial</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id}}/">| Relaciones con la misma fase</a><a href="/proyectos/artefactos&id={{proyecto.id}}/veradj&id={{item.id}}/">| Adjuntos</a><a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/">| Impacto</a></td>
 	</tr>
 	{% endfor %}
 </table>
@@ -51,7 +51,7 @@
 		<td>{{item.descripcion_larga}}</td>
 		<td>{{item.icono}}</td>	
        	<td>{{item.tipo}}</td>
-        <td><a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">| Historial</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id}}/">| Relaciones con la misma fase</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id|add:"-1" }}/">| Relaciones con la fase anterior</a><a href="">| Adjuntos</a><a href=" ">| Impacto</a></td>
+        <td><a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">| Historial</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id}}/">| Relaciones con la misma fase</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id|add:"-1" }}/">| Relaciones con la fase anterior</a><a href="/proyectos/artefactos&id={{proyecto.id}}/veradj&id={{item.id}}/">| Adjuntos</a><a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/">| Impacto</a></td>
 	</tr>
 	{% endfor %}
 </table>
@@ -79,7 +79,7 @@
 		<td>{{item.descripcion_larga}}</td>
 		<td>{{item.icono}}</td>	
        	<td>{{item.tipo}}</td>
-        <td><a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">| Historial</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id}}/">| Relaciones con la misma fase</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id|add:"-1" }}/">| Relaciones con la fase anterior</a><a href="">| Adjuntos</a><a href=" ">| Impacto</a></td>
+        <td><a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">| Historial</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id}}/">| Relaciones con la misma fase</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id|add:"-1" }}/">| Relaciones con la fase anterior</a><a href="/proyectos/artefactos&id={{proyecto.id}}/veradj&id={{item.id}}/">| Adjuntos</a><a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/ ">| Impacto</a></td>
 	</tr>
 	{% endfor %}
 </table>

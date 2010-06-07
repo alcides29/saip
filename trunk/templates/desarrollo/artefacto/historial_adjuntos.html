@@ -1,14 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Historial de Relaciones{% endblock %}
-{% block head %}Relaciones de {{art.nombre}} en la version {{ registro.version }}<br>{% endblock %}
+{% block title %}Historial de Adjuntos{% endblock %}
+{% block head %}Adjuntos de {{art.nombre}} en la version {{ registro.version }}<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos %}
-<ul>  
+<ul>   
     {% for item in lista %}
     <li> {{ item.nombre }} </li>
     {% endfor %}
 </ul>
-
 <input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/historial&id={{art.id}}/' "/>
 
 {% else %}

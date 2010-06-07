@@ -4,13 +4,18 @@
 {% block content %}
 {% if abm_artefactos %}
 <p>La complejidad del artefacto es {{impacto}}</p>
+
+{% if fin %}<input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/fasesAnt/'"/>{% else %}
+
+
 {% ifequal art.fase proyecto.fase %}
 <input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/'"/>
 {% else %}
 <input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/fasesAnt/'"/>
 {% endifequal %}
+{% endif %}
 {% else %}
-<p>¡No tiene los permisos para ver esta p&aacute;gina!</p>
-<input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/'"/>	
+    <p>¡No tiene los permisos para ver esta p&aacute;gina!</p>
+    <input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/'"/>	
 {% endif %}
 {% endblock %}
