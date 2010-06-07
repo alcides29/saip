@@ -126,7 +126,7 @@ class ModRolesForm(forms.Form):
 	descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
 
 class ItemForm(forms.Form):
-	items = forms.ModelMultipleChoiceField(queryset= Rol.objects.filter(categoria=2), widget = forms.CheckboxSelectMultiple, required=False)
+	items = forms.ModelMultipleChoiceField(queryset= Rol.objects.filter(categoria=2).exclude(id = 2), widget = forms.CheckboxSelectMultiple, required=False)
 	
 	def __init__(self, miembro, *args, **kwargs):
 		super(ItemForm, self).__init__(*args, **kwargs)

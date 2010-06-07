@@ -708,7 +708,7 @@ def del_proyecto(request, proyecto_id):
 
 @login_required
 def admin_tipo_artefacto(request):
-    """Muestra la p√°gina de administracion de tipo de artefactos."""
+    """Muestra la pagina de administracion de tipo de artefactos."""
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -906,7 +906,7 @@ def quitar_tipo_artefacto_fase(request, proyecto_id, tipo_art_id):
 #desde aqui artefacto
 @login_required
 def admin_artefactos(request, proyecto_id):
-    """Muestra la p·gina de administracion de artefactos."""
+    """Muestra la pagina de administracion de artefactos."""
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     tipoArtefactos = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyecto_id, fase = proyect.fase)
@@ -944,7 +944,7 @@ def crear_artefacto(request, proyecto_id):
         permisos.append(item.nombre)
     #-------------------------------------------------------------------
     if request.method == 'POST':
-        form = ArtefactoForm(proyect.fase, proyecto_id, request.POST)
+        form = ArtefactoForm(proyect.fase, proyecto_id, request.FILES, request.POST)
         if form.is_valid():
             art = Artefacto()
             art.usuario = user#solo en el historial?
@@ -999,7 +999,7 @@ def modificar_artefacto(request, proyecto_id, art_id):
     #-------------------------------------------------------------------
     if request.method == 'POST':
         art = Artefacto.objects.get(pk=art_id)
-        form = ModArtefactoForm(proyect.fase, request.POST)
+        form = ModArtefactoForm(proyect.fase, request.FILES, request.POST)
         if (form.is_valid()):
             
             archivos = Adjuntos.objects.filter(artefacto=art)
@@ -1234,18 +1234,8 @@ def admin_adjuntos(request, proyecto_id, art_id):
     user = User.objects.get(username=request.user.username)
     art = get_object_or_404(Artefacto, id = art_id)
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
-    archivos = Adjunto.objects.filter(artefacto = art, habilitado = True)
+    archivos = Adjunto.objects.filter(artefacto = art)
     return render_to_response('desarrollo/artefacto/adjunto/adjuntos.html', {'art':art, 'lista': archivos, 
-                                                                             'proyecto': proyecto,'user':user})
-
-@login_required
-def adjuntos_eliminados(request, proyecto_id, art_id):
-    """Administracion de archivos de un artefacto dado"""
-    user = User.objects.get(username=request.user.username)
-    art = get_object_or_404(Artefacto, id = art_id)
-    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
-    archivos = Adjunto.objects.filter(artefacto = art, habilitado = False)
-    return render_to_response('desarrollo/artefacto/adjunto/adjuntos_eliminados.html', {'art':art, 'lista': archivos, 
                                                                              'proyecto': proyecto,'user':user})
 
 @login_required
@@ -1253,7 +1243,7 @@ def add_adjunto(request, proyecto_id, art_id):
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     art = get_object_or_404(Artefacto, id=art_id)
-    AdjuntoFormSet = formset_factory(AdjuntoForm, extra=5)
+    AdjuntoFormSet = formset_factory(AdjuntoForm, extra=2)
     if request.method == 'POST':
         #form = AdjuntoForm(request.POST, request.FILES)
         formset = AdjuntoFormSet(request.POST, request.FILES)
@@ -1287,6 +1277,7 @@ def add_adjunto(request, proyecto_id, art_id):
                                                                                       'art':art, 
                                                                                       'user':user, 
                                                                                       'proyecto':proyect})
+
 @login_required
 def quitar_archivo(request, proyecto_id, art_id, arch_id):
     user = User.objects.get(username=request.user.username)
@@ -1314,7 +1305,7 @@ def retornar_archivo(request, proyecto_id, art_id, arch_id):
         respuesta['Content-Disposition'] = 'attachment; filename=' + adjunto.nombre
         respuesta['Content-Length'] = adjunto.tamanho
         return respuesta
-    return HttpResponseRedirect('/proyectos/artefactos&id=' + str(proyecto_id) + '/adj&id=' + str(art_id) +'/')
+    return HttpResponseRedirect('proyectos/artefactos&id=' + str(art.id))
 
 @login_required
 def restaurar_archivo(request, proyecto_id, art_id, arch_id):
