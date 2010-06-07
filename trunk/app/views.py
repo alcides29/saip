@@ -175,7 +175,7 @@ def add_usuario_proyecto(request, object_id):
     print permisos
     #-------------------------------------------------------------------
     if request.method == 'POST':
-        form = UsuarioProyectoForm(request.POST)
+        form = UsuarioProyectoForm(p, request.POST)
         if form.is_valid():
             roles = form.cleaned_data['roles']
             if not roles:
@@ -193,7 +193,7 @@ def add_usuario_proyecto(request, object_id):
                     relacion.save()
             return HttpResponseRedirect("/proyectos/miembros&id=" + str(object_id))
     else:
-        form = UsuarioProyectoForm()
+        form = UsuarioProyectoForm(p)
     return render_to_response('desarrollo/add_miembro.html', {'form':form, 
                                                               'user':user,  
                                                               'proyecto': p,

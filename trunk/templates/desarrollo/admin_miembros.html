@@ -1,21 +1,20 @@
 {% extends "base.html" %}
 {% block title %}Proyectos{% endblock %}
-{% block head %}Miembros del Proyecto {{proyecto.id}}<br>{% endblock %}
+{% block head %}Miembros de Proyecto {{proyecto.nombre}}<br>{% endblock %}
 {% block content %}
 {% if ver_miembros or abm_miembros %}
 <form id="form_id" action="" method="post">
 <table>
 <tr><td class="titulo">Usuario</td><td class="titulo">Acciones</td></tr>
 	{% for item in miembros %}
-		<tr><td>{{item.username}}</td><td>{% if abm_miembros %}<a href="/proyectos/miembros&id={{proyecto.id}}/cambiar&id={{item.id}}">Administrar Roles</a> | <a href="/proyectos/miembros&id={{proyecto.id}}/del&id={{item.id}}">Quitar</a>{% endif %}</td></tr>
+	{% ifnotequal proyecto.usuario_lider.id item.id%}<tr><td>{{item.username}}</td><td>{% if abm_miembros %}<a href="/proyectos/miembros&id={{proyecto.id}}/cambiar&id={{item.id}}">Administrar Roles</a> | <a href="/proyectos/miembros&id={{proyecto.id}}/del&id={{item.id}}">Quitar</a>{% endif %}</td></tr>{% endifnotequal%}
 	{% endfor %}
 </table>
 {% if abm_miembros %}<p><a href="/proyectos/miembros&id={{proyecto.id}}/nuevo/">Agregar nuevo miembro</a></p>{% endif %}
 <input type="button" value="Volver" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/' "/>	
 </form>
 {% else %}
-	<p>¡No posee los permisos para ver esta p&aacute;gina!</p>
-    
+	<p>¡No posee los permisos para ver esta p&aacute;gina!</p>    
 {% endif %}
 {% endblock%}
 
