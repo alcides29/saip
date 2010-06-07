@@ -40,6 +40,7 @@ def obtener_relaciones_der(art, lista_existentes):
             if aux:
                 ret.extend(aux)
     return ret
+<<<<<<< .mine
 
 def get_permisos_proyecto(user, proyecto):
     roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyecto).only('rol')
@@ -60,6 +61,7 @@ def get_permisos_sistema(user):
     for item in permisos_obj:
         permisos.append(item.nombre)
     return permisos
+=======
 
 def registrar_version(art, relaciones, archivos):
     """Se ingresa la version antigua al registro"""
@@ -98,4 +100,5 @@ def registrar_version(art, relaciones, archivos):
     """Se incrementa la version actual"""
     art.version = art.version + 1
     art.save()           
+>>>>>>> .r164
 
