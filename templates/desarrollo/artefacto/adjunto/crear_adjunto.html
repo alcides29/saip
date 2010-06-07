@@ -2,6 +2,7 @@
 {% block title %}Artefactos{% endblock %}
 {% block head %}Archivos adjuntos en {{ art.nombre }}<br>{% endblock %}
 {% block content %}
+{% if abm_artefactos %}
 <form enctype="multipart/form-data" id="form_id" action="" method="post">
 	{{ formset.management_form }}
     {% for form in formset.forms %}
@@ -10,4 +11,7 @@
 <input type="submit" value="Aceptar" />
 <input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/adj&id={{art.id}}/' "/>
 </form>	
+{% else %}
+<p>¡No tiene los permisos necesarios para ver esta p&aacute;gina!</p>
+{% endif %}
 {% endblock %}

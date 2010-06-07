@@ -18,8 +18,12 @@
 {% endif %}
 <p></p>
 <p><a href="/proyectos/artefactos&id={{proyecto.id}}/adj&id={{art.id}}/nuevo/">A&ntilde;adir archivos</a> | <a href="/proyectos/artefactos&id={{proyecto.id}}/adjdel&id={{art.id}}/">Ver archivos eliminados</a></p>
+<<<<<<< .mine
 <input type="button" value="<<Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}' "/>
 {% else %}
 <p>¡No tiene los permisos necesarios para ver esta p&aacute;gina!</p>
 {% endif %}
+=======
+    <input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/'"/>
+>>>>>>> .r164
 {% endblock %}

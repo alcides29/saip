@@ -174,6 +174,9 @@ class ArtefactoForm(forms.Form):
     def __init__(self, proyect_fase, proyecto_id, *args, **kwargs):
         super(ArtefactoForm, self).__init__(*args, **kwargs)
         self.fields['tipo'].queryset = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyecto_id, fase = proyect_fase)
+        print self.fields['tipo'].queryset
+        print proyect_fase
+        print proyecto_id
         
 class ModArtefactoForm(forms.ModelForm):
     tipo = forms.ModelChoiceField(queryset=TipoArtefacto.objects.all(), required=False)    

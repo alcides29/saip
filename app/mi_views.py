@@ -902,7 +902,7 @@ def quitar_tipo_artefacto_fase(request, proyecto_id, tipo_art_id):
     lista = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyecto_id)
     return render_to_response('desarrollo/tipo_artefacto_fase.html',
                               {'lista': lista,
-                               'proyecto': proyect,
+							   'proyecto': proyect,
                                'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
         
 #desde aqui artefacto
@@ -1094,7 +1094,7 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
                for item in relaciones_nuevas:
                     if (item in lista) == 0:
                         cambio =True
-                        
+                    	
             if (cambio):
                 registrar_version(art, relaciones, archivos)
                                  
@@ -1237,13 +1237,18 @@ def admin_adjuntos(request, proyecto_id, art_id):
     user = User.objects.get(username=request.user.username)
     art = get_object_or_404(Artefacto, id = art_id)
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+<<<<<<< .mine
     permisos = get_permisos_proyecto(user, proyecto)
     archivos = Adjunto.objects.filter(artefacto = art, habilitado = True)
+=======
+    archivos = Adjunto.objects.filter(artefacto = art)
+>>>>>>> .r164
     return render_to_response('desarrollo/artefacto/adjunto/adjuntos.html', {'art':art, 'lista': archivos, 
                                                                              'proyecto': proyecto,'user':user,
                                                                              'abm_artefactos': 'ABM artefactos' in permisos})
 
 @login_required
+<<<<<<< .mine
 def adjuntos_eliminados(request, proyecto_id, art_id):
     """Administracion de archivos de un artefacto dado"""
     user = User.objects.get(username=request.user.username)
@@ -1256,6 +1261,8 @@ def adjuntos_eliminados(request, proyecto_id, art_id):
                                                                              'abm_artefactos': 'ABM artefactos' in permisos})
 
 @login_required
+=======
+>>>>>>> .r164
 def add_adjunto(request, proyecto_id, art_id):
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
@@ -1338,6 +1345,7 @@ def restaurar_archivo(request, proyecto_id, art_id, arch_id):
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     art = get_object_or_404(Artefacto, id=art_id)
     adjunto = get_object_or_404(Adjunto, id=arch_id)
+<<<<<<< .mine
     permisos = get_permisos_proyecto(user, proyect)
     if 'ABM artefactos' in permisos:
         if request.method == 'GET':
@@ -1348,6 +1356,14 @@ def restaurar_archivo(request, proyecto_id, art_id, arch_id):
     else:
         mensaje = 'No tiene los permisos necesarios.'
         return render_to_response('error.html', {'mensaje':mensaje})
+=======
+    if request.method == 'GET':
+        archivos = Adjunto.objects.filter(artefacto = art)
+        relaciones = RelArtefacto.objects.filter(hijo = art)
+        registrar_version(art, relaciones, archivos)
+        adjunto.habilitado = True
+        adjunto.save()
+>>>>>>> .r164
     return HttpResponseRedirect('/proyectos/artefactos&id=' + str(proyecto_id) + '/adj&id=' + str(art_id) + '/')
 
 @login_required
@@ -1696,3 +1712,4 @@ def logout_pagina(request):
     """Pagina de logout"""
     logout(request)
     return render_to_response('logout.html')
+

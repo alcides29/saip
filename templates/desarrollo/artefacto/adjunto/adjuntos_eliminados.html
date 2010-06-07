@@ -2,6 +2,7 @@
 {% block title %}Artefactos{% endblock %}
 {% block head %}Archivos adjuntos eliminados en &lt;{{ art.nombre }}&gt;<br>{% endblock %}
 {% block content %}
+{% if abm_artefactos %}
 {% if lista %}
 	<table>
 	<tr><td class="titulo">Nombre</td><td class="titulo">Tama&ntilde;o</td><td class="titulo">Acciones</td></tr>
@@ -14,5 +15,8 @@
 	</table>
 {% else %}
 	<p>No hay adjuntos</p>
+{% endif %}
+{% else %}
+<p>¡No tiene los permisos necesarios para ver esta p&aacute;gina!</p>
 {% endif %}
 {% endblock %}
