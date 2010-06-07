@@ -126,7 +126,7 @@ class ModRolesForm(forms.Form):
 	descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')
 
 class ItemForm(forms.Form):
-	items = forms.ModelMultipleChoiceField(queryset= Rol.objects.filter(categoria=2).exclude(id = 2), widget = forms.CheckboxSelectMultiple, required=False)
+	items = forms.ModelMultipleChoiceField(queryset= Rol.objects.filter(categoria=2).exclude(id=2), widget = forms.CheckboxSelectMultiple, required=False)
 	
 	def __init__(self, miembro, *args, **kwargs):
 		super(ItemForm, self).__init__(*args, **kwargs)
@@ -134,8 +134,13 @@ class ItemForm(forms.Form):
 
 class UsuarioProyectoForm(forms.Form):
     usuario = forms.ModelChoiceField(queryset = User.objects.all())
-    roles = forms.ModelMultipleChoiceField(queryset = Rol.objects.filter(categoria=2), widget = forms.CheckboxSelectMultiple, required=False)
+    roles = forms.ModelMultipleChoiceField(queryset = Rol.objects.filter(categoria=2).exclude(id=2), widget = forms.CheckboxSelectMultiple, required=False)
     proyecto = Proyecto()
+    
+    def __init__(self, proyecto, *args, **kwargs):
+        super(UsuarioProyectoForm, self).__init__(*args, **kwargs)
+        self.fields['usuario'].queryset = User.objects.filter(~Q(id = proyecto.usuario_lider.id))
+
 
     def clean_usuario(self):
         if 'usuario' in self.cleaned_data:
