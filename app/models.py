@@ -176,5 +176,16 @@ class RegHistoRel(models.Model):
     
     class Meta:
         unique_together = [("art_padre", "art_hijo", "registro")]
+        
+class RegHistoAdj(models.Model):
+    #archivo = models.FileField(upload_to='artefactos')
+    nombre = models.CharField(max_length = 100)
+    contenido = models.TextField(null=True)
+    tamanho = models.IntegerField()
+    mimetype = models.CharField(max_length = 255)  
+    #claves foraneas
+    artefacto = models.ForeignKey(Artefacto)
+    #habilitado = models.BooleanField(default = True)
+    registro = models.ForeignKey(RegistroHistorial)
 
 

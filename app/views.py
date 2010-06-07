@@ -1001,6 +1001,10 @@ def modificar_artefacto(request, proyecto_id, art_id):
         art = Artefacto.objects.get(pk=art_id)
         form = ModArtefactoForm(proyect.fase, request.POST)
         if (form.is_valid()):
+            
+            archivos = Adjuntos.objects.filter(artefacto=art)
+            relaciones = RelArtefacto.objects.filter(hijo = art)            
+            
             cambio = False            
             if (form.cleaned_data['complejidad'] != art.complejidad):
                 cambio = True
@@ -1012,26 +1016,10 @@ def modificar_artefacto(request, proyecto_id, art_id):
                 cambio = True
             elif (form.cleaned_data['tipo'] != art.tipo):
                 cambio = True            
+            
             if (cambio):
-                """ Se ingresa la version antigua al registro"""
-                reg = RegistroHistorial()
-                reg.version = art.version
-                reg.estado = art.estado
-                reg.complejidad = art.complejidad
-                reg.descripcion_corta = art.descripcion_corta
-                reg.descripcion_larga = art.descripcion_larga
-                reg.habilitado = art.habilitado
-                reg.icono = art.icono
-                reg.tipo = art.tipo
-                reg.fecha_modificacion = datetime.datetime.today()
-                historial = Historial.objects.get(artefacto = art)
-                reg.historial = historial
-                reg.save()
-                """Se cambia el estado del artefacto"""
-                art.estado = 2            
-                """Se incrementa la version actual"""
-                art.version = art.version + 1
-                art.save()                    
+                registrar_version(art, relaciones, archivos)                    
+                
             art.complejidad = form.cleaned_data['complejidad']
             art.descripcion_corta = form.cleaned_data['descripcion_corta']
             art.descripcion_larga = form.cleaned_data['descripcion_larga']            
@@ -1087,9 +1075,11 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
         form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, request.POST)
         if form.is_valid():            
             cambio = False            
-            relaciones_nuevas = form.cleaned_data['artefactos']
+            
+            archivos = Adjunto.objects.filter(artefacto=art)
             relaciones = RelArtefacto.objects.filter(hijo = art)
-            print relaciones
+            relaciones_nuevas = form.cleaned_data['artefactos']
+            
             lista = []
             for item in relaciones:
                 if ( item.padre.fase == Fase.objects.get(pk=fase)):
@@ -1104,32 +1094,8 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
                         cambio =True
                     	
             if (cambio):
-                """Se ingresa la version antigua al registro"""
-                reg = RegistroHistorial()
-                reg.version = art.version
-                reg.estado = art.estado
-                reg.complejidad = art.complejidad
-                reg.descripcion_corta = art.descripcion_corta
-                reg.descripcion_larga = art.descripcion_larga
-                reg.habilitado = art.habilitado
-                reg.icono = art.icono
-                reg.tipo = art.tipo
-                reg.fecha_modificacion = datetime.datetime.today()
-                historial = Historial.objects.get(artefacto = art)
-                reg.historial = historial
-                reg.save()
-                for item in relaciones:
-                    nuevo = RegHistoRel()
-                    nuevo.art_padre = item.padre
-                    nuevo.art_hijo = item.hijo
-                    nuevo.registro = reg
-                    nuevo.save()
-                """Se cambia el estado del artefacto"""
-                art.estado = 2            
-                """Se incrementa la version actual"""
-                art.version = art.version + 1
-                art.save()             	
-                  
+                registrar_version(art, relaciones, archivos)
+                                 
             for item in lista:
                 auxi = RelArtefacto.objects.filter(padre = item, hijo = art)
                 if auxi:
@@ -1189,6 +1155,29 @@ def ver_dependencias(request, proyecto_id, art_id, fase):
     return render_to_response("desarrollo/artefacto/ver_relacion.html", {'art':art, 
                                                                          'proyecto':proyect,
                                                                          'lista':lista,
+                                                                         'abm_artefactos':'ABM artefactos' in permisos})
+
+@login_required
+def ver_adjuntos(request, proyecto_id, art_id):
+    """ver las relaciones de un artefacto."""
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
+    art = get_object_or_404(Artefacto, id=art_id)
+    adjuntos = Adjunto.objects.filter(artefacto = art, habilitado = True)
+    
+    return render_to_response("desarrollo/artefacto/ver_relacion.html", {'art':art, 
+                                                                         'proyecto':proyect,
+                                                                         'lista':adjuntos,
                                                                          'abm_artefactos':'ABM artefactos' in permisos})
     
 
@@ -1271,20 +1260,27 @@ def add_adjunto(request, proyecto_id, art_id):
         i=0
         if formset.is_valid():
             #for form in formset.forms:
-            archivos = request.FILES.values()
-            print archivos
-            for f in archivos: 
+            archivos = Adjunto.objects.filter(artefacto = art)
+            relaciones = RelArtefacto.objects.filter(hijo = art)
+            archivos_nuevos = request.FILES.values()
+            
+            cambio = False
+            if (archivos and archivos_nuevos):
+                cambio = True
+                                
+            if (cambio):
+                registrar_version(art, relaciones, archivos)       
+            for f in archivos_nuevos: 
                 nuevo = Adjunto()
-                #file = request.FILES['archivo']
-                file = f
                 nuevo.nombre = f.name
                 nuevo.tamanho = f.size
                 nuevo.mimetype = f.content_type
                 nuevo.contenido = base64.b64encode(f.read())
                 nuevo.artefacto = art
                 nuevo.save()
+                
             return HttpResponseRedirect("/proyectos/artefactos&id="+ str(proyect.id) + "/adj&id=" + str(art_id) + "/")
-        return render_to_response('error.html', {'form': form})
+        #return render_to_response('error.html', {'form': form})
     else:
         formset = AdjuntoFormSet()
         return render_to_response('desarrollo/artefacto/adjunto/crear_adjunto.html', {'formset':formset,
@@ -1298,6 +1294,9 @@ def quitar_archivo(request, proyecto_id, art_id, arch_id):
     art = get_object_or_404(Artefacto, id=art_id)
     adjunto = get_object_or_404(Adjunto, id=arch_id)
     if request.method == 'POST':
+        archivos = Adjunto.objects.filter(artefacto = art)
+        relaciones = RelArtefacto.objects.filter(hijo = art)
+        registrar_version(art, relaciones, archivos)       
         adjunto.habilitado = False
         adjunto.save()
         return HttpResponseRedirect('/proyectos/artefactos&id=' + str(proyecto_id) + '/adj&id=' + str(art_id) + '/')
@@ -1320,9 +1319,12 @@ def retornar_archivo(request, proyecto_id, art_id, arch_id):
 @login_required
 def restaurar_archivo(request, proyecto_id, art_id, arch_id):
     #proyect = get_object_or_404(Proyecto, id=proyecto_id)
-    #art = get_object_or_404(Artefacto, id=art_id)
+    art = get_object_or_404(Artefacto, id=art_id)
     adjunto = get_object_or_404(Adjunto, id=arch_id)
     if request.method == 'GET':
+        archivos = Adjunto.objects.filter(artefacto = art)
+        relaciones = RelArtefacto.objects.filter(hijo = art)
+        registrar_version(art, relaciones, archivos)
         adjunto.habilitado = True
         adjunto.save()
     return HttpResponseRedirect('/proyectos/artefactos&id=' + str(proyecto_id) + '/adj&id=' + str(art_id) + '/')
@@ -1407,6 +1409,30 @@ def historial_relaciones(request, proyecto_id, art_id, reg_id, fase):
                                          'abm_artefactos': 'ABM artefactos' in permisos})
     return render_to_response('desarrollo/artefacto/historial_relaciones.html', variables)
 
+@login_required
+def historial_adjuntos(request, proyecto_id, art_id, reg_id):
+    art = Artefacto.objects.get(pk=art_id)
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    #-------------------------------------------------------------------
+    reg = RegistroHistorial.objects.get (pk=reg_id)
+    adjuntos = RegHistoAdj.objects.filter (registro = reg)
+    
+    variables = RequestContext(request, {'registro': reg,
+                                         'lista': adjuntos,
+                                         'art': art,
+                                         'proyecto': proyect,
+                                         'abm_artefactos': 'ABM artefactos' in permisos})
+    return render_to_response('desarrollo/artefacto/historial_adjuntos.html', variables)
+
 
 @login_required
 def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
@@ -1425,29 +1451,11 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
     #-------------------------------------------------------------------
     if request.method == 'POST':
         art = Artefacto.objects.get(pk = art_id)
-        reg = RegistroHistorial()
-        reg.version = art.version
-        reg.complejidad = art.complejidad
-        reg.descripcion_corta = art.descripcion_corta
-        reg.descripcion_larga = art.descripcion_larga
-        reg.habilitado = art.habilitado
-        reg.icono = art.icono
-        reg.tipo = art.tipo
-        reg.fecha_modificacion = datetime.datetime.today()
-        historial = Historial.objects.get(artefacto = art)
-        reg.historial = historial
-        reg.save()
-        relaciones = RelArtefacto.objects.filter(Q(padre = art) | Q(hijo = art), habilitado = True)
-        if (relaciones):             
-            for item in relaciones:
-                nuevo=  RegHistoRel()
-                nuevo.art_padre = item.padre
-                nuevo.art_hijo = item.hijo
-                nuevo.registro = reg
-                nuevo.save()     
+        relaciones = RelArtefacto.objects.filter(hijo = art)
+        archivos = Adjunto.objects.filter(artefacto = art)
+        registrar_version(art, relaciones, archivos)
         
         r = RegistroHistorial.objects.get(pk=reg_id)
-        art.version = art.version + 1
         art.complejidad = r.complejidad
         art.descripcion_corta = r.descripcion_corta 
         art.descripcion_larga = r.descripcion_larga 
@@ -1455,22 +1463,25 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
         art.icono = r.icono
         art.tipo = r.tipo
         art.save()
-        relaciones_nuevas= RegHistoRel.objects.filter(registro=r)
-        """hijos_nuevos = RegHistoRel.objects.filter(registro=r).only('art_hijo')
+        relaciones_nuevas = RegHistoRel.objects.filter(registro=r)
+        archivos_nuevos = RegHistoAdj.objects.filter(registro=r)
+        
         for item in relaciones:
             item.habilitado = False
             item.save()
-        relacion = RelArtefacto.objects.filter(Q(padre__in = padres_nuevos)|Q( hijo__in = hijos_nuevos))
-        for item in relacion:            
-            item.habilitado = True
-            item.save()"""
-        for item in relaciones:
-                item.habilitado = False
-                item.save()
+        for item in archivos:
+            item.habilitado = False
+            item.save()
                 
         for item in relaciones_nuevas:
-            print item
             aux = RelArtefacto.objects.filter(padre = item.art_padre, hijo = item.art_hijo, habilitado = False)
+            if aux:
+                nuevo = aux[0]
+                nuevo.habilitado = True
+                nuevo.save()
+                
+        for item in relaciones_nuevas:
+            aux = Adjuntos.objects.filter(artefacto = art, habilitado = False)
             if aux:
                 nuevo = aux[0]
                 nuevo.habilitado = True
@@ -1538,8 +1549,10 @@ def calcular_impacto(request, proyecto_id, art_id):
             impacto = impacto + item.complejidad
             print impacto
     impacto = impacto - art.complejidad
+    linea = LineaBase.objects.filter(proyectos=proyect, fase=3)
     return render_to_response("desarrollo/artefacto/complejidad.html", {'art': art, 'user': user, 'impacto': impacto,
                                                                         'izq': relaciones_izq, 'der': relaciones_der,
+                                                                        'fin':linea,
                                                                         'proyecto': proyect,
                                                                         'abm_artefactos': 'ABM artefactos' in permisos})
     
@@ -1560,13 +1573,13 @@ def fases_anteriores(request, proyecto_id):
     linea1 = LineaBase.objects.filter(proyectos=proyect, fase=1)
     linea2 = LineaBase.objects.filter(proyectos=proyect, fase=2)
    
-    tipo1 = TipoArtefacto.objects.filter(fase=1)
+    tipo1 = TipoArtefactoFaseProyecto.objects.filter(fase=1)
     lista1 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo1).order_by('nombre')
-    tipo2 = TipoArtefacto.objects.filter(fase=2)
+    tipo2 = TipoArtefactoFaseProyecto.objects.filter(fase=2)
     lista2 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo2).order_by('nombre')
     
     linea3 = LineaBase.objects.filter(proyectos=proyect, fase=3)
-    tipo3 = TipoArtefacto.objects.filter(fase=3)
+    tipo3 = TipoArtefactoFaseProyecto.objects.filter(fase=3)
     lista3 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo3).order_by('nombre')
     
     
@@ -1595,7 +1608,7 @@ def linea_base (request, proyecto_id):
     print permisos
     #-------------------------------------------------------------------
     if request.method == 'POST':
-        tipoArtefactos = TipoArtefacto.objects.filter(fase=fase)
+        tipoArtefactos = TipoArtefactoFaseProyecto.objects.filter(fase=fase)
         artefactos = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipoArtefactos, habilitado=True)        
         if (artefactos):
             bool = False
@@ -1636,7 +1649,7 @@ def linea_base (request, proyecto_id):
         linea = LineaBase.objects.filter(proyectos=proyect, fase=fase)        
         if (linea):
             fin = True          
-    print fin       
+          
     variables = RequestContext(request, {'lineabase': 'Generar LB' in permisos,
                                          'proyecto': proyect,
                                          'fase': fase,
