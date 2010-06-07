@@ -2,6 +2,8 @@
 {% block title %}Error{% endblock %}
 {% block head %}{% endblock %}
 {% block content %}
+{% autoescape off %}
 <p>Ha ocurrido un error. El mensaje devuelto es:</p>
 <p>{{mensaje}}</p>
+{% endautoescape %}
 {% endblock %}

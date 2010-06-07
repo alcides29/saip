@@ -1282,6 +1282,9 @@ def add_adjunto(request, proyecto_id, art_id):
                 nuevo = Adjunto()
                 nuevo.nombre = f.name
                 nuevo.tamanho = f.size
+                if f.size > 1048576:
+                    mensaje = 'Tama&ntilde;o m&aacute;ximo excedido'
+                    return render_to_response('error.html', {'mensaje':mensaje})
                 nuevo.mimetype = f.content_type
                 nuevo.contenido = base64.b64encode(f.read())
                 nuevo.artefacto = art
