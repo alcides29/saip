@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Error{% endblock %}
-{% block head %}{% endblock %}
+{% block head %}¡Error!{% endblock %}
 {% block content %}
 {% autoescape off %}
 <p>Ha ocurrido un error. El mensaje devuelto es:</p>
-<p>{{mensaje}}</p>
+<p class="error">{{mensaje}}</p>
 {% endautoescape %}
 {% endblock %}
