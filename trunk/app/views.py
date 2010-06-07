@@ -923,7 +923,7 @@ def admin_artefactos(request, proyecto_id):
         permisos.append(item.nombre)
     print permisos
     #-------------------------------------------------------------------
-    lista = Artefacto.objects.filter(proyecto=proyect, habilitado=True, tipo__in=tipoArtefactos).order_by('nombre')
+    lista = Artefacto.objects.filter(proyecto=proyect, habilitado=True, tipo__in=tipoArtefactos).order_by('id')
     variables = RequestContext(request, {'proyecto': proyect,
                                          'linea': linea,
                                         'lista': lista,
@@ -1199,10 +1199,15 @@ def borrar_artefacto(request, proyecto_id, art_id):
     print permisos
     #-------------------------------------------------------------------
     art = get_object_or_404(Artefacto, id=art_id)
-    
+    r = RelArtefacto.objects.filter(padre = art)
+    if r:
+        mensaje = 'Otros artefactos dependen de el que se est&aacute; tratando de eliminar.'
+        return render_to_response('error.html', {'mensaje': mensaje})
     if request.method == 'POST':
         art.habilitado = False
-        r = RelArtefacto.objects.filter(Q(padre = art) | Q(hijo = art))
+        r = RelArtefacto.objects.filter(hijo = art)
+        adj = Adjunto.objects.filter(artefacto = art)
+        registrar_version(art, r, adj)
         for item in r:
             r.habilitado = False
             r.save()
@@ -1505,7 +1510,7 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
                 nuevo.save()
                 
         for item in relaciones_nuevas:
-            aux = Adjuntos.objects.filter(artefacto = art, habilitado = False)
+            aux = Adjunto.objects.filter(artefacto = art, habilitado = False)
             if aux:
                 nuevo = aux[0]
                 nuevo.habilitado = True
