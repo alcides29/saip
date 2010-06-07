@@ -1506,9 +1506,13 @@ def revisar_artefacto(request, proyecto_id, art_id):
             art.estado = 3        
             art.save()                
             return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyect.id)+"/")
-   
+    
+    archivos = Adjunto.objects.filter(artefacto = art)
+    relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
     return render_to_response("desarrollo/artefacto/revisar_artefacto.html", {'proyecto':proyect,                                                                       
                                                                               'art':art,
+                                                                              'archivos':archivos,
+                                                                              'relaciones':relaciones,
                                                                               'revisar_artefacto': 'Revisar artefactos' in permisos})
     
 @login_required

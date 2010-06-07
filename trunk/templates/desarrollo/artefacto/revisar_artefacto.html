@@ -4,24 +4,29 @@
 {% block content %}
 {% if revisar_artefacto %}
 <form id="form_id" action="" method="post">
-<p>Nombre: {{ art.nombre }}</p>
-<p>Versi&oacute;n: {{ art.version }}</p>
-<p>Complejidad: {{ art.complejidad }}</p>
-<p>Descripci&oacute;n Corta: {{ art.descripcion_corta }}</p>
-<p>Descripci&oacute;n Larga: {{ art.descripcion_larga }}</p>
-<p>Tipo: {{ art.tipo.descripcion }}</p>
-<p>Icono: {{ art.icono }}</p>
-<p>Relaciones:</p>
-<p>Adjuntos:</p>
-{% ifequal art.estado 3%}
-    <p>Este artefacto ya ha sido aprobado...</p>
-    <input type="button" value="Aceptar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>
-{% else %}   
-    <p>Estas seguro que desea aprobar este artefacto?</p>
+<ul>
+<li>Nombre: {{ art.nombre }}</li>
+<li>Versi&oacute;n: {{ art.version }}</li>
+<li>Complejidad: {{ art.complejidad }}</li>
+<li>Descripci&oacute;n Corta: {{ art.descripcion_corta }}</li>
+<li>Descripci&oacute;n Larga: {{ art.descripcion_larga }}</li>
+<li>Tipo: {{ art.tipo }}</li>
+<li>Icono: {{ art.icono }}</li>
+<li>Relaciones:</li>
+    {% for item in relaciones %}
+        <p>{{item.padre.nombre}}</p>
+    {% endfor %}
+<li>Adjuntos:</li>
+    {% for item in archivos %}
+        <p>{{item.nombre}}</p>
+    {% endfor %}
+</ul>
+ 
+    <p>Est&aacute; seguro que desea aprobar este artefacto?</p>
     <input type="submit" value="Aceptar" />
     <input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>
 </form>
-{% endifequal %}
+
 {% else %}
     <p> No tiene permiso para modificar el estado del artefacto, solo el lider puede hacerlo </p>
 {% endif %}
