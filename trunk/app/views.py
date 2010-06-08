@@ -784,7 +784,7 @@ def mod_tipo_artefacto(request, tipo_id):
     #-------------------------------------------------------------------
     actual = get_object_or_404(TipoArtefacto, id=tipo_id)
     if request.method == 'POST':
-        form = TipoArtefactoForm(request.POST)
+        form = ModTipoArtefactoForm(actual, request.POST)
         if form.is_valid():
             actual.nombre = form.cleaned_data['nombre']
             actual.descripcion = form.cleaned_data['descripcion']
@@ -792,7 +792,7 @@ def mod_tipo_artefacto(request, tipo_id):
             actual.save()
             return HttpResponseRedirect("/tipo_artefacto")
     else:
-        form = TipoArtefactoForm(initial = {'nombre': actual.nombre,
+        form = ModTipoArtefactoForm(actual, initial = {'nombre': actual.nombre,
                                             'descripcion': actual.descripcion,
                                             'fase': actual.fase.id})
     return render_to_response("admin/tipo_artefacto/mod_tipo_artefacto.html", {'form':form, 
