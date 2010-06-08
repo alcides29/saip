@@ -165,6 +165,27 @@ class TipoArtefactoForm(forms.Form):
 					raise forms.ValidationError('Ya existe este nombre.')
 			return nombre
 
+class ModTipoArtefactoForm(forms.Form):
+    """Form para Tipo de artefacto."""
+    nombre = forms.CharField(max_length=5, label='Abreviatura')
+    descripcion = forms.CharField(max_length=100, label='Nombre')
+    fase = forms.ModelChoiceField(queryset=Fase.objects.all(), label='Fase')
+    
+    def __init__(self, tipo_art, *args, **kwargs):
+        super(ModTipoArtefactoForm, self).__init__(*args, **kwargs)
+        self.tipo_arterfacto = tipo_art    
+    
+    def clean_nombre(self):
+    	if 'nombre' in self.cleaned_data:
+			roles = TipoArtefacto.objects.all()
+			nombre = self.cleaned_data['nombre']
+			if nombre == self.tipo_arterfacto.nombre:
+				return nombre
+			for item in roles: 
+				if nombre == item.nombre:
+					raise forms.ValidationError('Ya existe este nombre.')
+			return nombre
+		
 class TipoArtefactoFaseForm(forms.Form):
     """Form para asociar un tipo de artefacto a una fase de un proyecto."""
     fase = forms.ModelChoiceField(queryset = Fase.objects.all(), widget=forms.RadioSelect, required=False, empty_label=None)
