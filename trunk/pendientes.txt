@@ -1,2 +1,12 @@
 - Verificar el formato de entrada de fechas.
--  
+- Al anadir adjuntos la primera vez se debe modificar la version.
+- Solo se puede tener un padre.
+- Agregar en el detalle de las relaciones (las dependencias, el peso de cada uno, etc).
+- Descripcion larga no hace falta mostrar en ver artefactos.
+- Cuales artefactos estan pendientes de aprobacion?
+- Mostrar nombre de los estados en vez de numeros.
+- Mostrar mas detalles de los artefactos anteriores a la hora de asignar relaciones.
+- Todos los artefactos deben estar relacionados con la fase anterior.
+- Ver calculo del impacto cuando esta en otra fase (detallado).
+- Poder bajar adjuntos de la fase anterior.
+- Al hacer click en un artefacto mostrar todos los detalles del artefacto de una vez.
