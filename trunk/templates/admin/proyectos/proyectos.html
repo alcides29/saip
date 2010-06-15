@@ -3,7 +3,7 @@
 {% block head %}Proyectos<br>{% endblock %}
 {% block content %}
 {% if ver_proyectos or crear_proyecto or mod_proyecto or eliminar_proyecto %}
-	<table>
+	<table class="admin">
 	<tr>
 	<td class="titulo">Nombre</td>
 	<td class="titulo">Usuario L&iacute;der</td>
@@ -27,7 +27,7 @@
 		</tr>
 	{% endfor %}
 	</table>
-	{% if crear_proyecto %}<div class="footer"><a href="/proyectos/crear/">Crear un nuevo proyecto</a></div>{% endif %}
+	{% if crear_proyecto %}<div class="footer"><div class="volver"><a href="/">&lt;&lt;Volver a la p&aacute;gina principal</a></div><a href="/proyectos/crear/">Crear un nuevo proyecto</a></div>{% endif %}
 {% else %}
 	<p>¡No posee los permisos para ver esta p&aacute;gina!</p>
 {% endif %}

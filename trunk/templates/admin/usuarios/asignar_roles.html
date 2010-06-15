@@ -7,16 +7,17 @@
 	<p>Se ha producido el siguiente inconveniente:</p>
 	<p>{{mensaje}}</p>
 {% else %}
-	<form id="form_id" action="" method="post">
-		<table>
-		{{ form.as_table }}
-		</table>
-	<input type="submit" value="Guardar" />
-	<input type="button" value="Cancelar" onClick = "location.href='/usuarios' "/>
-	</form>
+	<table class="abm">
+		<form id="form_id" action="" method="post">
+			{{ form.as_table }}
+			<tr>
+			<td colspan="2" class="buttonlist"><input type="submit" value="Guardar" />
+			<input type="button" value="Cancelar" onClick = "location.href='/usuarios' "/></td>
+			</tr>
+		</form>
+	</table>
 {% endif %}
 {% else %}
 	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
 {% endif %}
 {% endblock%}
-
