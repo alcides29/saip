@@ -39,8 +39,8 @@ class ModUsuariosForm(forms.Form):
 	email = forms.EmailField(max_length=75, label='Correo Electronico')
 
 class CambiarPasswordForm(forms.Form):
-	password1 = forms.CharField(widget = forms.PasswordInput, max_length=128, label = 'Escriba su nueva contrasena')
-	password2 = forms.CharField(widget = forms.PasswordInput, max_length=128, label = 'Repita la contrasena')
+	password1 = forms.CharField(widget = forms.PasswordInput, max_length=128, label = u'Escriba su nueva contraseña')
+	password2 = forms.CharField(widget = forms.PasswordInput, max_length=128, label = u'Repita la contraseña')
 	
 	def clean_password2(self):
 		if 'password1' in self.cleaned_data:

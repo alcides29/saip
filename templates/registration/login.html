@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Inicio de sesi&oacute;n{% endblock %}
-{% block head %}Inicio de sesi&oacute;n{% endblock %}
+{% block head %}SAIP: Inicio de sesi&oacute;n{% endblock %}
 {% block content %}
+	<div class="login">
 	<form method="post" action="">
-		<table>
+		<table class="login">
 		{{form.as_table}}
 		<tr>
-		<td><input type="hidden" name="next" value="/" /></td>
-		<td><input type="submit" value="Entrar" /></td>
+		<td colspan="2" style="text-align:center; padding-top:10px;" ><input type="hidden" name="next" value="/" /><input type="submit" value="Entrar" /></td>
 		</tr>
 		</table>
 	</form>
+	</div>
 {% endblock %}

@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Usuarios{% endblock %}
-{% block head %}Modificar {{proyecto.nombre}}{% endblock %}
+{% block head %}Modificar &lt;{{proyecto.nombre}}&gt;{% endblock %}
 {% block content %}
 {% if mod_proyecto %}
-<form enctype="multipart/form-data" id="form_id" action="" method="post">
-	<table>
-    {{ form.as_table }}
-	</table>
-<input type="submit" value="Guardar" />
-<input type="button" value="Cancelar" onClick = "location.href='/proyectos' "/>
-</form>
+<table class="abm">
+	<form enctype="multipart/form-data" id="form_id" action="" method="post">
+		{{ form.as_table }}
+		<tr><td colspan="2" class="buttonlist">
+		<input type="submit" value="Guardar" />
+		<input type="button" value="Cancelar" onClick = "location.href='/proyectos' "/></td>
+		</tr>
+	</form>
+</table>
 {% else %}
 <P>¡No tiene permisos para ver esta p&aacute;gina!</p>
 {% endif %}

@@ -4,7 +4,7 @@
 {% block content %}
 <h2>Roles de Sistema</h2>
 {% if ver_roles or crear_rol or mod_rol or eliminar_rol %}
-	<table>
+	<table class="admin">
 	<tr>
 	<td class="titulo">Nombre</td>
 	<td class="titulo">Descripci&oacute;n</td>
@@ -23,7 +23,7 @@
 	{% endfor %}
 	</table>
 <h2>Roles de Proyecto</h2>
-	<table>
+	<table class="admin">
 	<tr>
 	<td class="titulo">Nombre</td>
 	<td class="titulo">Descripci&oacute;n</td>
@@ -41,7 +41,7 @@
 		</tr>
 	{% endfor %}
 	</table>
-	{% if crear_rol %}<div class="footer"><a href="/roles/crear/">Crear un nuevo rol</a></div>{% endif %}
+	{% if crear_rol %}<div class="footer"><div class="volver"><a href="/">&lt;&lt;Volver a la p&aacute;gina principal</a></div><a href="/roles/crear/">Crear un nuevo rol</a></div>{% endif %}
 {% else %}
 	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
 {% endif %}

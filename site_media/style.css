@@ -6,6 +6,43 @@ div#cabecera{
 	background-color: #D8BFD8;
 }
 
+h1{
+	text-shadow: gray 0.2em 0.1em 0.2em;
+}
+
+div.login{
+	text-align: center;
+}
+
+table.login{
+	padding:10px;
+	text-align: left;
+	border: double 4px #42426F;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+table.abm{
+	padding:10px;
+	text-align: left;
+	border: groove 4px #42426F;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+table.admin{
+	margin:10px auto 20px auto;
+}
+
+table.abm th{
+	text-align: center;
+}
+
+td.buttonlist{
+	text-align:center;
+	padding-top:10px;
+}
+
 h2{
 	border-top:dotted 1px #42426F;
 	border-bottom:dotted 1px #42426F;}
@@ -28,7 +65,20 @@ table td{
 	padding-right:5px;
 }
 
-table th{
+div.login table td{
+	vertical-align: bottom;
+}
+
+div.login table th{
+	vertical-align: bottom;
+}
+
+table.abm th{
+	vertical-align: top;
+}
+
+table.abm ul{
+	margin-top: 2px;
 }
 
 td.titulo{
@@ -41,29 +91,31 @@ td.titulo{
 }
 
 div.footer{
-	text-align:left;
+	text-align:right;
+	background-color:#f8f8f8;
 }
 
 input[type=button]{
 	border: solid 1px black;
 	background-color: #DCDCDC;
 	color: black;
-	padding-top: 2px;
-	padding-bottom: 2px;
+	padding-top: 4px;
+	padding-bottom: 4px;
 }
 
 input[type=submit]{
 	border: solid 1px black;
 	background-color: #DCDCDC;
 	color: black;
-	padding-top: 2px;
-	padding-bottom: 2px;
+	padding-top: 4px;
+	padding-bottom: 4px;
 }
 
 select{
 	border: solid 1px black;
 	background-color: #DCDCDC;
 	color: black;
+	width: 150px;
 }
 
 input[type=checkbox]{
@@ -74,6 +126,8 @@ input[type=checkbox]{
 
 ul.errorlist{
 	color: red;
+	font-size:0.8em;
+	margin: 2px;
 }
 
 div.bienvenida{
@@ -82,4 +136,19 @@ div.bienvenida{
 	color:#42426F;
 }
 
+span.optionbuttons{
+	padding-left: 10px;
+}
 
+span.optionbuttons input[type=button]{
+	width: 50px;
+}
+
+span.optionbuttons input[type=submit]{
+	width: 50px;
+}
+
+div.volver{
+	text-align:left; 
+	float:left;
+}

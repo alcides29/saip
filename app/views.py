@@ -358,6 +358,7 @@ def borrar_usuario(request, usuario_id):
     permisos = []
     for item in permisos_obj:
         permisos.append(item.nombre)
+    print permisos
     #--------------------------------------------------------------------
     usuario = get_object_or_404(User, id=usuario_id)
     comprometido = 0
@@ -369,10 +370,10 @@ def borrar_usuario(request, usuario_id):
     else:
         if usuario.id == 1:
             error = "No se puede borrar al superusuario."
-            return render_to_response("admin/usuarios/user_confirm_delete.html", {'mensaje': error,'usuario':usuario, 'user': user})
+            return render_to_response("admin/usuarios/user_confirm_delete.html", {'mensaje': error,'usuario':usuario, 'user': user, 'eliminar_usuario': 'Eliminar usuario' in permisos})
         elif comprometido > 0:
-            error = "El usuario esta asociado a un proyecto como lider."
-            return render_to_response("admin/usuarios/user_confirm_delete.html", {'mensaje': error,'usuario':usuario, 'user': user})
+            error = "El usuario est&aacute; asociado a un proyecto como l&iacute;der."
+            return render_to_response("admin/usuarios/user_confirm_delete.html", {'mensaje': error,'usuario':usuario, 'user': user, 'eliminar_usuario': 'Eliminar usuario' in permisos})
     return render_to_response("admin/usuarios/user_confirm_delete.html", {'usuario':usuario, 
                                                                           'user':user,
                                                                           'eliminar_usuario': 'Eliminar usuario' in permisos})
@@ -405,7 +406,7 @@ def admin_usuarios(request):
         permisos.append(item.nombre)
     print permisos
     #-------------------------------------------------------------------
-    lista = User.objects.all()
+    lista = User.objects.all().order_by("id")
     return render_to_response('admin/usuarios/usuarios.html',{'lista':lista,
                                                                'user':user, 
                                                                'ver_usuarios': 'Ver usuarios' in permisos,
@@ -551,6 +552,7 @@ def mod_rol(request, rol_id):
         form.fields['descripcion'].initial = actual.descripcion
     return render_to_response("admin/roles/mod_rol.html", {'user':user, 
                                                            'form':form,
+														   'rol': actual,
                                                            'mod_rol':'Modificar rol' in permisos})
 
 @login_required 
@@ -582,16 +584,16 @@ def borrar_rol(request, rol_id):
             return render_to_response("admin/roles/rol_confirm_delete.html", {'mensaje': error, 
                                                                               'rol':actual, 
                                                                               'user':user,
-                                                                              'eliminar_rol':'Eliminar_rol' in permisos})
+                                                                              'eliminar_rol':'Eliminar rol' in permisos})
         if relacionados > 0:
             error = "El rol se esta utilizando."
             return render_to_response("admin/roles/rol_confirm_delete.html", {'mensaje': error, 
                                                                               'rol':actual, 
                                                                               'user':user,
-                                                                              'eliminar_rol':'Eliminar_rol' in permisos})
+                                                                              'eliminar_rol':'Eliminar rol' in permisos})
     return render_to_response("admin/roles/rol_confirm_delete.html", {'rol':actual, 
                                                                       'user':user, 
-                                                                      'eliminar_rol':'Eliminar_rol' in permisos})
+                                                                      'eliminar_rol':'Eliminar rol' in permisos})
 
 @login_required
 def crear_proyecto(request):
