@@ -3,30 +3,32 @@
 {% block head %}Aprobaci&oacute;n del artefacto {{art.nombre}}<br>{% endblock %}
 {% block content %}
 {% if revisar_artefacto %}
+<table class="art-inf">
 <form id="form_id" action="" method="post">
-<ul>
-<li>Nombre: {{ art.nombre }}</li>
-<li>Versi&oacute;n: {{ art.version }}</li>
-<li>Complejidad: {{ art.complejidad }}</li>
-<li>Descripci&oacute;n Corta: {{ art.descripcion_corta }}</li>
-<li>Descripci&oacute;n Larga: {{ art.descripcion_larga }}</li>
-<li>Tipo: {{ art.tipo }}</li>
-<li>Icono: {{ art.icono }}</li>
-<li>Relaciones:</li>
-    {% for item in relaciones %}
-        <p>{{item.padre.nombre}}</p>
-    {% endfor %}
-<li>Adjuntos:</li>
-    {% for item in archivos %}
-        <p>{{item.nombre}}</p>
-    {% endfor %}
-</ul>
- 
-    <p>Est&aacute; seguro que desea aprobar este artefacto?</p>
-    <input type="submit" value="Aceptar" />
-    <input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>
+<tr><th>Nombre:</th><td>{{ art.nombre }}</td></tr>
+<tr><th>Versi&oacute;n:</th><td>{{ art.version }}</td></tr>
+<tr><th>Complejidad:</th><td>{{ art.complejidad }}</td></tr>
+<tr><th>Descripci&oacute;n Corta:</th><td>{{ art.descripcion_corta }}</td></tr>
+<tr><th>Descripci&oacute;n Larga:</th><td>{{ art.descripcion_larga }}</td></tr>
+<tr><th>Tipo:</th><td>{{ art.tipo }}</td></tr>
+<tr><th>Icono:</th><td>{{ art.icono }}</td></tr>
+<tr><th>Relaciones:</th>
+    <td><ul>{% for item in relaciones %}
+        <li>{{item.padre.nombre}}</li>
+	{% empty %}
+		<li>No tiene relaciones</li>
+    {% endfor %}</ul></td></tr>
+<tr><th>Adjuntos:</th>
+    <td><ul>{% for item in archivos %}
+        <li>{{item.nombre}}</li>
+	{% empty %}
+		<li>No tiene adjuntos</li>
+    {% endfor %}</ul></td></tr>
+	<tr><td colspan="2" class="buttonlist" style="border:none;">
+    <input type="submit" value="Aprobar artefacto" />
+    <input type="button" value="Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/></td></tr>
 </form>
-
+</table>
 {% else %}
     <p> No tiene permiso para modificar el estado del artefacto, solo el lider puede hacerlo </p>
 {% endif %}

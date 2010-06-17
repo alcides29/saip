@@ -1,10 +1,29 @@
 {% extends "base.html" %}
 {% block title %}Artefacto{% endblock %}
-{% block head %}Calcular complejidad de &lt;{{art.nombre}}&gt;{% endblock %}
+{% block head %}Calcular impacto de &lt;{{art.nombre}}&gt;{% endblock %}
 {% block content %}
 {% if abm_artefactos or ver_artefactos%}
-<p>La complejidad del artefacto es {{impacto}}</p>
-
+<p>Complejidad de {{art.nombre}}: {{art.complejidad}}</p>
+<div class="comp"><p><strong>Artefactos de los que depende {{art.nombre}}:</strong></p>
+<ul>
+{% for item in izq %}
+	<li>{{item.nombre}}:{{item.complejidad}} ({% ifequal item.fase art.fase %}Fase Actual{% else %}{{item.fase}}{% endifequal %})</li>
+{% empty %}
+	<li>No depende de ning&uacute;n artefacto.</li>
+{% endfor %}
+</ul>
+</div>
+<div class="comp"><p><strong>Artefactos dependientes de {{art.nombre}}:</strong></p>
+<ul>
+{% for item in der %}
+	<li>{{item.nombre}} ({% ifequal item.fase art.fase %}fase actual{% else %}{{item.fase}}{% endifequal %})</li>
+{% empty %}
+	<li>Ning&uacute;n artefacto depende de &eacute;l.</li>
+{% endfor %}
+</ul>
+</div>
+<div style="clear:left; padding: 5px;">
+<div style="background-color:#f8f8f8; font-style:italic;"><p>El impacto de cambio de {{art.nombre}} es {{impacto}}</p></div>
 {% if fin %}<input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/fasesAnt/'"/>{% else %}
 
 
@@ -14,6 +33,7 @@
 <input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/fasesAnt/'"/>
 {% endifequal %}
 {% endif %}
+</div>
 {% else %}
     <p>¡No tiene los permisos para ver esta p&aacute;gina!</p>
     <input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/'"/>	
