@@ -30,6 +30,23 @@ table.abm{
 	margin-right: auto;
 }
 
+table.art-inf{
+	padding:10px;
+	text-align: left;
+	border: groove 4px #42426F;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+table.art-inf th{
+	font-size: bold;
+	border: dotted 1px #42426F;
+}
+
+table.art-inf td{
+	border: dotted 1px #42426F;
+}
+
 table.admin{
 	margin:10px auto 20px auto;
 }
@@ -151,4 +168,10 @@ span.optionbuttons input[type=submit]{
 div.volver{
 	text-align:left; 
 	float:left;
+}
+
+div.comp{
+	margin: 0 auto 0 auto;
+	float: left;
+	padding: 0px 10px 0px 10px;
 }

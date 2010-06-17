@@ -6,11 +6,28 @@
 {% if mensaje %}
 	<p>{{mensaje}}</p>
 {% else %}
+<div class="comp">
+<p>Estos son los artefactos que ya dependen de {{art.nombre}}</p>
+<ul>
+{% for item in dependientes%}
+	<li>{{item.nombre}}</li>
+{% empty %}
+	<li>No hay dependientes</li>
+{% endfor %}
+</ul>
+</div>
+<div class="comp">
+<p>Seleccione los artefactos de los que depender&aacute; {{art.nombre}}:</p>
+<table class="abm">
 	<form action="" method="post">
 	{{form.as_table}}
+	<tr><td colspan="2" class="buttonlist">
 	<input type="submit" value="Guardar" />
-	<input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>
+	<input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/></td>
+	</tr>
 	</form>
+</table>
+</div>
 {% endif %}
 {% else %}
 	<p>¡No tiene los permisos para ver esta p&aacute;gina!</p>

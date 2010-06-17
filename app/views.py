@@ -1073,7 +1073,13 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
     print permisos
     #-------------------------------------------------------------------
     art = get_object_or_404(Artefacto, id=art_id)
+    fase_actual = Fase.objects.get(pk=fase)
     relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
+    aux = RelArtefacto.objects.filter(padre = art, habilitado = True)
+    dependientes = []
+    for item in aux:
+        if item.hijo.fase == fase_actual:
+            dependientes.append(item.hijo)
     if request.method == 'POST':
         art = get_object_or_404(Artefacto, id=art_id)
         form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, request.POST)
@@ -1129,7 +1135,7 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
         for item in relaciones:
             dic[item.padre.id] = True
         form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, initial = {'artefactos': dic})
-        return render_to_response("desarrollo/artefacto/relacion_artefacto.html", {'form': form,
+        return render_to_response("desarrollo/artefacto/relacion_artefacto.html", {'form': form, 'dependientes': dependientes,
                                                                                    'user':user,
                                                                                    'art':art, 
                                                                                    'proyecto': p,
@@ -1549,7 +1555,7 @@ def revisar_artefacto(request, proyecto_id, art_id):
     
     archivos = Adjunto.objects.filter(artefacto = art)
     relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
-    return render_to_response("desarrollo/artefacto/revisar_artefacto.html", {'proyecto':proyect,                                                                       
+    return render_to_response("desarrollo/artefacto/revisar_artefacto.html", {'proyecto':proyect, 'user':user,
                                                                               'art':art,
                                                                               'archivos':archivos,
                                                                               'relaciones':relaciones,
@@ -1584,6 +1590,8 @@ def calcular_impacto(request, proyecto_id, art_id):
             impacto = impacto + item.complejidad
             print impacto
     impacto = impacto - art.complejidad
+    del relaciones_izq[0]
+    del relaciones_der[0]  
     linea = LineaBase.objects.filter(proyectos=proyect, fase=3)
     return render_to_response("desarrollo/artefacto/complejidad.html", {'art': art, 'user': user, 'impacto': impacto,
                                                                         'izq': relaciones_izq, 'der': relaciones_der,

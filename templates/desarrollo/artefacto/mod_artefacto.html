@@ -3,16 +3,15 @@
 {% block head %}Modificar el artefacto {{ art.nombre }}<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos %}
-<form enctype="multipart/form-data" id="form_id" action="/proyectos/artefactos&id={{proyecto.id}}/mod&id={{art.id}}/" method="post">
-	<p>Nombre: {{ art.nombre }}</p>
-    <p>{{ form.complejidad.errors }}<label for="id_complejidad">Complejidad:</label>{{ form.complejidad }}</p>
-    <p>{{ form.descripcion_corta.errors }}<label for="id_descripcion_corta">Descripci&oacute;n Corta:</label>{{ form.descripcion_corta }}</p>
-	<p>{{ form.descripcion_larga.errors }}<label for="id_descripcion_larga">Descripci&oacute;n Larga:</label>{{ form.descripcion_larga }}</p>
-	<p>{{ form.icono.errors }}<label for="id_icono">Icono:</label>{{ form.icono }}</p>
-    <p>{{ form.tipo.errors }}<label for="id_tipo">Tipo:</label>{{ form.tipo }}</p>
-<input type="submit" value="Guardar" />
-<input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>
-</form>
+<table class="abm">
+	<form enctype="multipart/form-data" id="form_id" action="/proyectos/artefactos&id={{proyecto.id}}/mod&id={{art.id}}/" method="post">
+		{{form.as_table}}
+		<tr><td colspan="2" class="buttonlist">
+		<input type="submit" value="Guardar" />
+		<input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/></td>
+		</tr>
+	</form>
+</table>
 {% else %}
 	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
     <input type="button" value="Aceptar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/>

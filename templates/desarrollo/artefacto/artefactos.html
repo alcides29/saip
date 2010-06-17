@@ -2,8 +2,9 @@
 {% block title %}Artefactos{% endblock %}
 {% block head %}Artefactos de {{ proyecto.fase.nombre }}<br>{% endblock %}
 {% block content %}
+{% load app_extras %}
 {% if abm_artefactos  or ver_artefactos or revisar_artefactos %}
-<table>
+<table class="admin">
 	<tr>
 		<td class="titulo">Nombre</td>        
 		<td class="titulo">Versi&oacute;n</td>
@@ -19,12 +20,12 @@
 		{% if abm_artefactos%}<td>{% if not linea %}<a href="/proyectos/artefactos&id={{proyecto.id}}/mod&id={{item.id}}/">{% endif %}{{item.nombre}}</a></td>
 		{% else %}<td>{{item.nombre}}</td>{% endif %}
 		<td>{{item.version}}</td>
-		<td>{{item.estado}}</td>        
+		<td>{{item.estado|display}}</td>        
 		<td>{{item.complejidad}}</td>
 		<td>{{item.descripcion_corta}}</td>
 		<td>{{item.descripcion_larga}}</td>
 		<td>{{item.tipo}}</td>
-		<td>{% if not linea %}{% if abm_artefactos %}<a href="/proyectos/artefactos&id={{proyecto.id}}/del&id={{item.id}}/">Borrar</a>{% endif %}{% endif %}{% if abm_artefactos %} | <a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">Historial</a> | <a href="/proyectos/artefactos&id={{proyecto.id}}/rel&id={{item.id}}&fase={{proyecto.fase.id}}/">Relaciones con la fase actual</a> | {% ifnotequal proyecto.fase.id 1 %}<a href="/proyectos/artefactos&id={{proyecto.id}}/rel&id={{item.id}}&fase={{proyecto.fase.id|add:"-1" }}/">Relaciones con la fase anterior</a>{% endifnotequal %} | <a href="/proyectos/artefactos&id={{proyecto.id}}/adj&id={{item.id}}/">Adjuntos</a> | {% endif %}<a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/">Impacto</a>{% if not linea %}{% if revisar_artefactos %} | <a href="/proyectos/artefactos&id={{proyecto.id}}/revisar&id={{item.id}}/ ">Revisar</a>{% endif %}{% endif %}</td>
+		<td>{% if not linea %}{% if abm_artefactos %}<a href="/proyectos/artefactos&id={{proyecto.id}}/del&id={{item.id}}/">Borrar</a>{% endif %}{% endif %}{% if abm_artefactos %} | <a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">Historial</a> | <a href="/proyectos/artefactos&id={{proyecto.id}}/rel&id={{item.id}}&fase={{proyecto.fase.id}}/">Relaciones con la fase actual</a> | {% ifnotequal proyecto.fase.id 1 %}<a href="/proyectos/artefactos&id={{proyecto.id}}/rel&id={{item.id}}&fase={{proyecto.fase.id|add:"-1" }}/">Relaciones con la fase anterior</a>{% endifnotequal %} <a href="/proyectos/artefactos&id={{proyecto.id}}/adj&id={{item.id}}/">Adjuntos</a> | {% endif %}<a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/">Impacto</a>{% if not linea %}{% if revisar_artefactos %} | <a href="/proyectos/artefactos&id={{proyecto.id}}/revisar&id={{item.id}}/ ">Revisar</a>{% endif %}{% endif %}</td>
 	</tr>
 	{% endfor %}
 </table><br>
