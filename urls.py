@@ -51,6 +51,7 @@ urlpatterns = patterns('',
     # desarrollo
     (r'^proyectos/admin&id=(?P<proyecto_id>\d+)/$', administrar_proyecto),
     (r'^proyectos/tipoArtefacto&id=(?P<proyecto_id>\d+)/$', admin_tipo_artefacto_fase),
+    (r'^proyectos/add_tipoArtefacto_fase&id=(?P<proyecto_id>\d+)/$', add_tipo_artefacto), #tipo de artefacto por proyecto
     (r'^proyectos/mod_tipoArtefacto_fase&id=(?P<proyecto_id>\d+)/(?P<tipo_art_id>\d+)/$', mod_tipo_artefacto_fase),
     (r'^proyectos/quitar_tipoArtefacto_fase&id=(?P<proyecto_id>\d+)/(?P<tipo_art_id>\d+)/$', quitar_tipo_artefacto_fase),
     
