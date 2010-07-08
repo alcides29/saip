@@ -772,6 +772,45 @@ def crear_tipo_artefacto(request):
                                                                                'crear_tipo_artefacto': 'Crear tipo-artefacto' in permisos})
 
 @login_required
+def add_tipo_artefacto(request, proyecto_id):
+    """Crea un tipo de artefacto para un proyecto."""
+    user = User.objects.get(username=request.user.username)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    print permisos
+    #-------------------------------------------------------------------
+    if request.method == 'POST':
+        form = TipoArtefactoForm(request.POST)
+        if form.is_valid():
+            nuevo = TipoArtefacto()
+            nuevo.nombre = form.cleaned_data['nombre']
+            nuevo.descripcion = form.cleaned_data['descripcion']
+            nuevo.fase = form.cleaned_data['fase']
+            nuevo.save()
+            
+            p = Proyecto.objects.get(pk = proyecto_id)
+            # Agregamos al proyecto actual
+            tipo_art = TipoArtefactoFaseProyecto()
+            tipo_art.proyecto = p
+            tipo_art.fase = nuevo.fase
+            tipo_art.tipo_artefacto = nuevo
+            tipo_art.cant = 1
+            tipo_art.save()
+            return HttpResponseRedirect("/proyectos/tipoArtefacto&id="+str(proyecto_id))
+    else:
+        form = TipoArtefactoForm()
+    return render_to_response("admin/tipo_artefacto/add_tipo_artefacto.html",
+                              {'form':form,
+                               'user':user,
+                               'crear_tipo_artefacto': 'Crear tipo-artefacto' in permisos})
+
+@login_required
 def mod_tipo_artefacto(request, tipo_id):
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos---------------------------------------------
