@@ -4,6 +4,30 @@
 {% block content %}
 {% if lineabase %}
 <p>{{msg}}</p>
+
+<table class="admin">
+	<tr>
+		<td class="titulo">Nombre</td>        
+		<td class="titulo">Versi&oacute;n</td>
+		<td class="titulo">Estado</td>		
+		<td class="titulo">Complejidad</td>
+		<td class="titulo">Descripci&oacute;n Corta</td>		
+		<td class="titulo">Tipo</td>
+		<td class="titulo">Accion</td>
+	</tr>
+	{% for item in lista %}
+	<tr>
+	    <td>{{item.nombre}}</td>
+		<td>{{item.version}}</td>
+		<td>{{item.estado}}</td>        
+		<td>{{item.complejidad}}</td>
+		<td>{{item.descripcion_corta}}</td>		
+		<td>{{item.tipo}}</td>
+		<td><a href="/proyectos/lineabase&id={{proyecto.id}}/revisar&id={{item.id}}/ ">Revisar</a></td>
+	</tr>
+	{% endfor %}
+</table><br>
+
 <input type="button" value="Aceptar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/'"/>
 {% else %}
 	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
