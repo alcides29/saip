@@ -785,6 +785,7 @@ def add_tipo_artefacto(request, proyecto_id):
         permisos.append(item.nombre)
     print permisos
     #-------------------------------------------------------------------
+    p = Proyecto.objects.get(pk = proyecto_id)
     if request.method == 'POST':
         form = TipoArtefactoForm(request.POST)
         if form.is_valid():
@@ -794,7 +795,6 @@ def add_tipo_artefacto(request, proyecto_id):
             nuevo.fase = form.cleaned_data['fase']
             nuevo.save()
             
-            p = Proyecto.objects.get(pk = proyecto_id)
             # Agregamos al proyecto actual
             tipo_art = TipoArtefactoFaseProyecto()
             tipo_art.proyecto = p
@@ -808,6 +808,7 @@ def add_tipo_artefacto(request, proyecto_id):
     return render_to_response("admin/tipo_artefacto/add_tipo_artefacto.html",
                               {'form':form,
                                'user':user,
+                               'proyecto':p,
                                'crear_tipo_artefacto': 'Crear tipo-artefacto' in permisos})
 
 @login_required
