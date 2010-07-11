@@ -3,16 +3,40 @@
 {% block head %}Gesti&oacute;n de linea Base<br>{% endblock %}
 {% block content %}
 {% if lineabase %}
-<form action="/proyectos/lineabase&id={{proyecto.id}}/" method="post">
-{% if fin %}
-    <p> Todas las lineas bases del proyecto han sido generadas...</p>
-    <input type="button" value="Aceptar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/'"/>
-{% else %}
-<p>Est&aacute; seguro que desea generar la l&iacute;nea base de {{ fase.nombre }} de {{ proyecto.nombre }}?</p>
-<input type="submit" value="Aceptar" />
-<input type="button" value="Cancelar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/'"/>
+{% if msg %}
+    <p>{{msg}}</p>
+
+{% if lista %}
+    <table class="admin">
+	<tr>
+		<td class="titulo">Nombre</td>        
+		<td class="titulo">Versi&oacute;n</td>
+		<td class="titulo">Estado</td>		
+		<td class="titulo">Complejidad</td>
+		<td class="titulo">Descripci&oacute;n Corta</td>		
+		<td class="titulo">Tipo</td>
+		<td class="titulo">Accion</td>
+	</tr>
+
+	{% for item in lista %}
+	<tr>
+	    <td>{{item.nombre}}</td>
+		<td>{{item.version}}</td>
+		<td>{{item.estado}}</td>        
+		<td>{{item.complejidad}}</td>
+		<td>{{item.descripcion_corta}}</td>		
+		<td>{{item.tipo}}</td>
+		<td><a href="/proyectos/lineabase&id={{proyecto.id}}/revisar&id={{item.id}}/">Revisar</a></td>
+	</tr>
+	{% endfor %}
+</table><br>
 {% endif %}
-</form>
+{% else %}
+    <p>La linea base de la fase de {{fase}} se ha creado con exito</p>
+{% endif %}
+
+<input type="button" value="Aceptar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/'"/>
+
 {% else %}
     <p>¡No tiene permisos para ver esta p&aacute;gina!</p>
     <input type="button" value="Aceptar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/'"/>
