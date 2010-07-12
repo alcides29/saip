@@ -47,6 +47,7 @@ urlpatterns = patterns('',
     # gestion
     (r'^proyectos/lineabase&id=(?P<proyecto_id>\d+)/$', linea_base),
     (r'^proyectos/lineabase&id=(?P<proyecto_id>\d+)/revisar&id=(?P<art_id>\d+)/$', linea_revisar),
+    (r'^proyectos/lineabase&id=(?P<proyecto_id>\d+)/rel&id=(?P<art_id>\d+)&fase=(?P<fase>\d+)/$', linea_relaciones),
     
     # desarrollo
     (r'^proyectos/admin&id=(?P<proyecto_id>\d+)/$', administrar_proyecto),

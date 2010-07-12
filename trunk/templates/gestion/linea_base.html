@@ -7,6 +7,7 @@
     <p>{{msg}}</p>
 
 {% if lista %}
+    <p>Los siguientes artefactos estan pendientes de aprobacion...</p>
     <table class="admin">
 	<tr>
 		<td class="titulo">Nombre</td>        
@@ -31,6 +32,43 @@
 	{% endfor %}
 </table><br>
 {% endif %}
+
+{% if lista1 %}
+    <p>Los siguientes artefactos no se encuentran relacionados con la fase anterior...</p>
+    <table class="admin">
+	<tr>
+		<td class="titulo">Nombre</td>        
+		<td class="titulo">Versi&oacute;n</td>
+		<td class="titulo">Estado</td>		
+		<td class="titulo">Complejidad</td>
+		<td class="titulo">Descripci&oacute;n Corta</td>		
+		<td class="titulo">Tipo</td>
+		<td class="titulo">Accion</td>
+	</tr>
+
+	{% for item in lista1 %}
+	<tr>
+	    <td>{{item.nombre}}</td>
+		<td>{{item.version}}</td>
+		<td>{{item.estado}}</td>        
+		<td>{{item.complejidad}}</td>
+		<td>{{item.descripcion_corta}}</td>		
+		<td>{{item.tipo}}</td>
+		<td>{% if abm_artefactos %}<a href="/proyectos/lineabase&id={{proyecto.id}}/rel&id={{item.id}}&fase={{proyecto.fase.id}}/">Relaciones con la fase actual</a> | {% ifnotequal proyecto.fase.id 1 %}<a href="/proyectos/lineabase&id={{proyecto.id}}/rel&id={{item.id}}&fase={{proyecto.fase.id|add:"-1" }}/">Relaciones con la fase anterior</a>{% endifnotequal %}{% endif %} </td>
+	</tr>
+	{% endfor %}
+</table><br>
+{% endif %}
+
+{% if lista2 %}
+    <p>Los siguientes artefactos deben estar relacionados con artefactos de esta fase...</p>
+    <ul>   
+    {% for item in lista2 %}
+    <li> {{ item.nombre }} </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
 {% else %}
     <p>La linea base de la fase de {{fase}} se ha creado con exito</p>
 {% endif %}

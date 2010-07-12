@@ -99,3 +99,24 @@ def registrar_version(art, relaciones, archivos):
     art.version = art.version + 1
     art.save()           
 
+def tiene_padre (hijo, padres):
+    for item in padres:
+        if (item.fase.id == hijo.fase.id - 1):
+            return True
+        else:
+            relaciones = RelArtefacto.objects.filter(hijo=item, habilitado=True).values_list('padre', flat=True)
+            if (relaciones):
+                padres = Artefacto.objects.filter(id__in = relaciones)
+                return tiene_padre (item, padres)
+    return False
+
+def tiene_hijo (padre, hijos):
+    for item in hijos:
+        if (item.fase.id == padre.fase.id + 1):
+            return True
+        else:
+            relaciones = RelArtefacto.objects.filter(padre=item, habilitado=True).values_list('hijo', flat=True)
+            if (relaciones):
+                hijos = Artefacto.objects.filter(id__in = relaciones)
+                return tiene_hijo (item, hijos)
+    return False
