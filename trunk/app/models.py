@@ -40,7 +40,7 @@ class Rol(models.Model):
     descripcion = models.TextField(null=True, blank=True)
     fecHor_creacion = models.DateTimeField(auto_now=False, auto_now_add=True, null=True, blank=True, editable=False)
     usuario_creador = models.ForeignKey(User, null=True)
-    permisos = models.ManyToManyField(Permiso)
+    permisos = models.ManyToManyField(Permiso, through='RolPermiso')
     
     def __unicode__(self):
         return self.nombre
@@ -51,6 +51,11 @@ class Fase(models.Model):
     
     def __unicode__(self):
         return self.nombre
+    
+class RolPermiso(models.Model):
+    rol = models.ForeignKey(Rol)
+    permiso = models.ForeignKey(Permiso)
+    fase = models.ForeignKey(Fase, null = True)
 
 class Proyecto(models.Model):
     """Clase que representa un proyecto."""

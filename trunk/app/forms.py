@@ -116,11 +116,17 @@ class RolesForm(forms.Form):
 			return nombre
 
 class PermisosForm(forms.Form):
-	permisos = forms.ModelMultipleChoiceField(queryset = None, widget = forms.CheckboxSelectMultiple, required = False)
+	permisos = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 1), widget = forms.CheckboxSelectMultiple, required = False)
 	
-	def __init__(self, cat, *args, **kwargs):
-		super(PermisosForm, self).__init__(*args, **kwargs)
-		self.fields['permisos'].queryset = Permiso.objects.filter(categoria = cat)
+	#def __init__(self, cat, *args, **kwargs):
+	#	super(PermisosForm, self).__init__(*args, **kwargs)
+	#	self.fields['permisos'].queryset = Permiso.objects.filter(categoria = 1)
+
+class PermisosProyectoForm(forms.Form):
+	permisos = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False)
+	permisos = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False)
+	permisos = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False)
+	
     
 class ModRolesForm(forms.Form):
 	descripcion = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion')

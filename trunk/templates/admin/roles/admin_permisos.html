@@ -3,6 +3,7 @@
 {% block head %}Establecer permisos para {{rol.nombre}}<br>{% endblock %}
 {% block content %}
 {% if mod_rol %}
+	{% ifequal rol.categoria 1 %}
 	<table class="abm">
 	<form id="form_id" action="" method="post">
 		{{ form.as_table }}
@@ -12,6 +13,9 @@
 	</tr>
 	</form>
 	</table>
+	{% else %}
+		algo
+	{% endifequal %}
 {% else %}
 	<p>¡No posee los permisos para ver esta p&aacute;gina!</p>
 {% endif %}

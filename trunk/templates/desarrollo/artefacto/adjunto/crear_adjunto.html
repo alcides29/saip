@@ -4,6 +4,7 @@
 {% block content %}
 {% if abm_artefactos %}
 <form enctype="multipart/form-data" id="form_id" action="" method="post">
+<p>(M&acuote;ximo 1MB)</p>
 	{{ formset.management_form }}
     {% for form in formset.forms %}
     {{ form.as_p }}
