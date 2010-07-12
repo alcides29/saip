@@ -508,23 +508,60 @@ def admin_permisos(request, rol_id):
     #-------------------------------------------------------------------
     actual = get_object_or_404(Rol, id=rol_id)
     if request.method == 'POST':
-        form = PermisosForm(actual.categoria, request.POST)
+        if actual.categoria == 1:
+            form = PermisosForm(request.POST)
+        else:
+            form = PermisosProyectoForm(request.POST)
         if form.is_valid():
             actual.permisos.clear()
-            lista = form.cleaned_data['permisos']
-            for item in lista:
-                actual.permisos.add(item)
-            actual.save()
-            return HttpResponseRedirect("/roles")
+            if actual.categoria == 1:
+                lista = form.cleaned_data['permisos']
+                for item in lista:
+                    nuevo = RolPermiso()
+                    nuevo.rol = actual
+                    nuevo.permiso = item
+                    nuevo.save()
+            else:
+                lista_req = form.cleaned_data['permisos1']
+                lista_dis = form.cleaned_data['permisos2']
+                lista_impl = form.cleaned_data['permisos3']
+                for item in lista_req:
+                    nuevo = RolPermiso()
+                    nuevo.rol = actual
+                    nuevo.permiso = item
+                    nuevo.fase = Fase.objects.get(pk=1)
+                    nuevo.save()
+                for item in lista_dis:
+                    nuevo = RolPermiso()
+                    nuevo.rol = actual
+                    nuevo.permiso = item
+                    nuevo.fase = Fase.objects.get(pk=2)
+                    nuevo.save()
+                for item in lista_impl:
+                    nuevo = RolPermiso()
+                    nuevo.rol = actual
+                    nuevo.permiso = item
+                    nuevo.fase = Fase.objects.get(pk=3)
+                    nuevo.save()
+        return HttpResponseRedirect("/roles")
     else:
-        dict = {}
-        for item in actual.permisos.all():
-            dict[item.id] = True
         #form = PermisosForm(actual.categoria, initial={'permisos': dict})
         if actual.categoria == 1:
+            dict = {}
+            for item in actual.permisos.all():
+                dict[item.id] = True
             form = PermisosForm(initial={'permisos': dict})
         else:
-            form = PermisosProyectoForm(initial={'permisos': dict})
+            dict1 = {}
+            for item in actual.permisos.filter(rolpermiso__fase = Fase.objects.get(pk=1)):
+                dict1[item.id] = True
+            dict2 = {}
+            for item in actual.permisos.filter(rolpermiso__fase = Fase.objects.get(pk=2)):
+                dict2[item.id] = True
+            dict3 = {}
+            for item in actual.permisos.filter(rolpermiso__fase = Fase.objects.get(pk=3)):
+                dict3[item.id] = True
+            form = PermisosProyectoForm(initial={'permisos1': dict1, 'permisos2': dict2, 'permisos3': dict3})
     return render_to_response("admin/roles/admin_permisos.html", {'form': form, 
                                                                   'rol': actual, 
                                                                   'user':user,

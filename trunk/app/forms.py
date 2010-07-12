@@ -123,9 +123,9 @@ class PermisosForm(forms.Form):
 	#	self.fields['permisos'].queryset = Permiso.objects.filter(categoria = 1)
 
 class PermisosProyectoForm(forms.Form):
-	permisos = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False)
-	permisos = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False)
-	permisos = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False)
+	permisos1 = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False, label = u'Permisos de la fase de Requerimientos')
+	permisos2 = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False, label = u'Permisos de la fase de Diseño')
+	permisos3 = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False, label = u'Permisos de la fase de Implementación')
 	
     
 class ModRolesForm(forms.Form):

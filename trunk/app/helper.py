@@ -45,7 +45,17 @@ def get_permisos_proyecto(user, proyecto):
     roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyecto).only('rol')
     permisos_obj = []
     for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
+        permisos_obj.extend(item.rol.permisos.filter(rolpermiso__fase = proyecto.fase))
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    return permisos
+	
+def get_permisos_proyecto_ant(user, proyecto, fase):
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyecto).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.filter(rolpermiso__fase = fase))
     permisos = []
     for item in permisos_obj:
         permisos.append(item.nombre)
