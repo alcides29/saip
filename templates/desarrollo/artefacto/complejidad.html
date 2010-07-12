@@ -16,7 +16,7 @@
 <div class="comp"><p><strong>Artefactos dependientes de {{art.nombre}}:</strong></p>
 <ul>
 {% for item in der %}
-	<li>{{item.nombre}} ({% ifequal item.fase art.fase %}fase actual{% else %}{{item.fase}}{% endifequal %})</li>
+	<li>{{item.nombre}}:{{item.complejidad}} ({% ifequal item.fase art.fase %}fase actual{% else %}{{item.fase}}{% endifequal %})</li>
 {% empty %}
 	<li>Ning&uacute;n artefacto depende de &eacute;l.</li>
 {% endfor %}

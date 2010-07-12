@@ -14,7 +14,11 @@
 	</form>
 	</table>
 	{% else %}
-		algo
+		<form id="form_id" action="" method="post">
+		{{ form.as_p}}
+		<input type="submit" value="OK" />
+		<input type="button" value="Cancelar" onClick = "location.href='/roles' "/>
+		</form>
 	{% endifequal %}
 {% else %}
 	<p>¡No posee los permisos para ver esta p&aacute;gina!</p>
