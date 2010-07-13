@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Fases Anteriores{% endblock %}
-{% block head %}{% if fin %}Artefactos de {{proyecto.nombre}}{% else %}Artefactos de Fases Anteriores{% endif %}<br>{% endblock %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}{% if fin %}Artefactos de {{proyecto.nombre}}{% else %}Artefactos de {{proyecto.nombre}}{% endif %}<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos or ver_artefactos_ant%}
 <h2>Analisis de requerimientos</h2>
@@ -90,8 +90,8 @@
     <input type="button" value="Aceptar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/' "/>	
 {% endif %}
 {% if fin %}
-    <input type="button" value="<< Volver" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}' "/>	
+    <input type="button" value="Volver" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}' "/>	
 {% else %}
-    <input type="button" value="<< Volver" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/' "/>	
+    <input type="button" value="Volver" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/' "/>	
 {%endif%}
 {% endblock%}

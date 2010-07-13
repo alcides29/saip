@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Proyectos{% endblock %}
-{% block head %}Miembros de Proyecto {{proyecto.nombre}}<br>{% endblock %}
+{% block title %}{{proyecto.nombre}}{% endblock %}
+{% block head %}Miembros del Proyecto {{proyecto.nombre}}<br>{% endblock %}
 {% block content %}
 {% if ver_miembros or abm_miembros %}
 <form id="form_id" action="" method="post">

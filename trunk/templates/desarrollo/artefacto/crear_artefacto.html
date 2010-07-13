@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Artefacto{% endblock %}
-{% block head %}A&ntilde;adir nuevo artefacto<br>{% endblock %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}A&ntilde;adir nuevo artefacto de &lt;{{ proyecto.fase }}&gt;<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos %}
 <table class="abm">

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Artefactos{% endblock %}
-{% block head %}Archivos adjuntos en &lt;{{ art.nombre }}&gt;<br>{% endblock %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}Archivos adjuntos de &lt;{{ art.nombre }}&gt;<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos %}
 {% if lista %}
@@ -18,7 +18,7 @@
 {% endif %}
 <p></p>
 <p><a href="/proyectos/artefactos&id={{proyecto.id}}/adj&id={{art.id}}/nuevo/">A&ntilde;adir archivos</a> | <a href="/proyectos/artefactos&id={{proyecto.id}}/adjdel&id={{art.id}}/">Ver archivos eliminados</a></p>
-<input type="button" value="<<Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}' "/>
+<input type="button" value="Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}' "/>
 {% else %}
 <p>¡No tiene los permisos necesarios para ver esta p&aacute;gina!</p>
 {% endif %}

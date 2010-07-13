@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Artefactos{% endblock %}
-{% block head %}Aprobaci&oacute;n del artefacto {{art.nombre}}<br>{% endblock %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}Aprobaci&oacute;n del artefacto &lt;{{art.nombre}}&gt;<br>{% endblock %}
 {% block content %}
 {% if revisar_artefacto %}
 <table class="art-inf">

@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Artefactos{% endblock %}
-{% block head %}Archivos adjuntos en {{ art.nombre }}<br>{% endblock %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}A&ntilde;adir adjuntos de &lt;{{ art.nombre }}&gt;<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos %}
 <form enctype="multipart/form-data" id="form_id" action="" method="post">
-<p>(M&acuote;ximo 1MB)</p>
+<p>(M&aacute;ximo 1MB)</p>
 	{{ formset.management_form }}
     {% for form in formset.forms %}
     {{ form.as_p }}
