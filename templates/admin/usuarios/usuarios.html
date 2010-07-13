@@ -3,14 +3,16 @@
 {% block head %}Usuarios<br>{% endblock %}
 {% block content %}
 {% if ver_usuarios or crear_usuario or mod_usuario or eliminar_usuario or asignar_roles%}
+<form action="" method="post">
 	<table class="admin">
+	<tr><td colspan="3">{{form.filtro.label}}: {{form.filtro}}</td><td align="right">{{form.paginas.label}}: {{form.paginas}}  <input type="submit" value="Ok" name="Buscar"/></td></tr>
 	<tr>
 	<td class="titulo">Usuario</td>
 	<td class="titulo">Nombre</td>
 	<td class="titulo">Apellido</td>
 	<td class="titulo">Acciones</td>
 	</tr>
-	{%for item in lista%}
+	{%for item in pag.object_list%}
 		<tr>
 		{% if mod_usuario %}<td><a href="/usuarios/mod&id={{item.id}}/">{{item.username}}</a></td>
 		{% else %}<td>{{item.username}}</td>{% endif %}
@@ -26,6 +28,22 @@
 		</tr>
 	{% endfor %}
 	</table>
+	<div class="pagination">
+    <span class="step-links">
+        {% if pag.has_previous %}
+            <a href="?page={{ pag.previous_page_number }}">anterior</a>
+        {% endif %}
+
+        <span class="current">
+            P&aacute;gina {{ pag.number }} de {{ pag.paginator.num_pages }}.
+        </span>
+
+        {% if pag.has_next %}
+            <a href="?page={{ pag.next_page_number }}">siguiente</a>
+        {% endif %}
+    </span>
+	</div>
+	</form>
 	{% if crear_usuario %}<div class="footer"><div class="volver"><a href="/">&lt;&lt;Volver a la p&aacute;gina principal</a></div><a href="/usuarios/crear/">Crear un nuevo usuario</a></div>{% endif %}
 {% else %}
 	<p>No tiene permisos para esta secci&oacute;n</p>

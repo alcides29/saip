@@ -8,6 +8,7 @@ from django.http import Http404
 from django.contrib.auth import logout
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 
 from django.template import Context
 from django.template.loader import get_template
@@ -395,18 +396,50 @@ def admin_usuarios(request):
     """Administracion general de usuarios"""
     '''Ya esta la validacion de permisos en este'''
     user = User.objects.get(username=request.user.username)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_sistema(user)
     lista = User.objects.all().order_by("id")
-    return render_to_response('admin/usuarios/usuarios.html',{'lista':lista,
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            lista = User.objects.filter(Q(username__icontains = palabra) | Q(first_name__icontains = palabra) | Q(last_name__icontains = palabra)).order_by('id')
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            try:
+                page = int(request.GET.get('page', '1'))
+            except ValueError:
+                page = 1
+            try:
+                pag = paginator.page(page)
+            except (EmptyPage, InvalidPage):
+                pag = paginator.page(paginator.num_pages)
+            return render_to_response('admin/usuarios/usuarios.html',{'pag': pag,
+                                                               'form': form,
+                                                               'lista':lista,
+                                                               'user':user, 
+                                                               'ver_usuarios': 'Ver usuarios' in permisos,
+                                                               'crear_usuario': 'Crear usuario' in permisos,
+                                                               'mod_usuario': 'Modificar usuario' in permisos,
+                                                               'eliminar_usuario': 'Eliminar usuario' in permisos,
+                                                               'asignar_roles': 'Asignar rol' in permisos})
+    else:
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
+    return render_to_response('admin/usuarios/usuarios.html',{ 'pag':pag,
+                                                               'form': form,
+                                                               'lista':lista,
                                                                'user':user, 
                                                                'ver_usuarios': 'Ver usuarios' in permisos,
                                                                'crear_usuario': 'Crear usuario' in permisos,
@@ -1233,7 +1266,8 @@ def ver_dependencias(request, proyecto_id, art_id, fase):
     for item in relaciones:
         if ( item.padre.fase == Fase.objects.get(pk=fase)):
             lista.append(item.padre)
-    return render_to_response("desarrollo/artefacto/ver_relacion.html", {'art':art, 
+    return render_to_response("desarrollo/artefacto/ver_relacion.html", {'user': user,
+                                                                         'art':art, 
                                                                          'proyecto':proyect,
                                                                          'lista':lista,
                                                                          'abm_artefactos':'ABM artefactos' in permisos})
@@ -1682,16 +1716,7 @@ def calcular_impacto(request, proyecto_id, art_id):
 def fases_anteriores(request, proyecto_id):
     user = User.objects.get(username = request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')    
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())    
-    permisos = []    
-    for item in permisos_obj:
-        permisos.append(item.nombre)        
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     linea1 = LineaBase.objects.filter(proyectos=proyect, fase=1)
     linea2 = LineaBase.objects.filter(proyectos=proyect, fase=2)
     linea3 = LineaBase.objects.filter(proyectos=proyect, fase=3)
@@ -1704,12 +1729,13 @@ def fases_anteriores(request, proyecto_id):
     lista2 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo2, habilitado = True).order_by('nombre')
     lista3 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo3, habilitado = True).order_by('nombre')
     
-    permisos_ant = []
+    permisos_ant1 = []
+    permisos_ant2 = []
     if proyect.fase.id == 2:
-        permisos_ant = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=1))
+        permisos_ant1 = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=1))
     elif proyect.fase.id == 3:
-        permisos_ant = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=1)) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2)) 
-    print permisos_ant
+        permisos_ant1 = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=1))
+        permisos_ant2 = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2))
     
     return render_to_response("desarrollo/artefacto/Fases_anteriores.html", {'user': user, 
                                                                              'proyecto':proyect,                                                                       
@@ -1718,7 +1744,8 @@ def fases_anteriores(request, proyecto_id):
                                                                               'fin':linea3,
                                                                               'lista3':lista3,
                                                                               'abm_artefactos': 'ABM artefactos' in permisos,
-                                                                              'ver_artefactos_ant':'ABM artefactos'in permisos_ant or 'Ver artefactos' in permisos_ant
+                                                                              'ver_artefactos_ant_1':'ABM artefactos'in permisos_ant1 or 'Ver artefactos' in permisos_ant1,
+                                                                              'ver_artefactos_ant_2':'ABM artefactos'in permisos_ant2 or 'Ver artefactos' in permisos_ant2
                                                                               })    
     
 @login_required
@@ -1929,5 +1956,10 @@ def login_redirect(request):
 
 def logout_pagina(request):
     """Pagina de logout"""
+    try:
+        del request.session['nro_items']
+    except KeyError:
+        pass
+
     logout(request)
-    return render_to_response('logout.html')
+    return HttpResponseRedirect('/login')

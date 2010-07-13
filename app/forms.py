@@ -235,4 +235,8 @@ class RelacionArtefactoForm(forms.Form):
         
 class AdjuntoForm(forms.Form):
 	archivo = forms.FileField(required = False)
+	
+class FilterForm(forms.Form):
+    filtro = forms.CharField(max_length = 30, label = 'Buscar', required=False)
+    paginas = forms.CharField(max_length=2, widget=forms.Select(choices=(('5','5'),('10','10'),('15','15'),('20','20'))), label='Mostrar')
 

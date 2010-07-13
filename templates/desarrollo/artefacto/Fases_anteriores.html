@@ -2,8 +2,9 @@
 {% block title %}{{ proyecto.nombre }}{% endblock %}
 {% block head %}{% if fin %}Artefactos de {{proyecto.nombre}}{% else %}Artefactos de {{proyecto.nombre}}{% endif %}<br>{% endblock %}
 {% block content %}
-{% if abm_artefactos or ver_artefactos_ant%}
-<h2>Analisis de requerimientos</h2>
+{% if abm_artefactos or ver_artefactos_ant_1 or ver_artefactos_ant_2%}
+{% if abm_artefactos or ver_artefactos_ant_1%}
+<h2>An&aacute;lisis de requerimientos</h2>
 <table>
 	<tr>
 		<td class="titulo">Nombre</td>        
@@ -29,8 +30,10 @@
 	</tr>
 	{% endfor %}
 </table>
+{% endif %}
 {% ifequal proyecto.fase.id 3%}
-<h2>Fase de Disenho</h2>
+{% if abm_artefactos or ver_artefactos_ant_2%}
+<h2>Dise&ntilde;o</h2>
 <table>
     <tr>
 		<td class="titulo">Nombre</td>        
@@ -55,6 +58,7 @@
 	</tr>
 	{% endfor %}
 </table>
+{% endif %}
 {% endifequal %}
 
 {% if fin %}
