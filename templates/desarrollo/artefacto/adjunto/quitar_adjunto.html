@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Artefactos{% endblock %}
-{% block head %}Quitar adjunto en {{ art.nombre }}<br>{% endblock %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}Quitar adjunto de &lt;{{ art.nombre }}&gt;<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos %}
 <form id="form_id" action="" method="post">
-<p>¿Est&aacute; seguro de que desea quitar este archivo?</p>
-<input type="submit" value="S&iacute;" />
-<input type="button" value="No" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/adj&id={{art.id}}/' "/>
+<p>¿Est&aacute; seguro de que desea quitar este archivo?<span class="optionbuttons">
+	<input type="submit" value="S&iacute;" />
+	<input type="button" value="No" onClick ="location.href='/proyectos/artefactos&id={{proyecto.id}}/adj&id={{art.id}}/' "/></span></p>
 </form>
 {% else %}
 <p>¡No tiene los permisos necesarios para ver esta p&aacute;gina!</p>

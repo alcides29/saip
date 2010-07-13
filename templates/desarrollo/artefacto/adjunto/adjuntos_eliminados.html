@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Artefactos{% endblock %}
-{% block head %}Archivos adjuntos eliminados en &lt;{{ art.nombre }}&gt;<br>{% endblock %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}Archivos adjuntos eliminados de &lt;{{ art.nombre }}&gt;<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos %}
 {% if lista %}
@@ -14,8 +14,11 @@
 	{% endfor %}
 	</table>
 {% else %}
-	<p>No hay adjuntos</p>
+	<p>No hay adjuntos eliminados</p>
 {% endif %}
+
+<input type="button" value="Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/adj&id={{art.id}}/' "/>
+
 {% else %}
 <p>¡No tiene los permisos necesarios para ver esta p&aacute;gina!</p>
 {% endif %}

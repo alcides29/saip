@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Artefactos{% endblock %}
-{% block head %}Artefactos eliminados<br>{% endblock %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}Artefactos eliminados de {{ proyecto.fase }}<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos %}
 <table>
@@ -10,8 +10,8 @@
 		<td class="titulo">Estado</td>		
 		<td class="titulo">Complejidad</td>
 		<td class="titulo">Descripci&oacute;n Corta</td>
-		<td class="titulo">Descripci&oacute;n Larga</td>		
-		<td class="titulo">Icono</td>		
+			
+	
 		<td class="titulo">Tipo</td>
 		<td class="titulo">Acci&oacute;n</td>
 	</tr>
@@ -22,14 +22,13 @@
 		<td>{{item.estado}}</td>        
 		<td>{{item.complejidad}}</td>
 		<td>{{item.descripcion_corta}}</td>
-		<td>{{item.descripcion_larga}}</td>
-		<td>{{item.icono}}</td>			
+				
 		<td>{{item.tipo}}</td>
 		<td><a href="/proyectos/artefactos&id={{proyecto.id}}/res&id={{item.id}}/">Restaurar</a></td>
 	</tr>
 	{% endfor %}
 </table><br>
-<input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}' "/>	
+<input type="button" value="Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}' "/>	
 {% else %}
 	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
 {% endif %}

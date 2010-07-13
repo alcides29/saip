@@ -1256,7 +1256,7 @@ def ver_adjuntos(request, proyecto_id, art_id):
     art = get_object_or_404(Artefacto, id=art_id)
     adjuntos = Adjunto.objects.filter(artefacto = art, habilitado = True)
     
-    return render_to_response("desarrollo/artefacto/ver_relacion.html", {'art':art, 
+    return render_to_response("desarrollo/artefacto/ver_adjuntos.html", {'art':art, 
                                                                          'proyecto':proyect,
                                                                          'lista':adjuntos,
                                                                          'abm_artefactos':'ABM artefactos' in permisos})
@@ -1300,6 +1300,7 @@ def admin_artefactos_eliminados(request, proyecto_id):
     """Muestra la lista de artefactos eliminados de un proyecto."""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
+    fase = Fase.objects.get(pk = proyect.fase.id)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
     permisos_obj = []
@@ -1310,7 +1311,7 @@ def admin_artefactos_eliminados(request, proyecto_id):
         permisos.append(item.nombre)
     print permisos
     #-------------------------------------------------------------------
-    lista = Artefacto.objects.filter(proyecto=proyect, habilitado=False)
+    lista = Artefacto.objects.filter(proyecto=proyect, fase=fase, habilitado=False)
     variables = RequestContext(request, {'proyecto': proyect, 'lista': lista, 
                                          'abm_artefactos': 'ABM artefactos' in permisos})
     return render_to_response('desarrollo/artefacto/artefactos_eliminados.html', variables)
@@ -1693,15 +1694,15 @@ def fases_anteriores(request, proyecto_id):
     #-------------------------------------------------------------------
     linea1 = LineaBase.objects.filter(proyectos=proyect, fase=1)
     linea2 = LineaBase.objects.filter(proyectos=proyect, fase=2)
+    linea3 = LineaBase.objects.filter(proyectos=proyect, fase=3)
    
     tipo1 = TipoArtefactoFaseProyecto.objects.filter(fase=1)
-    lista1 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo1).order_by('nombre')
     tipo2 = TipoArtefactoFaseProyecto.objects.filter(fase=2)
-    lista2 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo2).order_by('nombre')
-    
-    linea3 = LineaBase.objects.filter(proyectos=proyect, fase=3)
     tipo3 = TipoArtefactoFaseProyecto.objects.filter(fase=3)
-    lista3 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo3).order_by('nombre')
+    
+    lista1 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo1, habilitado = True).order_by('nombre')
+    lista2 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo2, habilitado = True).order_by('nombre')
+    lista3 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo3, habilitado = True).order_by('nombre')
     
     permisos_ant = []
     if proyect.fase.id == 2:
@@ -1831,11 +1832,12 @@ def linea_revisar(request, proyecto_id, art_id):
     
     archivos = Adjunto.objects.filter(artefacto = art)
     relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
-    return render_to_response("gestion/linea_base_detalles.html", {'proyecto':proyect, 'user':user,
-                                                                              'art':art,
-                                                                              'archivos':archivos,
-                                                                              'relaciones':relaciones,
-                                                                              'revisar_artefacto': 'Revisar artefactos' in permisos})
+    return render_to_response("gestion/linea_base_detalles.html", {'proyecto':proyect, 
+                                                                   'user':user,
+                                                                   'art':art,
+                                                                   'archivos':archivos,
+                                                                   'relaciones':relaciones,
+                                                                   'revisar_artefacto': 'Revisar artefactos' in permisos})
 
 @login_required
 def linea_relaciones(request, proyecto_id, art_id, fase):
@@ -1856,10 +1858,12 @@ def linea_relaciones(request, proyecto_id, art_id, fase):
     fase_actual = Fase.objects.get(pk=fase)
     relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
     aux = RelArtefacto.objects.filter(padre = art, habilitado = True)
+    
     dependientes = []
     for item in aux:
         if item.hijo.fase == fase_actual:
             dependientes.append(item.hijo)
+            
     if request.method == 'POST':
         art = get_object_or_404(Artefacto, id=art_id)
         form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, request.POST)
@@ -1907,18 +1911,12 @@ def linea_relaciones(request, proyecto_id, art_id, fase):
         for item in relaciones:
             dic[item.padre.id] = True
         form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, initial = {'artefactos': dic})
-        return render_to_response("gestion/linea_base_relaciones.html", {'form': form, 'dependientes': dependientes,
+        return render_to_response("gestion/linea_base_relaciones.html", {'form': form, 
+                                                                         'dependientes': dependientes,
                                                                         'user':user,
                                                                         'art':art, 
                                                                         'proyecto': proyect,
                                                                         'abm_artefactos': 'ABM artefactos' in permisos})
-    
-    
-    
-    
-    
-    
-    
     
 @login_required
 def terminar(peticion):
