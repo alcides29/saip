@@ -64,16 +64,13 @@ def administrar_proyecto(request, proyecto_id):
     """Administracion de proyecto para el modulo de desarrollo."""
     user = User.objects.get(username=request.user.username)
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyecto).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyecto)
+    permisos_ant = []
+    if proyecto.fase.id == 2:
+        permisos_ant = get_permisos_proyecto_ant(user, proyecto, Fase.objects.get(pk=1))
+    elif proyecto.fase.id == 3:
+        permisos_ant = get_permisos_proyecto_ant(user, proyecto, Fase.objects.get(pk=1)) + get_permisos_proyecto_ant(user, proyecto, Fase.objects.get(pk=2)) 
+    print permisos_ant
     linea = LineaBase.objects.filter(proyectos=proyecto, fase=3)
     return render_to_response("desarrollo/admin_proyecto.html", {'proyecto':proyecto, 
                                                                  'user':user,
@@ -84,7 +81,8 @@ def administrar_proyecto(request, proyecto_id):
                                                                  'abm_miembros': 'ABM miembros' in permisos,
                                                                  'asignar_roles': 'Asignar roles' in permisos,
                                                                  'generarlb':'Generar LB' in permisos,
-                                                                 'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
+                                                                 'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos,
+                                                                 'ver_artefactos_ant': 'Ver artefactos' in permisos_ant or 'ABM artefactos' in permisos_ant})
     
 @login_required
 def admin_usuarios_proyecto(request, object_id):
@@ -997,16 +995,7 @@ def admin_artefactos(request, proyecto_id):
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     tipoArtefactos = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyecto_id, fase = proyect.fase)
     linea = LineaBase.objects.filter(proyectos=proyect, fase=proyect.fase)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     lista = Artefacto.objects.filter(proyecto=proyect, habilitado=True, tipo__in=tipoArtefactos).order_by('id')
     variables = RequestContext(request, {'proyecto': proyect,
                                          'linea': linea,
@@ -1714,7 +1703,12 @@ def fases_anteriores(request, proyecto_id):
     tipo3 = TipoArtefactoFaseProyecto.objects.filter(fase=3)
     lista3 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo3).order_by('nombre')
     
-    
+    permisos_ant = []
+    if proyect.fase.id == 2:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=1))
+    elif proyect.fase.id == 3:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=1)) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2)) 
+    print permisos_ant
     
     return render_to_response("desarrollo/artefacto/Fases_anteriores.html", {'user': user, 
                                                                              'proyecto':proyect,                                                                       
@@ -1722,7 +1716,8 @@ def fases_anteriores(request, proyecto_id):
                                                                               'lista2':lista2,
                                                                               'fin':linea3,
                                                                               'lista3':lista3,
-                                                                              'abm_artefactos': 'ABM artefactos' in permisos
+                                                                              'abm_artefactos': 'ABM artefactos' in permisos,
+                                                                              'ver_artefactos_ant':'ABM artefactos'in permisos_ant or 'Ver artefactos' in permisos_ant
                                                                               })    
     
 @login_required

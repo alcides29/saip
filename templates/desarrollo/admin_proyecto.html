@@ -2,22 +2,25 @@
 {% block title %}Administraci&oacute;n de Proyectos{% endblock %}
 {% block head %}{{proyecto.nombre}}<br>{% endblock %}
 {% block content %}
-{% if ver_artefactos or abm_artefactos or ver_miembros or abm_miembros or asignar_roles or generarlb%}
+{% if ver_artefactos or abm_artefactos or ver_miembros or abm_miembros or asignar_roles or generarlb or ver_artefactos_ant%}
 <p>{{proyecto.descripcion}}</p>
 <p>L&iacute;der del proyecto: {{proyecto.usuario_lider}}</p>
 <p>Fase del Proyecto: {{proyecto.fase}}</p>
+{% if ver_miembros or abm_miembros or asignar_roles or asignar_tipoArt or generarlb %}
 <h2>Administraci&oacute;n</h2>
 <ul>
 {% if ver_miembros or abm_miembros or asignar_roles %}<li><a href="/proyectos/miembros&id={{proyecto.id}}/">Miembros</a></li>{% endif %}
 {% if asignar_tipoArt %}<li><a href="/proyectos/tipoArtefacto&id={{proyecto.id}}">Tipos de Artefacto</a></li>{% endif %}
 {% if generarlb %}<li><a href="/proyectos/lineabase&id={{proyecto.id}}/">Gesti&oacute;n de l&iacute;nea base</a></li>{% endif %}
 </ul>
+{% endif %}
 <h2>Desarrollo</h2>
 <ul> 
 {%if fin%}
 {% if ver_artefactos or abm_artefactos %}<li><a href="/proyectos/artefactos&id={{ proyecto.id }}/fasesAnt/">Artefactos del Proyecto</a></li>{% endif %}
 {% else %}
 {% if ver_artefactos or abm_artefactos %}<li><a href="/proyectos/artefactos&id={{proyecto.id}}/">Artefactos de la fase actual</a></li>{% endif %}
+{% ifnotequal proyecto.fase.id 1%}<li><a href="/proyectos/artefactos&id={{proyecto.id}}/fasesAnt/">Ver artefactos de otra Fase</a></li>{% endifnotequal %}
 {% endif %}
 </ul>
 {% else %}
