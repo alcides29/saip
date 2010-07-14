@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}Artefactos no relacionados con la fase anterior<br>{% endblock %}
+{% block content %}
+{% if abm_artefactos %}
+
+{% if lista %}
+<table class="admin">
+	<tr>
+		<td class="titulo">Nombre</td>        
+		<td class="titulo">Versi&oacute;n</td>
+		<td class="titulo">Estado</td>		
+		<td class="titulo">Complejidad</td>
+		<td class="titulo">Descripci&oacute;n Corta</td>		
+		<td class="titulo">Tipo</td>
+		<td class="titulo">Accion</td>
+	</tr>
+	{% for item in lista %}
+	<tr>
+	    <td>{{item.nombre}}</td>
+		<td>{{item.version}}</td>
+		<td>{{item.estado}}</td>        
+		<td>{{item.complejidad}}</td>
+		<td>{{item.descripcion_corta}}</td>		
+		<td>{{item.tipo}}</td>
+		<td>{% if abm_artefactos %}<a href="/proyectos/lineabase&id={{proyecto.id}}/rel&id={{item.id}}&fase={{proyecto.fase.id}}/">Relaciones con la fase actual</a> | {% ifnotequal proyecto.fase.id 1 %}<a href="/proyectos/lineabase&id={{proyecto.id}}/rel&id={{item.id}}&fase={{proyecto.fase.id|add:"-1" }}/">Relaciones con la fase anterior</a>{% endifnotequal %}{% endif %} </td>
+	</tr>
+	{% endfor %}
+</table><br>
+{% else %}
+    <p>Todos los artefactos se encuentran relacionados con la fase anterior</p>
+{% endif %}
+
+<input type="button" value="Volver" onClick = "location.href='/proyectos/lineabase&id={{proyecto.id}}/'"/>
+{% else %}
+	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+{% endif %}
+{% endblock %}
