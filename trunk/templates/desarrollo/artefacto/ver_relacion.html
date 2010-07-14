@@ -3,12 +3,18 @@
 {% block head %}Relaciones de &lt;{{art.nombre}}&gt;<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos %}
-<ul>   
+
+<ul>  
+{% if lista %}
     {% for item in lista %}
     <li> {{ item.nombre }} </li>
     {% endfor %}
+{% else %}
+     <li>Este artefacto no tiene relaciones en esta fase</li>
+{% endif %}
 </ul>
-<input type="button" value="Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/fasesAnt/' "/>
+
+<input type="button" value="Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}&fasesAnt={{ art.fase.id }}/' "/>
 
 {% else %}
 	<p>¡No tiene los permisos para ver esta p&aacute;gina!</p>

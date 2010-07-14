@@ -67,24 +67,26 @@ urlpatterns = patterns('',
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/res/$', admin_artefactos_eliminados),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/res&id=(?P<art_id>\d+)/$', restaurar_artefacto_eliminado),
     
-    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)&fasesAnt=(?P<fase>\d+)/$', fases_anteriores),    
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)&fasesAnt=(?P<fase>\d+)/$', fases_anteriores),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/verrel&id=(?P<art_id>\d+)&fase=(?P<fase>\d+)/$', ver_dependencias),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/veradj&id=(?P<art_id>\d+)/$', ver_adjuntos),    
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/$', ver_historial),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/imp&id=(?P<art_id>\d+)/$',calcular_impacto),
+    
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/revisar&id=(?P<art_id>\d+)/$', revisar_artefacto),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/rel&id=(?P<art_id>\d+)&fase=(?P<fase>\d+)/$', definir_dependencias),
-    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/verrel&id=(?P<art_id>\d+)&fase=(?P<fase>\d+)/$', ver_dependencias),
-    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/imp&id=(?P<art_id>\d+)/$',calcular_impacto),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/adj&id=(?P<art_id>\d+)/$',admin_adjuntos),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/adjdel&id=(?P<art_id>\d+)/$',adjuntos_eliminados),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/adj&id=(?P<art_id>\d+)/nuevo/$',add_adjunto),
-    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/veradj&id=(?P<art_id>\d+)/$', ver_adjuntos),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/adj&id=(?P<art_id>\d+)/get&id=(?P<arch_id>\d+)/$',retornar_archivo),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/adj&id=(?P<art_id>\d+)/quitar&id=(?P<arch_id>\d+)/$',quitar_archivo),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/adj&id=(?P<art_id>\d+)/res&id=(?P<arch_id>\d+)/$',restaurar_archivo),
     
     # historial
-    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/$', ver_historial),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/historel&id=(?P<reg_id>\d+)&fase=(?P<fase>\d+)/$', historial_relaciones),
-    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/volver&id=(?P<reg_id>\d+)/$', restaurar_artefacto),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/histoadj&id=(?P<reg_id>\d+)/$', historial_adjuntos),
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/volver&id=(?P<reg_id>\d+)/$', restaurar_artefacto),
+
     
     # roles
     (r'^roles/$', admin_roles),
