@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}{{ proyecto.nombre }}{% endblock %}
-{% block head %}Detalles<br>{% endblock %}
+{% block head %}Artefactos pendientes de aprobacion<br>{% endblock %}
 {% block content %}
-{% if lineabase %}
+{% if revisar_artefacto %}
 
 {% if lista %}
 <table class="admin">
@@ -27,9 +27,11 @@
 	</tr>
 	{% endfor %}
 </table><br>
+{% else %}
+    <p>Todos los artefactos han sido aprobados</p>
 {% endif %}
 
-<input type="button" value="Aceptar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/'"/>
+<input type="button" value="Volver" onClick = "location.href='/proyectos/lineabase&id={{proyecto.id}}/'"/>
 {% else %}
 	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
 {% endif %}

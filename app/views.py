@@ -1842,21 +1842,17 @@ def calcular_impacto(request, proyecto_id, art_id):
                                                                         'ver_artefactos': 'Ver artefactos' in permisos})
     
 @login_required
-def fases_anteriores(request, proyecto_id):
+def fases_anteriores(request, proyecto_id, fase):
     user = User.objects.get(username = request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
+    fase = Fase.objects.get(pk=fase)
     permisos = get_permisos_proyecto(user, proyect)
+    
     linea1 = LineaBase.objects.filter(proyectos=proyect, fase=1)
     linea2 = LineaBase.objects.filter(proyectos=proyect, fase=2)
     linea3 = LineaBase.objects.filter(proyectos=proyect, fase=3)
    
-    tipo1 = TipoArtefactoFaseProyecto.objects.filter(fase=1)
-    tipo2 = TipoArtefactoFaseProyecto.objects.filter(fase=2)
-    tipo3 = TipoArtefactoFaseProyecto.objects.filter(fase=3)
-    
-    lista1 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo1, habilitado = True).order_by('nombre')
-    lista2 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo2, habilitado = True).order_by('nombre')
-    lista3 = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipo3, habilitado = True).order_by('nombre')
+    tipoArtefactos = TipoArtefactoFaseProyecto.objects.filter(fase=fase)
     
     permisos_ant1 = []
     permisos_ant2 = []
@@ -1866,12 +1862,12 @@ def fases_anteriores(request, proyecto_id):
         permisos_ant1 = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=1))
         permisos_ant2 = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2))
     
+    lista = Artefacto.objects.filter(proyecto=proyect, habilitado=True, tipo__in=tipoArtefactos).order_by('id')
+        
     return render_to_response("desarrollo/artefacto/Fases_anteriores.html", {'user': user, 
                                                                              'proyecto':proyect,                                                                       
-                                                                              'lista1':lista1,
-                                                                              'lista2':lista2,
+                                                                              'lista':lista,
                                                                               'fin':linea3,
-                                                                              'lista3':lista3,
                                                                               'abm_artefactos': 'ABM artefactos' in permisos,
                                                                               'ver_artefactos_ant_1':'ABM artefactos'in permisos_ant1 or 'Ver artefactos' in permisos_ant1,
                                                                               'ver_artefactos_ant_2':'ABM artefactos'in permisos_ant2 or 'Ver artefactos' in permisos_ant2

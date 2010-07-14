@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Artefactos{% endblock %}
-{% block head %}Aprobaci&oacute;n del artefacto {{art.nombre}}<br>{% endblock %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}Aprobaci&oacute;n del artefacto &lt;{{art.nombre}}&gt;<br>{% endblock %}
 {% block content %}
 {% if revisar_artefacto %}
 <table class="art-inf">
@@ -26,7 +26,7 @@
     {% endfor %}</ul></td></tr>
 	<tr><td colspan="2" class="buttonlist" style="border:none;">
     <input type="submit" value="Aprobar artefacto" />
-    <input type="button" value="Volver" onClick = "location.href='/proyectos/lineabase&id={{proyecto.id}}/'"/></td></tr>
+    <input type="button" value="Volver" onClick = "location.href='/proyectos/lineabase&id={{proyecto.id}}/revisar/'"/></td></tr>
 </form>
 </table>
 {% else %}

@@ -67,7 +67,7 @@ urlpatterns = patterns('',
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/res/$', admin_artefactos_eliminados),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/res&id=(?P<art_id>\d+)/$', restaurar_artefacto_eliminado),
     
-    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/fasesAnt/$', fases_anteriores),    
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)&fasesAnt=(?P<fase>\d+)/$', fases_anteriores),    
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/revisar&id=(?P<art_id>\d+)/$', revisar_artefacto),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/rel&id=(?P<art_id>\d+)&fase=(?P<fase>\d+)/$', definir_dependencias),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/verrel&id=(?P<art_id>\d+)&fase=(?P<fase>\d+)/$', ver_dependencias),

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}Artefactos no referenciados<br>{% endblock %}
+{% block content %}
+{% if abm_artefactos %}
+
+{% if lista %}
+<table class="admin">
+	<tr>
+		<td class="titulo">Nombre</td>        
+		<td class="titulo">Versi&oacute;n</td>
+		<td class="titulo">Estado</td>		
+		<td class="titulo">Complejidad</td>
+		<td class="titulo">Descripci&oacute;n Corta</td>		
+		<td class="titulo">Tipo</td>
+	</tr>
+	{% for item in lista %}
+	<tr>
+	    <td>{{item.nombre}}</td>
+		<td>{{item.version}}</td>
+		<td>{{item.estado}}</td>        
+		<td>{{item.complejidad}}</td>
+		<td>{{item.descripcion_corta}}</td>		
+		<td>{{item.tipo}}</td>
+    </tr>
+	{% endfor %}
+</table><br>
+{% else %}
+    <p>Todos los artefactos han sido referenciados</p>
+{% endif %}
+
+<div class="footer"><a href="/proyectos/artefactos&id={{proyecto.id}}/" >ir a artefactos de la fase actual>></a></div>
+
+<input type="button" value="Volver" onClick = "location.href='/proyectos/lineabase&id={{proyecto.id}}/'"/>
+
+{% else %}
+	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+{% endif %}
+{% endblock %}
