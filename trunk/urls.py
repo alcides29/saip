@@ -85,6 +85,8 @@ urlpatterns = patterns('',
     
     # roles
     (r'^roles/$', admin_roles),
+    (r'^roles/sist/$',admin_roles_sist),
+    (r'^roles/proy/$',admin_roles_proy),
     (r'^roles/crear/$', crear_rol),
     (r'^roles/mod&id=(?P<rol_id>\d+)/$', mod_rol),
     (r'^roles/permisos&id=(?P<rol_id>\d+)/$', admin_permisos),
