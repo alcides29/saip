@@ -51,7 +51,7 @@ class CambiarPasswordForm(forms.Form):
 		raise forms.ValidationError('Las contrasenas no coinciden')
 
 class AsignarRolesForm(forms.Form):
-	roles = forms.ModelMultipleChoiceField(queryset = None, widget = forms.CheckboxSelectMultiple, label = 'Roles disponibles')
+	roles = forms.ModelMultipleChoiceField(queryset = None, widget = forms.CheckboxSelectMultiple, label = 'Roles disponibles', required=False)
 	
 	def __init__(self, cat, *args, **kwargs):
 		super(AsignarRolesForm, self).__init__(*args, **kwargs)
@@ -239,4 +239,10 @@ class AdjuntoForm(forms.Form):
 class FilterForm(forms.Form):
     filtro = forms.CharField(max_length = 30, label = 'Buscar', required=False)
     paginas = forms.CharField(max_length=2, widget=forms.Select(choices=(('5','5'),('10','10'),('15','15'),('20','20'))), label='Mostrar')
+    
+class FilterForm2(forms.Form):
+    filtro1 = forms.CharField(max_length = 30, label = 'Buscar', required=False)
+    paginas1 = forms.CharField(max_length=2, widget=forms.Select(choices=(('5','5'),('10','10'),('15','15'),('20','20'))), label='Mostrar')
+    filtro2 = forms.CharField(max_length = 30, label = 'Buscar', required=False)
+    paginas2 = forms.CharField(max_length=2, widget=forms.Select(choices=(('5','5'),('10','10'),('15','15'),('20','20'))), label='Mostrar')
 

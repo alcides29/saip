@@ -307,16 +307,7 @@ def cambiar_password(request):
 def asignar_roles_sistema(request, usuario_id):
     """Asigna roles de sistema a un usuario"""
     user = User.objects.get(username=request.user.username)
-    #Validacion de permisos----------------------------------------------
-    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #--------------------------------------------------------------------
+    permisos = get_permisos_sistema(user)
     usuario = get_object_or_404(User, id=usuario_id)
     lista_roles = UsuarioRolSistema.objects.filter(usuario = usuario)
     print lista_roles
@@ -451,43 +442,153 @@ def admin_usuarios(request):
 def admin_proyectos(request):
     """Administracion general de proyectos"""
     user = User.objects.get(username=request.user.username)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_sistema(user)
     lista = Proyecto.objects.all().order_by('id')
-    return render_to_response('admin/proyectos/proyectos.html',{'lista':lista, 
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            lista = Proyecto.objects.filter(Q(nombre__icontains = palabra) | Q(descripcion__icontains = palabra) | Q(usuario_lider__username__icontains = palabra)).order_by('id')
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            try:
+                page = int(request.GET.get('page', '1'))
+            except ValueError:
+                page = 1
+            try:
+                pag = paginator.page(page)
+            except (EmptyPage, InvalidPage):
+                pag = paginator.page(paginator.num_pages)
+            return render_to_response('admin/proyectos/proyectos.html',{'lista':lista, 'pag': pag, 'form':form, 
                                                                 'user':user,
                                                                 'ver_proyectos':'Ver proyectos' in permisos,
                                                                 'crear_proyecto': 'Crear proyecto' in permisos,
                                                                 'mod_proyecto': 'Modificar proyecto' in permisos,
-                                                                'eliminar_proyecto': 'Eliminar proyecto' in permisos})    
+                                                                'eliminar_proyecto': 'Eliminar proyecto' in permisos})
+    else:
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
+        return render_to_response('admin/proyectos/proyectos.html',{'lista':lista, 'pag': pag, 'form':form, 
+                                                                'user':user,
+                                                                'ver_proyectos':'Ver proyectos' in permisos,
+                                                                'crear_proyecto': 'Crear proyecto' in permisos,
+                                                                'mod_proyecto': 'Modificar proyecto' in permisos,
+                                                                'eliminar_proyecto': 'Eliminar proyecto' in permisos})
 
 @login_required
 def admin_roles(request):
     """Administracion general de roles"""
     user = User.objects.get(username=request.user.username)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
-    lista1 = Rol.objects.filter(categoria=1).order_by('id')
-    lista2 = Rol.objects.filter(categoria=2).order_by('id')
-    return render_to_response('admin/roles/roles.html',{'lista1':lista1,
-                                                        'lista2':lista2,
-                                                        'user':user,
+    permisos = get_permisos_sistema(user)
+    return render_to_response('admin/roles/roles.html',{'user':user,
+                                                        'ver_roles':'Ver roles' in permisos,
+                                                        'crear_rol': 'Crear rol' in permisos,
+                                                        'mod_rol': 'Modificar rol' in permisos,
+                                                        'eliminar_rol': 'Eliminar rol' in permisos})
+@login_required
+def admin_roles_sist(request):
+    """Administracion general de roles"""
+    user = User.objects.get(username=request.user.username)
+    permisos = get_permisos_sistema(user)
+    lista = Rol.objects.filter(categoria=1).order_by('id')
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            lista = Rol.objects.filter(Q(categoria = 1), Q(nombre__icontains = palabra) | Q(descripcion__icontains = palabra) | Q(usuario_creador__username__icontains = palabra)).order_by('id')
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            try:
+                page = int(request.GET.get('page', '1'))
+            except ValueError:
+                page = 1
+            try:
+                pag = paginator.page(page)
+            except (EmptyPage, InvalidPage):
+                pag = paginator.page(paginator.num_pages)
+            return render_to_response('admin/roles/roles_sistema.html',{'lista':lista, 'form': form,
+                                                        'user':user, 'pag': pag,
+                                                        'ver_roles':'Ver roles' in permisos,
+                                                        'crear_rol': 'Crear rol' in permisos,
+                                                        'mod_rol': 'Modificar rol' in permisos,
+                                                        'eliminar_rol': 'Eliminar rol' in permisos})
+    else:
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
+    return render_to_response('admin/roles/roles_sistema.html',{'lista':lista, 'form':form,
+                                                            'user':user, 'pag': pag,
+                                                            'ver_roles':'Ver roles' in permisos,
+                                                            'crear_rol': 'Crear rol' in permisos,
+                                                            'mod_rol': 'Modificar rol' in permisos,
+                                                            'eliminar_rol': 'Eliminar rol' in permisos})
+@login_required
+def admin_roles_proy(request):
+    """Administracion general de roles"""
+    user = User.objects.get(username=request.user.username)
+    permisos = get_permisos_sistema(user)
+    lista = Rol.objects.filter(categoria=2).order_by('id')
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            lista = Rol.objects.filter(Q(categoria = 2), Q(nombre__icontains = palabra) | Q(descripcion__icontains = palabra) | Q(usuario_creador__username__icontains = palabra)).order_by('id')
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            try:
+                page = int(request.GET.get('page', '1'))
+            except ValueError:
+                page = 1
+            try:
+                pag = paginator.page(page)
+            except (EmptyPage, InvalidPage):
+                pag = paginator.page(paginator.num_pages)
+            return render_to_response('admin/roles/roles_sistema.html',{'lista':lista,'form':form,
+                                                        'user':user, 'pag': pag,
+                                                        'ver_roles':'Ver roles' in permisos,
+                                                        'crear_rol': 'Crear rol' in permisos,
+                                                        'mod_rol': 'Modificar rol' in permisos,
+                                                        'eliminar_rol': 'Eliminar rol' in permisos})
+    else:
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
+    return render_to_response('admin/roles/roles_proyecto.html',{'lista':lista,'form':form,
+                                                        'user':user,'pag': pag,
                                                         'ver_roles':'Ver roles' in permisos,
                                                         'crear_rol': 'Crear rol' in permisos,
                                                         'mod_rol': 'Modificar rol' in permisos,
@@ -495,7 +596,7 @@ def admin_roles(request):
 
 @login_required
 def crear_rol(request):
-    """Agrega un nuevo rol."""
+    """Agrega un nuevo rol"""
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -787,20 +888,48 @@ def del_proyecto(request, proyecto_id):
 def admin_tipo_artefacto(request):
     """Muestra la pagina de administracion de tipo de artefactos."""
     user = User.objects.get(username=request.user.username)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_sistema(user)
     lista = TipoArtefacto.objects.all()
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            lista = TipoArtefacto.objects.filter(Q(nombre__icontains = palabra) | Q(descripcion__icontains = palabra) | Q(fase__nombre__icontains = palabra)).order_by('id')
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            try:
+                page = int(request.GET.get('page', '1'))
+            except ValueError:
+                page = 1
+            try:
+                pag = paginator.page(page)
+            except (EmptyPage, InvalidPage):
+                pag = paginator.page(paginator.num_pages)
+            return render_to_response('admin/tipo_artefacto/tipo_artefacto.html',
+                              {'lista': lista, 'pag':pag,
+                               'user':user, 'form': form,
+                               'ver_tipos_artefacto': 'Ver tipos-artefacto' in permisos,
+                               'crear_tipo_artefacto': 'Crear tipo-artefacto' in permisos,
+                               'mod_tipo_artefacto': 'Modificar tipo-artefacto' in permisos,
+                               'eliminar_tipo_artefacto': 'Eliminar tipo-artefacto' in permisos})
+    else:
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
     return render_to_response('admin/tipo_artefacto/tipo_artefacto.html',
-                              {'lista': lista,
-                               'user':user, 
+                              {'lista': lista, 'pag':pag,
+                               'user':user, 'form': form,
                                'ver_tipos_artefacto': 'Ver tipos-artefacto' in permisos,
                                'crear_tipo_artefacto': 'Crear tipo-artefacto' in permisos,
                                'mod_tipo_artefacto': 'Modificar tipo-artefacto' in permisos,
