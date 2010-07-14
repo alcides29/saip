@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Linea Base{% endblock %}
-{% block head %}La generaci&oacute;n de la l&iacute;nea base no es posible...<br>{% endblock %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}Detalles<br>{% endblock %}
 {% block content %}
 {% if lineabase %}
-<p>{{msg}}</p>
 
+{% if lista %}
 <table class="admin">
 	<tr>
 		<td class="titulo">Nombre</td>        
@@ -23,10 +23,11 @@
 		<td>{{item.complejidad}}</td>
 		<td>{{item.descripcion_corta}}</td>		
 		<td>{{item.tipo}}</td>
-		<td><a href="/proyectos/lineabase&id={{proyecto.id}}/revisar&id={{item.id}}/ ">Revisar</a></td>
+		<td><a href="/proyectos/lineabase&id={{proyecto.id}}/revisar&id={{item.id}}/" >Revisar</a></td>
 	</tr>
 	{% endfor %}
 </table><br>
+{% endif %}
 
 <input type="button" value="Aceptar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/'"/>
 {% else %}

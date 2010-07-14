@@ -46,8 +46,11 @@ urlpatterns = patterns('',
     
     # gestion
     (r'^proyectos/lineabase&id=(?P<proyecto_id>\d+)/$', linea_base),
-    (r'^proyectos/lineabase&id=(?P<proyecto_id>\d+)/revisar&id=(?P<art_id>\d+)/$', linea_revisar),
-    (r'^proyectos/lineabase&id=(?P<proyecto_id>\d+)/rel&id=(?P<art_id>\d+)&fase=(?P<fase>\d+)/$', linea_relaciones),
+    (r'^proyectos/lineabase&id=(?P<proyecto_id>\d+)/revisar/$', linea_revisar),
+    (r'^proyectos/lineabase&id=(?P<proyecto_id>\d+)/revisar&id=(?P<art_id>\d+)/$', linea_revisar_artefacto),
+    (r'^proyectos/lineabase&id=(?P<proyecto_id>\d+)/relacionar/$', linea_relacionar),
+    (r'^proyectos/lineabase&id=(?P<proyecto_id>\d+)/rel&id=(?P<art_id>\d+)&fase=(?P<fase>\d+)/$', linea_relacionar_artefacto),
+    (r'^proyectos/lineabase&id=(?P<proyecto_id>\d+)/anteriores/$', linea_anteriores),
     
     # desarrollo
     (r'^proyectos/admin&id=(?P<proyecto_id>\d+)/$', administrar_proyecto),
