@@ -6,13 +6,12 @@
 <p>Usuario: {{ historial.usuario }}</p>
 <p>Fecha de creacion: {{ historial.fecha_creacion }}</p>
 
+{% if lista %}
 <table>
 	<tr>
 		<td class="titulo">Versi&oacute;n</td>
        	<td class="titulo">Complejidad</td>
 		<td class="titulo">Descripci&oacute;n Corta</td>
-		<td class="titulo">Descripci&oacute;n Larga</td>		
-        <td class="titulo">Icono</td>
         <td class="titulo">Tipo</td>
         <td class="titulo">Fecha/Modificacion</td>
 		<td class="titulo">Acciones</td>
@@ -21,21 +20,25 @@
 	<tr>
 		<td>{{item.version}}</td>
 		<td>{{item.complejidad}}</td>
-		<td>{{item.descripcion_corta}}</td>
-		<td>{{item.descripcion_larga}}</td>
-		<td>{{item.icono}}</td>			
+		<td>{{item.descripcion_corta}}</td>		
 		<td>{{item.tipo}}</td>
         <td>{{item.fecha_modificacion}}</td>
-		<td><a href="/proyectos/artefactos&id={{ proyecto.id }}/historial&id={{ art.id }}/historel&id={{ item.id }}&fase={{ art.fase.id }}/">| Relaciones con la fase actual</a>{% ifnotequal art.fase.id 1 %}<a href="/proyectos/artefactos&id={{ proyecto.id }}/historial&id={{ art.id }}/historel&id={{ item.id }}&fase={{ art.fase.id|add:"-1" }}/">| Relaciones con la fase anterior</a>{% endifnotequal %}<a href="/proyectos/artefactos&id={{ proyecto.id }}/historial&id={{ art.id }}/histoadj&id={{ item.id }}/">| Adjuntos</a>{% ifequal art.fase proyecto.fase %}{% ifnotequal art.estado 3%}<a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{art.id}}/volver&id={{item.id}}/">| Restaurar</a>{% endifnotequal %}{% endifequal %}</td>
+		<td><a href="/proyectos/artefactos&id={{ proyecto.id }}/historial&id={{ art.id }}/historel&id={{ item.id }}&fase={{ art.fase.id }}/">| Relaciones con la fase actual</a>{% ifnotequal art.fase.id 1 %}<a href="/proyectos/artefactos&id={{ proyecto.id }}/historial&id={{ art.id }}/historel&id={{ item.id }}&fase={{ art.fase.id|add:"-1" }}/">| Relaciones con la fase anterior</a>{% endifnotequal %}<a href="/proyectos/artefactos&id={{ proyecto.id }}/historial&id={{ art.id }}/histoadj&id={{ item.id }}/">| Adjuntos</a>{% ifequal art.fase proyecto.fase %}{% ifequal fin 1 %}<a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{art.id}}/volver&id={{item.id}}/">| Restaurar</a>{% endifequal%}{% endifequal %}</td>
 	</tr>
 	{% endfor %}
 </table>
-{% ifequal art.fase proyecto.fase %}
-{% if fin %}<input type="button" value="<< Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/fasesAnt/'"/>{% else %}
-<input type="button" value="Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/'"/>{% endif%}
 {% else %}
-<input type="button" value="Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/fasesAnt/'"/>
+<ul>
+    <li>No se ha registrado ninguna version</li>
+</ul>
+{% endif %}
+
+{% ifequal art.fase proyecto.fase %}
+<input type="button" value="Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}/'"/>
+{% else %}
+<input type="button" value="Volver" onClick = "location.href='/proyectos/artefactos&id={{ proyecto.id }}&fasesAnt={{ art.fase.id }}/'"/>
 {% endifequal %}
+
 {% else %}
 	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
 {% endif %}

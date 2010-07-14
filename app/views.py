@@ -1423,6 +1423,35 @@ def ver_adjuntos(request, proyecto_id, art_id):
                                                                          'proyecto':proyect,
                                                                          'lista':adjuntos,
                                                                          'abm_artefactos':'ABM artefactos' in permisos})
+
+@login_required
+def ver_historial(request, proyecto_id, art_id):
+    art = Artefacto.objects.get(pk=art_id)
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())
+    permisos = []
+    for item in permisos_obj:
+        permisos.append(item.nombre)
+    #-------------------------------------------------------------------
+    historial = Historial.objects.get(artefacto=art)
+    versiones = RegistroHistorial.objects.filter(historial=historial).order_by('version')
+    linea = LineaBase.objects.filter(proyectos=proyect, fase=3)
+    if (linea):
+        fin = 0
+    else:
+        fin = 1
+    variables = RequestContext(request, {'historial': historial, 
+                                         'lista': versiones,
+                                         'art': art,
+                                         'fin':fin,
+                                         'proyecto': proyect,
+                                         'abm_artefactos': 'ABM artefactos' in permisos})
+    return render_to_response('desarrollo/artefacto/historial.html', variables)
     
 
 @login_required
@@ -1633,30 +1662,6 @@ def restaurar_artefacto_eliminado(request, proyecto_id, art_id):
     variables = RequestContext(request, {'proyecto':proyect, 'art': art, 'abm_artefactos': 'ABM artefactos' in permisos})
     return render_to_response('desarrollo/artefacto/artefacto_confirm_restaurar.html', variables)
 
-@login_required
-def ver_historial(request, proyecto_id, art_id):
-    art = Artefacto.objects.get(pk=art_id)
-    user = User.objects.get(username=request.user.username)
-    proyect = Proyecto.objects.get(pk=proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    #-------------------------------------------------------------------
-    historial = Historial.objects.get(artefacto=art)
-    versiones = RegistroHistorial.objects.filter(historial=historial).order_by('version')
-    linea = LineaBase.objects.filter(proyectos=proyect, fase=3)
-    variables = RequestContext(request, {'historial': historial, 
-                                         'lista': versiones,
-                                         'art': art,
-                                         'fin':linea,
-                                         'proyecto': proyect,
-                                         'abm_artefactos': 'ABM artefactos' in permisos})
-    return render_to_response('desarrollo/artefacto/historial.html', variables)
 
 @login_required
 def historial_relaciones(request, proyecto_id, art_id, reg_id, fase):
@@ -1856,21 +1861,29 @@ def fases_anteriores(request, proyecto_id, fase):
     
     permisos_ant1 = []
     permisos_ant2 = []
+    permisos_ant3 = []
     if proyect.fase.id == 2:
         permisos_ant1 = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=1))
     elif proyect.fase.id == 3:
         permisos_ant1 = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=1))
         permisos_ant2 = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2))
+    elif(linea3):
+        permisos_ant1 = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=1))
+        permisos_ant2 = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2))
+        permisos_ant3 = get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+        
     
     lista = Artefacto.objects.filter(proyecto=proyect, habilitado=True, tipo__in=tipoArtefactos).order_by('id')
         
     return render_to_response("desarrollo/artefacto/Fases_anteriores.html", {'user': user, 
                                                                              'proyecto':proyect,                                                                       
                                                                               'lista':lista,
+                                                                              'fase':fase,
                                                                               'fin':linea3,
                                                                               'abm_artefactos': 'ABM artefactos' in permisos,
                                                                               'ver_artefactos_ant_1':'ABM artefactos'in permisos_ant1 or 'Ver artefactos' in permisos_ant1,
-                                                                              'ver_artefactos_ant_2':'ABM artefactos'in permisos_ant2 or 'Ver artefactos' in permisos_ant2
+                                                                              'ver_artefactos_ant_2':'ABM artefactos'in permisos_ant2 or 'Ver artefactos' in permisos_ant2,
+                                                                              'ver_artefactos_ant_3':'ABM artefactos'in permisos_ant3 or 'Ver artefactos' in permisos_ant3
                                                                               })    
     
 @login_required
