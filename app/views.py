@@ -1895,8 +1895,7 @@ def linea_base (request, proyecto_id):
     if (fase.id > 1):
         fase_ant = Fase.objects.get(pk=proyect.fase.id - 1)
         tipoArtefactos_ant = TipoArtefactoFaseProyecto.objects.filter(fase=fase_ant)
-        artefactos_ant = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipoArtefactos_ant, habilitado=True)
-    
+        artefactos_ant = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipoArtefactos_ant, habilitado=True)    
     
     tipoArtefactos = TipoArtefactoFaseProyecto.objects.filter(fase=fase)
     artefactos = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipoArtefactos, habilitado=True)
@@ -1905,6 +1904,7 @@ def linea_base (request, proyecto_id):
     lista2 = []       
     lista3 = [] 
     msg = ""
+    
     if (artefactos):        
         for item in artefactos:
             if (item.estado != 3):
@@ -1954,19 +1954,53 @@ def linea_base (request, proyecto_id):
             fin = True 
             msg = "Todas las lineas base han sido generadas"
             
-    variables = RequestContext(request, {'lineabase': 'Generar LB' in permisos,
-                                         'abm_artefactos': 'ABM artefactos' in permisos,
-                                         'proyecto': proyect,
-                                         'fase': fase,
-                                         'lista': lista1,
-                                         'lista1': lista2,
-                                         'lista2': lista3,
-                                         'fin': fin,
-                                         'msg':msg })
-    return render_to_response('gestion/linea_base.html', variables)         
+    return render_to_response("gestion/linea_base.html", {'lineabase': 'Generar LB' in permisos,
+                                                          'abm_artefactos': 'ABM artefactos' in permisos,
+                                                          'proyecto': proyect,
+                                                          'user': user,
+                                                          'fase': fase,
+                                                          'lista': lista1,
+                                                          'lista1': lista2,
+                                                          'lista2': lista3,
+                                                          'fin': fin,
+                                                          'msg':msg })
 
 @login_required
-def linea_revisar(request, proyecto_id, art_id):
+def linea_revisar(request, proyecto_id):
+    """Asigna roles de sistema a un usuario"""
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(id=proyecto_id)
+    fase = Fase.objects.get(pk=proyect.fase.id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')    
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())    
+    permisos = []    
+    for item in permisos_obj:
+        permisos.append(item.nombre)        
+    print permisos
+    #------------------------------------------------------------------- 
+    if (fase.id > 1):
+        fase_ant = Fase.objects.get(pk=proyect.fase.id - 1)
+        tipoArtefactos_ant = TipoArtefactoFaseProyecto.objects.filter(fase=fase_ant)
+        artefactos_ant = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipoArtefactos_ant, habilitado=True)
+             
+    tipoArtefactos = TipoArtefactoFaseProyecto.objects.filter(fase=fase)
+    artefactos = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipoArtefactos, habilitado=True)
+    lista1 = []       
+    if (artefactos):        
+        for item in artefactos:
+            if (item.estado != 3):
+                lista1.append(item)                
+    return render_to_response("gestion/linea_base_revisar.html", {'proyecto': proyect,
+                                                                   'user': user,
+                                                                   'lista': lista1,
+                                                                   'revisar_artefacto': 'Revisar artefactos' in permisos})
+           
+
+@login_required
+def linea_revisar_artefacto(request, proyecto_id, art_id):
     """Asigna roles de sistema a un usuario"""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
@@ -1984,11 +2018,11 @@ def linea_revisar(request, proyecto_id, art_id):
     if request.method == 'POST':
             art.estado = 3        
             art.save()                
-            return HttpResponseRedirect("/proyectos/lineabase&id=" + str(proyect.id)+"/")
+            return HttpResponseRedirect("/proyectos/lineabase&id=" + str(proyect.id)+"/revisar/")
     
     archivos = Adjunto.objects.filter(artefacto = art)
     relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
-    return render_to_response("gestion/linea_base_detalles.html", {'proyecto':proyect, 
+    return render_to_response("gestion/linea_revisar_detalles.html", {'proyecto':proyect, 
                                                                    'user':user,
                                                                    'art':art,
                                                                    'archivos':archivos,
@@ -1996,7 +2030,41 @@ def linea_revisar(request, proyecto_id, art_id):
                                                                    'revisar_artefacto': 'Revisar artefactos' in permisos})
 
 @login_required
-def linea_relaciones(request, proyecto_id, art_id, fase):
+def linea_relacionar(request, proyecto_id):
+    """Asigna roles de sistema a un usuario"""
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(id=proyecto_id)
+    fase = Fase.objects.get(pk=proyect.fase.id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')    
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())    
+    permisos = []    
+    for item in permisos_obj:
+        permisos.append(item.nombre)        
+    print permisos
+    #------------------------------------------------------------------- 
+    tipoArtefactos = TipoArtefactoFaseProyecto.objects.filter(fase=fase)
+    artefactos = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipoArtefactos, habilitado=True)
+    lista = []       
+    if (artefactos):        
+        for item in artefactos:
+            if (fase.id>1):                   
+                relaciones = RelArtefacto.objects.filter(hijo=item, habilitado=True).values_list('padre', flat=True)
+                if (relaciones):
+                    padres = Artefacto.objects.filter(id__in = relaciones)
+                    if (not tiene_padre (item, padres)):
+                        lista.append(item) 
+                else:
+                    lista.append(item)            
+    return render_to_response("gestion/linea_base_relacionar.html", {'proyecto': proyect,
+                                                                     'user': user,
+                                                                     'lista': lista,
+                                                                     'abm_artefactos':'ABM artefactos' in permisos})
+           
+@login_required
+def linea_relacionar_artefacto(request, proyecto_id, art_id, fase):
     """Asigna roles de sistema a un usuario"""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
@@ -2012,11 +2080,12 @@ def linea_relaciones(request, proyecto_id, art_id, fase):
     print permisos
     #-------------------------------------------------------------------
     fase_actual = Fase.objects.get(pk=fase)
-    relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
-    aux = RelArtefacto.objects.filter(padre = art, habilitado = True)
+    relaciones_padres = RelArtefacto.objects.filter(hijo = art, habilitado = True)
+    relaciones_hijos = RelArtefacto.objects.filter(padre = art, habilitado = True)
+    
     
     dependientes = []
-    for item in aux:
+    for item in relaciones_hijos:
         if item.hijo.fase == fase_actual:
             dependientes.append(item.hijo)
             
@@ -2025,12 +2094,12 @@ def linea_relaciones(request, proyecto_id, art_id, fase):
         form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, request.POST)
         if form.is_valid():            
             cambio = False                        
-            archivos = Adjunto.objects.filter(artefacto=art)
-            relaciones = RelArtefacto.objects.filter(hijo = art)
+            archivos = Adjunto.objects.filter(artefacto=art, habilitado = True)
+            relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
             relaciones_nuevas = form.cleaned_data['artefactos']            
             lista = []
             for item in relaciones:
-                if ( item.padre.fase == Fase.objects.get(pk=fase)):
+                if (item.padre.fase == Fase.objects.get(pk=fase)):
                     lista.append(item.padre)            
             for item in lista:
                 if (item in relaciones_nuevas) == 0:
@@ -2041,13 +2110,13 @@ def linea_relaciones(request, proyecto_id, art_id, fase):
             if (cambio):
                 registrar_version(art, relaciones, archivos)                                 
             for item in lista:
-                auxi = RelArtefacto.objects.filter(padre = item, hijo = art)
+                auxi = RelArtefacto.objects.filter(padre = item, hijo = art, habilitado = True)
                 if auxi:
                     nuevo = auxi[0]
                     nuevo.habilitado = False
                     nuevo.save()                
             for item in relaciones_nuevas:
-                aux = RelArtefacto.objects.filter(padre = item, hijo = art)
+                aux = RelArtefacto.objects.filter(padre = item, hijo = art, habilitado = True)
                 if aux:
                     nuevo = aux[0]
                     nuevo.habilitado = True
@@ -2058,13 +2127,13 @@ def linea_relaciones(request, proyecto_id, art_id, fase):
                     r.hijo = art
                     r.habilitado = True
                     r.save()                    
-            return HttpResponseRedirect("/proyectos/lineabase&id=" + str(proyect.id)+"/")
+            return HttpResponseRedirect("/proyectos/lineabase&id=" + str(proyect.id)+"/relacionar/")
     else:
         if not validar_fase(proyect, fase):
             mensaje = "Se paso un parametro invalido"
             return render_to_response("gestion/linea_base_relaciones.html", {'mensaje': mensaje})
         dic = {}
-        for item in relaciones:
+        for item in relaciones_padres:
             dic[item.padre.id] = True
         form = RelacionArtefactoForm(Fase.objects.get(pk=fase), art, initial = {'artefactos': dic})
         return render_to_response("gestion/linea_base_relaciones.html", {'form': form, 
@@ -2073,7 +2142,46 @@ def linea_relaciones(request, proyecto_id, art_id, fase):
                                                                         'art':art, 
                                                                         'proyecto': proyect,
                                                                         'abm_artefactos': 'ABM artefactos' in permisos})
-    
+
+@login_required
+def linea_anteriores(request, proyecto_id):
+    """Asigna roles de sistema a un usuario"""
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(id=proyecto_id)
+    fase = Fase.objects.get(pk=proyect.fase.id)
+    #Validacion de permisos---------------------------------------------
+    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')    
+    permisos_obj = []
+    for item in roles:
+        permisos_obj.extend(item.rol.permisos.all())    
+    permisos = []    
+    for item in permisos_obj:
+        permisos.append(item.nombre)        
+    print permisos
+    #------------------------------------------------------------------- 
+    if (fase.id > 1):
+        fase_ant = Fase.objects.get(pk=proyect.fase.id - 1)
+        tipoArtefactos_ant = TipoArtefactoFaseProyecto.objects.filter(fase=fase_ant)
+        artefactos_ant = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipoArtefactos_ant, habilitado=True)  
+        
+    tipoArtefactos = TipoArtefactoFaseProyecto.objects.filter(fase=fase)
+    artefactos = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipoArtefactos, habilitado=True)
+    lista = []       
+    if (artefactos):    
+        if (fase.id > 1):       
+            if (artefactos_ant):        
+                for item in artefactos_ant:
+                    relaciones = RelArtefacto.objects.filter(padre=item, habilitado=True).values_list('hijo', flat=True)
+                    if (relaciones):
+                        hijos = Artefacto.objects.filter(id__in = relaciones)
+                        if (not tiene_hijo (item, hijos)):
+                                lista.append(item) 
+                    else:
+                        lista.append(item)   
+    return render_to_response("gestion/linea_base_anteriores.html", {'proyecto': proyect,
+                                                                   'user': user,
+                                                                   'lista': lista,
+                                                                   'abm_artefactos': 'ABM artefactos' in permisos})    
 @login_required
 def terminar(peticion):
     """Muestra una pagina de confirmacion de exito"""

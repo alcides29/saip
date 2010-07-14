@@ -39,8 +39,8 @@ class ModUsuariosForm(forms.Form):
 	email = forms.EmailField(max_length=75, label='Correo Electronico')
 
 class CambiarPasswordForm(forms.Form):
-	password1 = forms.CharField(widget = forms.PasswordInput, max_length=128, label = u'Escriba su nueva contraseña')
-	password2 = forms.CharField(widget = forms.PasswordInput, max_length=128, label = u'Repita la contraseña')
+	password1 = forms.CharField(widget = forms.PasswordInput, max_length=128, label = u'Escriba su nueva contraseï¿½a')
+	password2 = forms.CharField(widget = forms.PasswordInput, max_length=128, label = u'Repita la contraseï¿½a')
 	
 	def clean_password2(self):
 		if 'password1' in self.cleaned_data:
@@ -124,8 +124,8 @@ class PermisosForm(forms.Form):
 
 class PermisosProyectoForm(forms.Form):
 	permisos1 = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False, label = u'Permisos de la fase de Requerimientos')
-	permisos2 = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False, label = u'Permisos de la fase de Diseño')
-	permisos3 = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False, label = u'Permisos de la fase de Implementación')
+	permisos2 = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False, label = u'Permisos de la fase de Diseï¿½o')
+	permisos3 = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False, label = u'Permisos de la fase de Implementaciï¿½n')
 	
     
 class ModRolesForm(forms.Form):
@@ -231,7 +231,7 @@ class RelacionArtefactoForm(forms.Form):
 		for item in rel:
 			lista.append(item.id)
 		print lista
-		self.fields['artefactos'].queryset = Artefacto.objects.filter(Q(fase = art_fase), ~Q(id = art.id), ~Q(pk__in=lista), Q(proyecto = art.proyecto)) 
+		self.fields['artefactos'].queryset = Artefacto.objects.filter(Q(fase = art_fase), ~Q(id = art.id), ~Q(pk__in=lista), Q(proyecto = art.proyecto), Q(habilitado=True) ) 
         
 class AdjuntoForm(forms.Form):
 	archivo = forms.FileField(required = False)
