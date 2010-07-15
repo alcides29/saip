@@ -26,7 +26,10 @@
 		<td><a href="/proyectos/artefactos&id={{ proyecto.id }}/historial&id={{ art.id }}/historel&id={{ item.id }}&fase={{ art.fase.id }}/">| Relaciones con la fase actual</a>{% ifnotequal art.fase.id 1 %}<a href="/proyectos/artefactos&id={{ proyecto.id }}/historial&id={{ art.id }}/historel&id={{ item.id }}&fase={{ art.fase.id|add:"-1" }}/">| Relaciones con la fase anterior</a>{% endifnotequal %}<a href="/proyectos/artefactos&id={{ proyecto.id }}/historial&id={{ art.id }}/histoadj&id={{ item.id }}/">| Adjuntos</a>{% ifequal art.fase proyecto.fase %}{% ifequal fin 1 %}<a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{art.id}}/volver&id={{item.id}}/">| Restaurar</a>{% endifequal%}{% endifequal %}</td>
 	</tr>
 	{% endfor %}
+
 </table>
+
+<div class="footer"><a href="/report/proyectos/artefactos&id={{proyecto.id}}/historial&id={{art.id}}/"> Obtener reporte</a></div>
 {% else %}
 <ul>
     <li>No se ha registrado ninguna version</li>

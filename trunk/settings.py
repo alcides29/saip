@@ -80,6 +80,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'geraldo', #Geraldo-0.4.7_stable-py2.6
     'saip.app',
     #'django.contrib.admin',
 )

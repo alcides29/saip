@@ -4,8 +4,8 @@
 {% block content %}
 {% if lineabase %}
 {% if msg %}
-    <p>{{msg}}</p>
-
+    <p>{{msg}}</p>{% if fin %}<a href="/report/proyectos/artefactos&id={{proyecto.id}}/">Obtener reporte</a>{% endif %}
+    
 
 <ul>
     {% if lista %}
@@ -21,7 +21,8 @@
     {% endif %}
 
 {% else %}
-    <p><strong>La linea base de la fase de {{fase}} se ha creado con exito<strong></p>
+    <p>La linea base de la fase de <strong>{{fase}}</strong> se ha creado con exito</p>
+
 {% endif %}
 
 </ul>

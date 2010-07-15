@@ -26,6 +26,14 @@ urlpatterns = patterns('',
     (r'^lista/(?P<tipo>\w+)/$', lista),
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
        {'document_root': os.path.abspath('site_media')}),
+       
+    #reportes
+    (r'^report/proyectos/$',reporte_proyecto),
+    (r'^report/usuarios/$',reporte_usuario),
+    (r'^report/roles=(?P<cat>\d+)/$',reporte_rol),
+    (r'^report/proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/$', reporte_historial),
+    (r'^report/proyectos/artefactos&id=(?P<proyecto_id>\d+)&fasesAnt=(?P<fase>\d+)/$', reporte_artefacto),
+    (r'^report/proyectos/artefactos&id=(?P<proyecto_id>\d+)/$', reporte_artefactos),
     
     # usuarios
     (r'^usuarios/$', admin_usuarios),
@@ -70,7 +78,7 @@ urlpatterns = patterns('',
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)&fasesAnt=(?P<fase>\d+)/$', fases_anteriores),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/verrel&id=(?P<art_id>\d+)&fase=(?P<fase>\d+)/$', ver_dependencias),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/veradj&id=(?P<art_id>\d+)/$', ver_adjuntos),    
-    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/$', ver_historial),
+    
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/imp&id=(?P<art_id>\d+)/$',calcular_impacto),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/art&id=(?P<art_id>\d+)/$', ver_detalle),
     
@@ -84,6 +92,7 @@ urlpatterns = patterns('',
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/adj&id=(?P<art_id>\d+)/res&id=(?P<arch_id>\d+)/$',restaurar_archivo),
     
     # historial
+    (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/$', ver_historial),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/historel&id=(?P<reg_id>\d+)&fase=(?P<fase>\d+)/$', historial_relaciones),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/histoadj&id=(?P<reg_id>\d+)/$', historial_adjuntos),
     (r'^proyectos/artefactos&id=(?P<proyecto_id>\d+)/historial&id=(?P<art_id>\d+)/volver&id=(?P<reg_id>\d+)/$', restaurar_artefacto),
