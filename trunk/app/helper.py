@@ -17,11 +17,11 @@ def validar_fase(proyecto, fase):
 
 def obtener_relaciones_izq(art, lista_existentes):
     relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
+    if art.id in lista_existentes:
+        return None
     ret = [art]
+    lista_existentes.append(art.id)
     if relaciones:
-        if art.id in lista_existentes:
-            return None
-        lista_existentes.append(art.id)
         for item in relaciones:
             aux = obtener_relaciones_izq(item.padre, lista_existentes)
             if aux:
@@ -30,11 +30,11 @@ def obtener_relaciones_izq(art, lista_existentes):
 
 def obtener_relaciones_der(art, lista_existentes):
     relaciones = RelArtefacto.objects.filter(padre = art, habilitado = True)
+    if art.id in lista_existentes:
+        return None
     ret = [art]
+    lista_existentes.append(art.id)
     if relaciones:
-        if art.id in lista_existentes:
-            return None
-        lista_existentes.append(art.id)
         for item in relaciones:
             aux = obtener_relaciones_der(item.hijo, lista_existentes)
             if aux:
