@@ -9,22 +9,25 @@
 {% if abm_artefactos or ver_artefactos_ant_1%}
 <table>
 	<tr>
-		<td class="titulo">Nombre</td>        
-        <td class="titulo">Versi&oacute;n</td>
-		<td class="titulo">Complejidad</td>
-		<td class="titulo">Descripci&oacute;n Corta</td>
-        <td class="titulo">Tipo</td>
-        <td class="titulo">Acciones</td>
+	  <td class="titulo">Nombre</td>        
+	  <td class="titulo">Versi&oacute;n</td>
+	  <td class="titulo">Complejidad</td>
+	  <td class="titulo">Descripci&oacute;n Corta</td>
+	  <td class="titulo">Tipo</td>
+	  <td class="titulo">Acciones</td>
 	</tr>
 
     {% for item in lista %}
 	<tr>
-		<td>{{item.nombre}}</td>
-        <td>{{item.version}}</td>        
-		<td>{{item.complejidad}}</td>
-		<td>{{item.descripcion_corta}}</td>
-        <td>{{item.tipo}}</td>
-        <td><a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">| Historial</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id}}/">| Relaciones con la misma fase</a><a href="/proyectos/artefactos&id={{proyecto.id}}/veradj&id={{item.id}}/">| Adjuntos</a><a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/">| Impacto</a></td>
+	  <td><a href="/proyectos/artefactos&id={{proyecto.id}}/art&id={{item.id}}/">{{item.nombre}}</a></td>
+	  <td>{{item.version}}</td>        
+	  <td>{{item.complejidad}}</td>
+	  <td>{{item.descripcion_corta}}</td>
+	  <td>{{item.tipo}}</td>
+	  <td><a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">Historial</a>
+	      <a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id}}/">| Relaciones con la misma fase</a>
+	      <a href="/proyectos/artefactos&id={{proyecto.id}}/veradj&id={{item.id}}/">| Adjuntos</a>
+	      <a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/">| Impacto</a></td>
 	</tr>
 	{% endfor %}
 </table>
@@ -35,21 +38,26 @@
 {% if abm_artefactos or ver_artefactos_ant_2%}
 <table>
     <tr>
-		<td class="titulo">Nombre</td>        
+	<td class="titulo">Nombre</td>        
         <td class="titulo">Versi&oacute;n</td>
-		<td class="titulo">Complejidad</td>
-		<td class="titulo">Descripci&oacute;n Corta</td>
+	<td class="titulo">Complejidad</td>
+	<td class="titulo">Descripci&oacute;n Corta</td>
         <td class="titulo">Tipo</td>
         <td class="titulo">Acciones</td>
 	</tr>
     {% for item in lista %}
 	<tr>
-		<td>{{item.nombre}}</td>
+	<td><a href="/proyectos/artefactos&id={{proyecto.id}}/art&id={{item.id}}/">{{item.nombre}}</td>
         <td>{{item.version}}</td>        
-		<td>{{item.complejidad}}</td>
-		<td>{{item.descripcion_corta}}</td>
+	<td>{{item.complejidad}}</td>
+	<td>{{item.descripcion_corta}}</td>
        	<td>{{item.tipo}}</td>
-        <td><a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">| Historial</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id}}/">| Relaciones con la misma fase</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id|add:"-1" }}/">| Relaciones con la fase anterior</a><a href="/proyectos/artefactos&id={{proyecto.id}}/veradj&id={{item.id}}/">| Adjuntos</a><a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/">| Impacto</a></td>
+        <td><a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">Historial</a>
+	    <a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id}}/">| Relaciones con la misma fase</a>
+	    <a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id|add:"-1" }}/">| Relaciones con la fase anterior</a>
+	    <a href="/proyectos/artefactos&id={{proyecto.id}}/veradj&id={{item.id}}/">| Adjuntos</a>
+	    <a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/">| Impacto</a>
+	</td>
 	</tr>
 	{% endfor %}
 </table>
@@ -60,19 +68,19 @@
 {% if abm_artefactos or ver_artefactos_ant_3%}
 <table>
     <tr>
-		<td class="titulo">Nombre</td>        
+	<td class="titulo">Nombre</td>        
         <td class="titulo">Versi&oacute;n</td>
-		<td class="titulo">Complejidad</td>
-		<td class="titulo">Descripci&oacute;n Corta</td>
+	<td class="titulo">Complejidad</td>
+	<td class="titulo">Descripci&oacute;n Corta</td>
         <td class="titulo">Tipo</td>
         <td class="titulo">Acciones</td>
 	</tr>
     {% for item in lista %}
 	<tr>
-		<td>{{item.nombre}}</td>
+	<td>{{item.nombre}}</td>
         <td>{{item.version}}</td>        
-		<td>{{item.complejidad}}</td>
-		<td>{{item.descripcion_corta}}</td>
+	<td>{{item.complejidad}}</td>
+	<td>{{item.descripcion_corta}}</td>
        	<td>{{item.tipo}}</td>
         <td><a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">| Historial</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id}}/">| Relaciones con la misma fase</a><a href="/proyectos/artefactos&id={{proyecto.id}}/verrel&id={{item.id}}&fase={{item.fase.id|add:"-1" }}/">| Relaciones con la fase anterior</a><a href="/proyectos/artefactos&id={{proyecto.id}}/veradj&id={{item.id}}/">| Adjuntos</a><a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/ ">| Impacto</a></td>
 	</tr>

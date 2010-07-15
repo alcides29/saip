@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}Aprobaci&oacute;n del artefacto &lt;{{art.nombre}}&gt;<br>{% endblock %}
+{% block content %}
+{% if ver_artefactos %}
+  <table class="art-inf">
+    <form id="form_id" action="" method="post">
+      <tr><th>Nombre:</th><td>{{ art.nombre }}</td></tr>
+      <tr><th>Versi&oacute;n:</th><td>{{ art.version }}</td></tr>
+      <tr><th>Complejidad:</th><td>{{ art.complejidad }}</td></tr>
+      <tr><th>Descripci&oacute;n Corta:</th><td>{{ art.descripcion_corta }}</td></tr>
+      <tr><th>Descripci&oacute;n Larga:</th><td>{{ art.descripcion_larga }}</td></tr>
+      <tr><th>Tipo:</th><td>{{ art.tipo }}</td></tr>
+      <tr><th>Icono:</th><td>{{ art.icono }}</td></tr>
+      <tr><th>Relaciones:</th>
+	  <td><ul>{% for item in relaciones %}
+	      <li>{{item.padre.nombre}}</li>
+	      {% empty %}
+		      <li>No tiene relaciones</li>
+	  {% endfor %}</ul></td></tr>
+      <tr><th>Adjuntos:</th>
+	  <td><ul>{% for item in archivos %}
+	      <li>{{item.nombre}}</li>
+	      {% empty %}
+		      <li>No tiene adjuntos</li>
+	  {% endfor %}</ul></td></tr>
+	      <tr><td colspan="2" class="buttonlist" style="border:none;">
+	  <input type="button" value="Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}&fasesAnt={{art.fase.id}}/' "/></td></tr>
+    </form>
+  </table>
+{% else %}
+    <p> No tiene permiso para ver el detalle del artefacto</p>
+{% endif %}
+{% endblock%}
