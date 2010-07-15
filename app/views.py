@@ -46,6 +46,7 @@ def principal(request):
             variables['usuarios'] = True
         if item == 'Ver tipos-artefacto' or item == 'Crear tipo-artefacto' or item == 'Modificar tipo-artefacto' or item == 'Eliminar tipo-artefacto':
             variables['tipos_artefacto'] = True
+    print permisos_sistema
     roles = UsuarioRolProyecto.objects.filter(usuario = user).only('rol')
     lista_proyectos = []
     for item in roles:
@@ -883,7 +884,7 @@ def del_proyecto(request, proyecto_id):
         p.delete()
         return HttpResponseRedirect("/proyectos")
     else:
-        return render_to_response("admin/proyectos/proyecto_confirm_delete.html", {'proyecto':p,
+        return render_to_response("admin/proyectos/proyecto_confirm_delete.html", {'proyecto':p, 'user': user,
                                                                                    'eliminar_proyecto': 'Eliminar proyecto' in permisos})
 
 @login_required
@@ -1629,8 +1630,8 @@ def restaurar_archivo(request, proyecto_id, art_id, arch_id):
             registrar_version(art, relaciones, archivos) 
             adjunto.habilitado = True
             adjunto.save()
-            mensaje = 'No se pudo restaurar el archivo'
-        return render_to_response('error.html', {'mensaje': mensaje})
+            #mensaje = 'No se pudo restaurar el archivo'
+        #return render_to_response('error.html', {'mensaje': mensaje})
     else:
         mensaje = 'No tiene los permisos necesarios.'
         return render_to_response('error.html', {'mensaje':mensaje})
