@@ -16,10 +16,12 @@ from django.contrib.auth.models import User
 from django.shortcuts import render_to_response
 from django.shortcuts import get_object_or_404
 from django.forms.formsets import formset_factory
+from geraldo.generators import PDFGenerator
 
 from saip.app.forms import *
 from saip.app.models import *
 from saip.app.helper import *
+from saip.app.reports import *
 
 @login_required
 def principal(request):
@@ -59,7 +61,7 @@ def principal(request):
     print variables
     return render_to_response('main_page.html', variables)
     #return render_to_response('main_page.html', RequestContext(request))
-
+    
 @login_required
 def administrar_proyecto(request, proyecto_id):
     """Administracion de proyecto para el modulo de desarrollo."""
@@ -2211,7 +2213,70 @@ def linea_anteriores(request, proyecto_id):
     return render_to_response("gestion/linea_base_anteriores.html", {'proyecto': proyect,
                                                                    'user': user,
                                                                    'lista': lista,
-                                                                   'abm_artefactos': 'ABM artefactos' in permisos})    
+                                                                   'abm_artefactos': 'ABM artefactos' in permisos})  
+    
+    
+@login_required
+def reporte_artefacto(request, proyecto_id, fase):
+    user = User.objects.get(username=request.user.username)
+    proyect = get_object_or_404(Proyecto, id=proyecto_id)
+    fase = get_object_or_404(Fase, id=fase)
+    tipoArtefactos = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyect, fase = fase)
+    artefactos = Artefacto.objects.filter(proyecto=proyect, habilitado=True, tipo__in=tipoArtefactos).order_by('id')
+    resp = HttpResponse(mimetype='application/pdf')
+    report = ReporteArtefacto(queryset=artefactos)
+    report.generate_by(PDFGenerator, filename=resp)
+    return resp
+
+@login_required
+def reporte_artefactos(request, proyecto_id):
+    user = User.objects.get(username=request.user.username)
+    proyect = get_object_or_404(Proyecto, id=proyecto_id)
+    artefactos = Artefacto.objects.filter(proyecto=proyect, habilitado=True).order_by('id')
+    resp = HttpResponse(mimetype='application/pdf')
+    report = ReporteArtefacto(queryset=artefactos)
+    report.generate_by(PDFGenerator, filename=resp)
+    return resp
+ 
+@login_required
+def reporte_usuario(request):
+    user = User.objects.get(username=request.user.username)
+    usuarios = User.objects.order_by('id')
+    resp = HttpResponse(mimetype='application/pdf')
+    report = ReporteUsuario(queryset=usuarios)
+    report.generate_by(PDFGenerator, filename=resp)
+    return resp    
+
+@login_required
+def reporte_proyecto(request):
+    user = User.objects.get(username=request.user.username)
+    proyectos = Proyecto.objects.order_by('id')
+    resp = HttpResponse(mimetype='application/pdf')
+    report = ReporteProyecto(queryset=proyectos)
+    report.generate_by(PDFGenerator, filename=resp)
+    return resp
+
+@login_required
+def reporte_rol(request, cat):
+    user = User.objects.get(username=request.user.username)
+    roles = Rol.objects.filter(categoria=cat).order_by('id')
+    resp = HttpResponse(mimetype='application/pdf')
+    report = ReporteRol(queryset=roles)
+    report.generate_by(PDFGenerator, filename=resp)
+    return resp
+
+@login_required
+def reporte_historial(request, proyecto_id, art_id):
+    art = Artefacto.objects.get(pk=art_id)
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(pk=proyecto_id)
+    historial = Historial.objects.get(artefacto=art)
+    versiones = RegistroHistorial.objects.filter(historial=historial).order_by('version')
+    resp = HttpResponse(mimetype='application/pdf')
+    report = ReporteHistorial(queryset=versiones)
+    report.generate_by(PDFGenerator, filename=resp)
+    return resp
+
 @login_required
 def terminar(peticion):
     """Muestra una pagina de confirmacion de exito"""

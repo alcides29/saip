@@ -31,7 +31,7 @@
 </td></tr>
 	</table>
 	</form>
-	{% if crear_usuario %}<div class="footer"><div class="volver"><a href="/">&lt;&lt;Volver a la p&aacute;gina principal</a></div><a href="/usuarios/crear/">Crear un nuevo usuario</a></div>{% endif %}
+	{% if crear_usuario %}<div class="footer"><div class="volver"><a href="/">&lt;&lt;Volver a la p&aacute;gina principal</a></div><a href="/usuarios/crear/">Crear un nuevo usuario</a>{% if ver_usuarios %}<a href="/report/usuarios/"> | Obtener reporte</a>{% endif %}</div>{% endif %}
 {% else %}
 	<p>No tiene permisos para esta secci&oacute;n</p>
 {% endif %}
