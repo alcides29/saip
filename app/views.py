@@ -1797,16 +1797,37 @@ def revisar_artefacto(request, proyecto_id, art_id):
             art.save()                
             return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyect.id)+"/")
     
-    archivos = Adjunto.objects.filter(artefacto = art)
+    archivos = Adjunto.objects.filter(artefacto = art, habilitado = True)
     relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
     return render_to_response("desarrollo/artefacto/revisar_artefacto.html", {'proyecto':proyect, 'user':user,
                                                                               'art':art,
                                                                               'archivos':archivos,
                                                                               'relaciones':relaciones,
                                                                               'revisar_artefacto': 'Revisar artefactos' in permisos})
-    
 
+
+@login_required
+def ver_detalle(request, proyecto_id, art_id):
+    """Permite ver el detalle de los artefactos."""
     
+    user = User.objects.get(username=request.user.username)
+    proyect = Proyecto.objects.get(id=proyecto_id)
+    # Validacion de permisos
+    permisos = get_permisos_proyecto(user, proyect)
+    
+    art = Artefacto.objects.get(pk=art_id)
+    #fase = Fase.objects.get(pk=proyect.fase.id)
+    archivos = Adjunto.objects.filter(artefacto = art, habilitado = True)
+    relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
+    
+    return render_to_response("desarrollo/artefacto/ver_detalle.html",
+                              {'proyecto': proyect,
+                               'user': user,
+                               'art': art,
+                               'archivos': archivos,
+                               'relaciones': relaciones,
+                               'ver_artefactos': 'Ver artefactos' in permisos})
+
 @login_required
 def calcular_impacto(request, proyecto_id, art_id):
     """Calculo del impacto de un artefacto"""
@@ -2029,7 +2050,7 @@ def linea_revisar_artefacto(request, proyecto_id, art_id):
             art.save()                
             return HttpResponseRedirect("/proyectos/lineabase&id=" + str(proyect.id)+"/revisar/")
     
-    archivos = Adjunto.objects.filter(artefacto = art)
+    archivos = Adjunto.objects.filter(artefacto = art, habilitado = True)
     relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
     return render_to_response("gestion/linea_revisar_detalles.html", {'proyecto':proyect, 
                                                                    'user':user,
