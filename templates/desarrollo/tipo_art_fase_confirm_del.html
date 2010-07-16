@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ proyecto.nombre }}{% endblock %}
+{% block head %}Quitar &lt;{{tipo.nombre}}&gt;<br>{% endblock %}
+{% block content %}
+{% if asignar_tipoArt %}
+<form action=" " method="post">
+<p>Est&aacute; seguro?<span class="optionbuttons">
+	<input type="submit" value="S&iacute;" />
+	<input type="button" value="No" onClick ="location.href='/proyectos/tipoArtefacto&id={{ proyecto.id }}/' "/></span></p>
+</form>
+{% else %}
+<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
+<input type="button" value="Cancelar" onClick = "location.href='/proyectos/tipoArtefacto&id={{ proyecto.id }}/' "/>
+{% endif %}
+{% endblock%}
