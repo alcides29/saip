@@ -26,7 +26,7 @@ from saip.app.reports import *
 @login_required
 def principal(request):
     """Muestra la pagina principal.
-    
+
     @return: Pagina principal, lista de proyectos y usuario.
     """
     user = User.objects.get(username=request.user.username)
@@ -108,16 +108,7 @@ def admin_usuarios_proyecto(request, object_id):
     """
     user = User.objects.get(username=request.user.username)
     p = Proyecto.objects.get(pk = object_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = p).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, p)
     miembros = UsuarioRolProyecto.objects.filter(proyecto = p).order_by('id')
     lista = []
     for item in miembros:
@@ -795,7 +786,10 @@ def admin_permisos(request, rol_id):
                     nuevo.permiso = item
                     nuevo.fase = Fase.objects.get(pk=3)
                     nuevo.save()
-        return HttpResponseRedirect("/roles")
+            if actual.categoria == 1:
+                return HttpResponseRedirect("/roles/sist")
+            else:
+                return HttpResponseRedirect("/roles/proy")
     else:
         #form = PermisosForm(actual.categoria, initial={'permisos': dict})
         if actual.categoria == 1:
@@ -837,16 +831,19 @@ def mod_rol(request, rol_id):
         if form.is_valid():
             actual.descripcion = form.cleaned_data['descripcion']
             actual.save()
-            return HttpResponseRedirect("/roles")
+            if actual.categoria == 1:
+                return HttpResponseRedirect("/roles/sist")
+            else:
+                return HttpResponseRedirect("/roles/proy")
     else:
         if actual.id == 1:
             error = "No se puede modificar el rol de superusuario"
-            return render_to_response("admin/roles/abm_rol.html", {'mensaje': error, 'rol':actual, 'user':user})
+            return render_to_response("admin/roles/abm_rol.html", {'user': user,'mensaje': error, 'rol':actual, 'user':user})
         form = ModRolesForm()
         form.fields['descripcion'].initial = actual.descripcion
     return render_to_response("admin/roles/mod_rol.html", {'user':user, 
                                                            'form':form,
-														   'rol': actual,
+                                                           'rol': actual,
                                                            'mod_rol':'Modificar rol' in permisos})
 
 @login_required 
@@ -875,13 +872,13 @@ def borrar_rol(request, rol_id):
     else:
         if actual.id == 1:
             error = "No se puede borrar el rol de superusuario"
-            return render_to_response("admin/roles/rol_confirm_delete.html", {'mensaje': error, 
+            return render_to_response("admin/roles/rol_confirm_delete.html", {'mensaje': error, 'user':user,
                                                                               'rol':actual, 
                                                                               'user':user,
                                                                               'eliminar_rol':'Eliminar rol' in permisos})
         if relacionados > 0:
             error = "El rol se esta utilizando."
-            return render_to_response("admin/roles/rol_confirm_delete.html", {'mensaje': error, 
+            return render_to_response("admin/roles/rol_confirm_delete.html", {'mensaje': error, 'user': user,
                                                                               'rol':actual, 
                                                                               'user':user,
                                                                               'eliminar_rol':'Eliminar rol' in permisos})
@@ -956,8 +953,9 @@ def mod_proyecto(request, proyecto_id):
         if form.is_valid():
             p.nombre = form.cleaned_data['nombre']
             if p.usuario_lider != form.cleaned_data['usuario_lider']:
-                relacion = UsuarioRolProyecto.objects.filter(usuario = User.objects.get(pk = p.usuario_lider), proyecto = p, rol = Rol.objects.get(pk=2))[0]
+                relacion = UsuarioRolProyecto.objects.filter(usuario = p.usuario_lider, proyecto = p, rol = Rol.objects.get(pk=2))[0]
                 relacion.delete()
+                p.usuario_lider = form.cleaned_data['usuario_lider']
                 relacion = UsuarioRolProyecto()
                 relacion.usuario = p.usuario_lider
                 relacion.rol = Rol.objects.get(id=2)
@@ -1188,7 +1186,7 @@ def borrar_tipo_artefacto(request, tipo_id):
     else:
         if relacionados > 0:
             error = "Este tipo de artefacto se esta utilizando"
-            return render_to_response("admin/tipo_artefacto/tipo_artefacto_confirm_delete.html", {'mensaje':error,
+            return render_to_response("admin/tipo_artefacto/tipo_artefacto_confirm_delete.html", {'mensaje':error, 'user': user,
                                                                                                   'tipo':actual, 
                                                                                                   'user':user,
                                                                                                   'eliminar_tipo_artefacto': 'Eliminar tipo-artefacto' in permisos})
@@ -1650,7 +1648,7 @@ def borrar_artefacto(request, proyecto_id, art_id):
     r = RelArtefacto.objects.filter(padre = art)
     if r:
         mensaje = 'Otros artefactos dependen de el que se est&aacute; tratando de eliminar.'
-        return render_to_response('error.html', {'mensaje': mensaje})
+        return render_to_response('error.html', {'user': user, 'mensaje': mensaje})
     if request.method == 'POST':
         art.habilitado = False
         r = RelArtefacto.objects.filter(hijo = art)
@@ -1760,7 +1758,7 @@ def add_adjunto(request, proyecto_id, art_id):
                 nuevo.tamanho = f.size
                 if f.size > 1048576:
                     mensaje = 'Tama&ntilde;o m&aacute;ximo excedido'
-                    return render_to_response('error.html', {'mensaje':mensaje})
+                    return render_to_response('error.html', {'user':user, 'mensaje':mensaje})
                 nuevo.mimetype = f.content_type
                 nuevo.contenido = base64.b64encode(f.read())
                 nuevo.artefacto = art
@@ -1812,10 +1810,10 @@ def retornar_archivo(request, proyecto_id, art_id, arch_id):
             respuesta['Content-Length'] = adjunto.tamanho
             return respuesta
         mensaje = 'No se pudo traer el archivo'
-        return render_to_response('error.html', {'mensaje': mensaje})
+        return render_to_response('error.html', {'user': user,'mensaje': mensaje})
     else:
         mensaje = 'No tiene los permisos necesarios.'
-        return render_to_response('error.html', {'mensaje':mensaje})
+        return render_to_response('error.html', {'user': user,'mensaje':mensaje})
     return HttpResponseRedirect('proyectos/artefactos&id=' + str(art.id))
 
 @login_required
@@ -1836,7 +1834,7 @@ def restaurar_archivo(request, proyecto_id, art_id, arch_id):
         #return render_to_response('error.html', {'mensaje': mensaje})
     else:
         mensaje = 'No tiene los permisos necesarios.'
-        return render_to_response('error.html', {'mensaje':mensaje})
+        return render_to_response('error.html', {'user': user,'mensaje':mensaje})
     return HttpResponseRedirect('/proyectos/artefactos&id=' + str(proyecto_id) + '/adj&id=' + str(art_id) + '/')
 
 @login_required
