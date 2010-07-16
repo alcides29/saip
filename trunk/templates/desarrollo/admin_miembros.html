@@ -14,8 +14,8 @@
 </td></tr>
 </table></form>
 
-{% if abm_miembros %}<p><a href="/proyectos/miembros&id={{proyecto.id}}/nuevo/">Agregar nuevo miembro</a></p>{% endif %}
-<input type="button" value="Volver" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/' "/>	
+<div class="footer"><div class="volver"><a href="/proyectos/admin&id={{proyecto.id}}">&lt;&lt;Volver al proyecto</a></div>{% if abm_miembros %}<p><a href="/proyectos/miembros&id={{proyecto.id}}/nuevo/">Agregar nuevo miembro</a></p>{% endif %}
+
 </form>
 {% else %}
 	<p>¡No posee los permisos para ver esta p&aacute;gina!</p>    

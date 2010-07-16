@@ -123,9 +123,42 @@ def admin_usuarios_proyecto(request, object_id):
     for item in miembros:
         if not item.usuario in lista:
             lista.append(item.usuario)
-    return render_to_response('desarrollo/admin_miembros.html',{'user':user, 
-                                                                'proyecto':Proyecto.objects.get(id=object_id), 
-                                                                'miembros': lista,
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            miembros = UsuarioRolProyecto.objects.filter(Q(proyecto = p), Q(usuario__username__icontains = palabra) |
+                                                         Q(rol__nombre__icontains = palabra)).order_by('id')
+            lista = []
+            for item in miembros:
+                if not item.usuario in lista:
+                    lista.append(item.usuario)
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            pag = page_excepcion1(request, paginator)
+            return render_to_response('desarrollo/admin_miembros.html',{'lista':lista, 'form': form,
+                                                                        'user':user, 'pag': pag, 
+                                                                        'proyecto':Proyecto.objects.get(id=object_id),                                                                         
+                                                                        'ver_miembros': 'Ver miembros' in permisos,
+                                                                        'abm_miembros': 'ABM miembros' in permisos})
+    else:
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
+    return render_to_response('desarrollo/admin_miembros.html',{'lista':lista, 'form': form,
+                                                                'user':user, 'pag': pag, 
+                                                                'proyecto':Proyecto.objects.get(id=object_id),                                                                 
                                                                 'ver_miembros': 'Ver miembros' in permisos,
                                                                 'abm_miembros': 'ABM miembros' in permisos})
     
@@ -1178,11 +1211,38 @@ def admin_tipo_artefacto_fase(request, proyecto_id):
         permisos.append(item.nombre)
     #-------------------------------------------------------------------
     lista = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyecto_id)
-    variables = RequestContext(request,
-                               {'lista': lista,
-                                'proyecto': p,
-                                'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
-    return render_to_response('desarrollo/tipo_artefacto_fase.html', variables)
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            lista = TipoArtefactoFaseProyecto.objects.filter(Q(proyecto = proyecto_id), Q(fase__id__icontains = palabra) | 
+                     Q(tipo_artefacto__nombre__icontains = palabra) | Q(fase__nombre__icontains = palabra)).order_by('id')
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            pag = page_excepcion1(request, paginator)
+            return render_to_response('desarrollo/tipo_artefacto_fase.html',{'lista': lista, 'pag':pag,
+                                                                             'user':user, 'form': form,'lista': lista,
+                                                                             'proyecto': p,
+                                                                             'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
+    else:   
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
+    return render_to_response('desarrollo/tipo_artefacto_fase.html',{'lista': lista, 'pag':pag,
+                                                                     'user':user, 'form': form,'lista': lista,
+                                                                     'proyecto': p,
+                                                                     'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
     
 @login_required
 def mod_tipo_artefacto_fase(request, proyecto_id, tipo_art_id):
@@ -1210,7 +1270,7 @@ def mod_tipo_artefacto_fase(request, proyecto_id, tipo_art_id):
         form = TipoArtefactoFaseForm(initial={'fase': tipo_art.fase.id})
     
     return render_to_response('desarrollo/mod_tipo_art_fase.html',
-                              {'form': form,
+                              {'form': form, 'user':user,
                                'tipo_artefacto': tipoA,
                                'proyecto': proyect,
                                'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
@@ -1220,6 +1280,7 @@ def quitar_tipo_artefacto_fase(request, proyecto_id, tipo_art_id):
     """Permite quitar un tipo de artefacto de un proyecto."""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
+    tipoA = TipoArtefacto.objects.get(id = tipo_art_id)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyecto_id).only('rol')
     permisos_obj = []
@@ -1229,13 +1290,18 @@ def quitar_tipo_artefacto_fase(request, proyecto_id, tipo_art_id):
     for item in permisos_obj:
         permisos.append(item.nombre)
     #-------------------------------------------------------------------
-    tipo_art = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyecto_id, tipo_artefacto = tipo_art_id)[0]
-    tipo_art.delete()
+    tipo_art = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyecto_id, tipo_artefacto = tipo_art_id)
     lista = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyecto_id)
-    return render_to_response('desarrollo/tipo_artefacto_fase.html',
-                              {'lista': lista,
+    if request.method == 'POST':
+        tipo_art.delete()
+        return HttpResponseRedirect("/proyectos/tipoArtefacto&id="+ str(proyecto_id)+"/")
+    else:
+        return render_to_response('desarrollo/tipo_art_fase_confirm_del.html',
+                              {'tipo':tipoA,
+                               'user':user,
                                'proyecto': proyect,
                                'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
+    
         
 #desde aqui artefacto
 @login_required
@@ -1247,13 +1313,44 @@ def admin_artefactos(request, proyecto_id):
     linea = LineaBase.objects.filter(proyectos=proyect, fase=proyect.fase)
     permisos = get_permisos_proyecto(user, proyect)
     lista = Artefacto.objects.filter(proyecto=proyect, habilitado=True, tipo__in=tipoArtefactos).order_by('id')
-    variables = RequestContext(request, {'proyecto': proyect,
-                                         'linea': linea,
-                                        'lista': lista,
-                                        'abm_artefactos': 'ABM artefactos' in permisos,
-                                        'ver_artefactos': 'Ver artefactos' in permisos,
-                                        'revisar_artefactos': 'Revisar artefactos' in permisos})
-    return render_to_response('desarrollo/artefacto/artefactos.html', variables)
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            lista = Artefacto.objects.filter(Q(proyecto=proyect), Q(habilitado=True), Q(tipo__in=tipoArtefactos),Q(nombre__icontains = palabra)|Q(descripcion_corta__icontains = palabra)| Q(usuario__username__icontains = palabra)|Q(estado__icontains = palabra) | Q(tipo__tipo_artefacto__nombre__icontains= palabra)).order_by('id')
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            pag = page_excepcion1(request, paginator)
+            return render_to_response('desarrollo/artefacto/artefactos.html', {'lista': lista, 'pag':pag,
+                                                                                   'user':user, 'form': form,
+                                                                                   'proyecto': proyect,
+                                                                                   'linea': linea,
+                                                                                   'abm_artefactos': 'ABM artefactos' in permisos,
+                                                                                   'ver_artefactos': 'Ver artefactos' in permisos,
+                                                                                   'revisar_artefactos': 'Revisar artefactos' in permisos})
+    else:
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
+    return render_to_response('desarrollo/artefacto/artefactos.html', {'lista': lista, 'pag':pag,
+                                                                        'user':user, 'form': form,
+                                                                        'proyecto': proyect,
+                                                                        'linea': linea,
+                                                                        'abm_artefactos': 'ABM artefactos' in permisos,
+                                                                        'ver_artefactos': 'Ver artefactos' in permisos,
+                                                                        'revisar_artefactos': 'Revisar artefactos' in permisos})
+
 
 @login_required
 def crear_artefacto(request, proyecto_id):
@@ -1498,20 +1595,50 @@ def ver_historial(request, proyecto_id, art_id):
         permisos_ant = get_permisos_proyecto(user, proyect)
     permiso = 'Ver artefactos' in permisos_ant or 'ABM artefactos' in permisos_ant
     historial = Historial.objects.get(artefacto=art)
-    versiones = RegistroHistorial.objects.filter(historial=historial).order_by('version')
+    lista = RegistroHistorial.objects.filter(historial=historial).order_by('version')
     linea = LineaBase.objects.filter(proyectos=proyect, fase=3)
     if (linea):
         fin = 0
     else:
         fin = 1
-    variables = RequestContext(request, {'historial': historial, 'user': user,
-                                         'lista': versiones,
-                                         'art': art,
-                                         'fin':fin,
-                                         'proyecto': proyect,
-                                         'abm_artefactos': permiso})
-    return render_to_response('desarrollo/artefacto/historial.html', variables)
-    
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            lista = RegistroHistorial.objects.filter( Q(historial=historial), Q(version__icontains = palabra)).order_by('id')
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            pag = page_excepcion1(request, paginator)
+            return render_to_response('desarrollo/artefacto/historial.html', {'lista': lista, 'pag':pag,
+                                                                                'user':user, 'form': form,
+                                                                                'historial': historial, 
+                                                                                'lista': lista,
+                                                                                'art': art,
+                                                                                'fin':fin,
+                                                                                'proyecto': proyect,
+                                                                                'abm_artefactos': permiso})
+    else:
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
+    return render_to_response('desarrollo/artefacto/historial.html', {'lista': lista, 'pag':pag,
+                                                                      'user':user, 'form': form,'historial': historial, 
+                                                                      'lista': lista,
+                                                                      'art': art,
+                                                                      'fin':fin,
+                                                                      'proyecto': proyect,
+                                                                      'abm_artefactos': permiso})
 
 @login_required
 def borrar_artefacto(request, proyecto_id, art_id):
@@ -1530,8 +1657,8 @@ def borrar_artefacto(request, proyecto_id, art_id):
         adj = Adjunto.objects.filter(artefacto = art)
         registrar_version(art, r, adj)
         for item in r:
-            r.habilitado = False
-            r.save()
+            item.habilitado = False
+            item.save()
         art.save()
         return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyecto_id)+"/")
     variables = RequestContext(request, {'proyecto':proyect, 'art': art, 'abm_artefactos': 'ABM artefactos' in permisos})
@@ -1545,9 +1672,39 @@ def admin_artefactos_eliminados(request, proyecto_id):
     fase = Fase.objects.get(pk = proyect.fase.id)
     permisos = get_permisos_proyecto(user, proyect)
     lista = Artefacto.objects.filter(proyecto=proyect, fase=fase, habilitado=False)
-    variables = RequestContext(request, {'proyecto': proyect, 'lista': lista, 
-                                         'abm_artefactos': 'ABM artefactos' in permisos})
-    return render_to_response('desarrollo/artefacto/artefactos_eliminados.html', variables)
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            lista = Artefacto.objects.filter(Q(proyecto=proyect), Q(habilitado=True), Q(tipo__in=tipoArtefactos),Q(nombre__icontains = palabra)|Q(descripcion_corta__icontains = palabra)| Q(usuario__username__icontains = palabra)|Q(estado__icontains = palabra) | Q(tipo__tipo_artefacto__nombre__icontains= palabra)).order_by('id')
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            pag = page_excepcion1(request, paginator)
+            return render_to_response('desarrollo/artefacto/artefactos_eliminados.html', {'lista': lista, 'pag':pag,
+                                                                        'user':user, 'form': form,
+                                                                        'proyecto': proyect,
+                                                                        'abm_artefactos': 'ABM artefactos' in permisos,
+                                                                        })
+    else:
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
+    return render_to_response('desarrollo/artefacto/artefactos_eliminados.html', {'lista': lista, 'pag':pag,
+                                                                        'user':user, 'form': form,
+                                                                        'proyecto': proyect,
+                                                                        'abm_artefactos': 'ABM artefactos' in permisos,
+                                                                        })
 
 @login_required
 def admin_adjuntos(request, proyecto_id, art_id):
@@ -1689,15 +1846,10 @@ def restaurar_artefacto_eliminado(request, proyecto_id, art_id):
     proyect = Proyecto.objects.get(pk=proyecto_id)
     permisos = get_permisos_proyecto(user, proyect)
     art = get_object_or_404(Artefacto, id=art_id)
-    
     if request.method == 'POST':
-        print "segunda ronda" 
         art.habilitado = True
         art.save()
-        lista = Artefacto.objects.filter(proyecto=proyect, habilitado=False)
-        variables = RequestContext(request, {'proyecto': proyect, 'lista': lista, 'abm_artefactos': 'ABM artefactos' in permisos})
-        return render_to_response('desarrollo/artefacto/artefactos_eliminados.html', variables)
-    print "primera ronda"
+        return HttpResponseRedirect ('/proyectos/artefactos&id=' + str(proyecto_id) + '/res/')
     variables = RequestContext(request, {'proyecto':proyect, 'art': art, 'abm_artefactos': 'ABM artefactos' in permisos})
     return render_to_response('desarrollo/artefacto/artefacto_confirm_restaurar.html', variables)
 

@@ -17,7 +17,7 @@
 		<td class="titulo">Tipo</td>
 		<td class="titulo">Acciones</td>
 	</tr>
-	{% for item in pag.object_list%}
+	{% for item in pag.object_list %}
 	<tr>
 		{% if abm_artefactos%}<td>{% if not linea %}<a href="/proyectos/artefactos&id={{proyecto.id}}/mod&id={{item.id}}/">{% endif %}{{item.nombre}}</a></td>
 		{% else %}<td>{{item.nombre}}</td>{% endif %}
