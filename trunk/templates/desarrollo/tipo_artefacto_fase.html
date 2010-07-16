@@ -3,20 +3,25 @@
 {% block head %}Tipo de artefactos por fase para {{proyecto.nombre}}<br>{% endblock %}
 {% block content %}
 {% if asignar_tipoArt %}
-    <table>
+<form action="" method="post">
+	<table class="admin">
+	<tr><td colspan="2">{{form.filtro.label}}: {{form.filtro}}</td><td align="right">{{form.paginas.label}}: {{form.paginas}}<input type="submit" value="Ok" name="Buscar"/></td></tr>
+
       <tr><td class="titulo">Tipo de artefacto</td>
 	  <td class="titulo">Fase actual</td>
 	  <td class="titulo">Acciones</td>
       </tr>
-      {% for item in lista %}
+      {% for item in pag.object_list %}
 	<tr><td>{{item.tipo_artefacto.descripcion}}</td>
 	    <td>{{item.fase.nombre}}</td>
-	    <td><a href="/proyectos/mod_tipoArtefacto_fase&id={{item.proyecto.id}}/{{item.tipo_artefacto.id}}/">Modificar fase </a>
-		<a href="/proyectos/quitar_tipoArtefacto_fase&id={{item.proyecto.id}}/{{item.tipo_artefacto.id}}/">| Quitar</a>
+	    <td><a href="/proyectos/mod_tipoArtefacto_fase&id={{item.proyecto.id}}/{{item.tipo_artefacto.id}}/"> Modificar fase </a>
+		<a href="/proyectos/quitar_tipoArtefacto_fase&id={{item.proyecto.id}}/{{item.tipo_artefacto.id}}/">|  Quitar</a>
 	    </td>
 	</tr>
       {% endfor %}
-    </table>
+<tr><td>P&aacute;gina {{ pag.number }} de {{ pag.paginator.num_pages }}.</td><td colspan="3">{% if pag.has_previous %}<a href="?page={{ pag.previous_page_number }}">&lt;&lt;anterior</a>{% endif %}{% if pag.has_next %}<a href="?page={{ pag.next_page_number }}"> siguiente&gt;&gt;</a>{% endif %}
+</td></tr>
+</table></form>
     <br><a href="/proyectos/add_tipoArtefacto_fase&id={{proyecto.id}}/">Agregar nuevo tipo de artefacto</a>
     <br><br><input type="button" value="Volver" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/' "/>
 {% else %}
