@@ -118,10 +118,6 @@ class RolesForm(forms.Form):
 class PermisosForm(forms.Form):
 	permisos = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 1), widget = forms.CheckboxSelectMultiple, required = False)
 	
-	#def __init__(self, cat, *args, **kwargs):
-	#	super(PermisosForm, self).__init__(*args, **kwargs)
-	#	self.fields['permisos'].queryset = Permiso.objects.filter(categoria = 1)
-
 class PermisosProyectoForm(forms.Form):
 	permisos1 = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False, label = u'Permisos de la fase de Requerimientos')
 	permisos2 = forms.ModelMultipleChoiceField(queryset = Permiso.objects.filter(categoria = 2), widget = forms.CheckboxSelectMultiple, required = False, label = u'Permisos de la fase de Dise�o')
@@ -165,15 +161,6 @@ class TipoArtefactoForm(forms.Form):
     nombre = forms.CharField(max_length=5, label='Abreviatura')
     descripcion = forms.CharField(max_length=100, label='Nombre')
     fase = forms.ModelChoiceField(queryset=Fase.objects.all(), label='Fase')
-    
-    #def clean_nombre(self):
-    	#if 'nombre' in self.cleaned_data:
-			#roles = TipoArtefacto.objects.all()
-			#nombre = self.cleaned_data['nombre']
-			#for item in roles: 
-				#if nombre == item.nombre:
-					#raise forms.ValidationError('Ya existe este nombre.')
-			#return nombre
 
 class ModTipoArtefactoForm(forms.Form):
     """Form para Tipo de artefacto."""
@@ -204,21 +191,18 @@ class ArtefactoForm(forms.Form):
     complejidad = forms.CharField(max_length=2, widget=forms.Select(choices=COMPLEXITY_CHOICES), label='Complejidad')
     descripcion_corta = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Corta')
     descripcion_larga = forms.CharField(widget=forms.Textarea(), required=False, label='Descripcion Larga')
-    icono = forms.FileField(required=False, label='Icono/Artefacto')
     tipo = forms.ModelChoiceField(queryset=None, label='Tipo')    
     
     def __init__(self, proyect_fase, proyecto_id, *args, **kwargs):
         super(ArtefactoForm, self).__init__(*args, **kwargs)
         self.fields['tipo'].queryset = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyecto_id, fase = proyect_fase)
         print self.fields['tipo'].queryset
-        print proyect_fase
-        print proyecto_id
         
 class ModArtefactoForm(forms.ModelForm):
     tipo = forms.ModelChoiceField(queryset=TipoArtefacto.objects.all(), required=False)    
     class Meta:
         model = Artefacto
-        fields = ('complejidad', 'descripcion_corta', 'descripcion_larga', 'icono')
+        fields = ('complejidad', 'descripcion_corta', 'descripcion_larga')
         
     def __init__(self, proyect_fase, *args, **kwargs):
         super(ModArtefactoForm, self).__init__(*args, **kwargs)
@@ -229,7 +213,6 @@ class RelacionArtefactoForm(forms.Form):
 	
 	def __init__(self, art_fase, art, *args, **kwargs):
 		super(RelacionArtefactoForm, self).__init__(*args, **kwargs)
-		#r = RelArtefacto.objects.filter(padre = art, habilitado = True)
 		lista = []
 		rel = obtener_relaciones_der(art, [])
 		for item in rel:

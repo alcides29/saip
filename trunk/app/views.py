@@ -1315,7 +1315,10 @@ def admin_artefactos(request, proyecto_id):
         form = FilterForm(request.POST)
         if form.is_valid():
             palabra = form.cleaned_data['filtro']
-            lista = Artefacto.objects.filter(Q(proyecto=proyect), Q(habilitado=True), Q(tipo__in=tipoArtefactos),Q(nombre__icontains = palabra)|Q(descripcion_corta__icontains = palabra)| Q(usuario__username__icontains = palabra)|Q(estado__icontains = palabra) | Q(tipo__tipo_artefacto__nombre__icontains= palabra)).order_by('id')
+            lista = Artefacto.objects.filter(Q(proyecto=proyect), Q(habilitado=True), Q(tipo__in=tipoArtefactos),
+                                             Q(nombre__icontains = palabra)|Q(descripcion_corta__icontains = palabra)|
+                                             Q(usuario__username__icontains = palabra)|Q(estado__icontains = palabra)|
+                                             Q(tipo__tipo_artefacto__nombre__icontains= palabra)).order_by('id')
             paginas = form.cleaned_data['paginas']
             request.session['nro_items'] = paginas
             paginator = Paginator(lista, int(paginas))
@@ -1360,17 +1363,16 @@ def crear_artefacto(request, proyecto_id):
         form = ArtefactoForm(proyect.fase, proyecto_id, request.POST, request.FILES)
         if form.is_valid():
             art = Artefacto()
-            art.usuario = user#solo en el historial?
+            art.usuario = user
             art.estado = 1
-            art.fecha_creacion = datetime.date.today()#solo en el historial?
+            art.fecha_creacion = datetime.date.today()
             art.version = 1
             art.complejidad = form.cleaned_data['complejidad']
-            art.descripcion_corta = form.cleaned_data['descripcion_corta']#otro widget?
+            art.descripcion_corta = form.cleaned_data['descripcion_corta']
             art.descripcion_larga = form.cleaned_data['descripcion_larga']
             art.habilitado = True
-            art.icono = form.cleaned_data['icono']
             art.proyecto = proyect
-            art.tipo = form.cleaned_data['tipo']#hay que ver
+            art.tipo = form.cleaned_data['tipo']
             art.fase = proyect.fase
             
             #asignamos el nombre
@@ -1415,8 +1417,6 @@ def modificar_artefacto(request, proyecto_id, art_id):
                 cambio = True
             elif (form.cleaned_data['descripcion_larga'] != art.descripcion_larga):
                 cambio = True
-            elif (form.cleaned_data['icono'] != art.icono):
-                cambio = True
             elif (form.cleaned_data['tipo'] != art.tipo):
                 cambio = True            
             
@@ -1426,7 +1426,6 @@ def modificar_artefacto(request, proyecto_id, art_id):
             art.complejidad = form.cleaned_data['complejidad']
             art.descripcion_corta = form.cleaned_data['descripcion_corta']
             art.descripcion_larga = form.cleaned_data['descripcion_larga']            
-            art.icono = form.cleaned_data['icono']
             if (form.cleaned_data['tipo'] != art.tipo):
                 lis = Artefacto.objects.filter(proyecto=proyect, tipo=form.cleaned_data['tipo'])
                 cont = 1
@@ -1446,13 +1445,11 @@ def modificar_artefacto(request, proyecto_id, art_id):
                         'complejidad': art.complejidad,
                         'descripcion_corta':art.descripcion_corta,
                         'descripcion_larga':art.descripcion_larga,
-                        'icono':art.icono,
                         'tipo':art.tipo._get_pk_val(),
                        })      
     variables = RequestContext(request, {'form':form,
                                          'proyecto':proyect,
                                          'art':art,
-#                                         'aprobado':aprobado,
                                          'abm_artefactos': 'ABM artefactos' in permisos})          
     return render_to_response('desarrollo/artefacto/mod_artefacto.html', variables)
 
@@ -1846,6 +1843,10 @@ def restaurar_artefacto_eliminado(request, proyecto_id, art_id):
     art = get_object_or_404(Artefacto, id=art_id)
     if request.method == 'POST':
         art.habilitado = True
+        r = RelArtefacto.objects.filter(hijo = art)
+        for item in r:
+            item.habilitado = True
+            item.save()
         art.save()
         return HttpResponseRedirect ('/proyectos/artefactos&id=' + str(proyecto_id) + '/res/')
     variables = RequestContext(request, {'proyecto':proyect, 'art': art, 'abm_artefactos': 'ABM artefactos' in permisos})
@@ -1909,10 +1910,11 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
     proyect = Proyecto.objects.get(pk=proyecto_id)
     art = Artefacto.objects.get(pk = art_id)
     permisos = get_permisos_proyecto(user, proyect)
+    r = RegistroHistorial.objects.get(pk=reg_id)
     if request.method == 'POST':
         art = Artefacto.objects.get(pk = art_id)
-        relaciones = RelArtefacto.objects.filter(hijo = art,habilitado=True)
-        archivos = Adjunto.objects.filter(artefacto = art,habilitado=True)
+        relaciones = RelArtefacto.objects.filter(hijo = art, habilitado=True)
+        archivos = Adjunto.objects.filter(artefacto = art, habilitado=True)
         registrar_version(art, relaciones, archivos)
         
         r = RegistroHistorial.objects.get(pk=reg_id)
@@ -1920,7 +1922,6 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
         art.descripcion_corta = r.descripcion_corta 
         art.descripcion_larga = r.descripcion_larga 
         art.habilitado = r.habilitado
-        art.icono = r.icono
         art.tipo = r.tipo
         art.save()
         relaciones_nuevas = RegHistoRel.objects.filter(registro=r)
@@ -1951,7 +1952,8 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
         return HttpResponseRedirect("/proyectos/artefactos&id="+ str(proyecto_id)+"/")
            
     variables = RequestContext(request,{'proyecto': proyect,
-                          'art': art,
+                          'art': r,
+                          'a':art,
                           'abm_artefactos': 'ABM artefactos' in permisos})
     return render_to_response('desarrollo/artefacto/restaurar_version.html', variables)
 
@@ -1968,11 +1970,15 @@ def revisar_artefacto(request, proyecto_id, art_id):
             return HttpResponseRedirect("/proyectos/artefactos&id=" + str(proyect.id)+"/")
     
     archivos = Adjunto.objects.filter(artefacto = art, habilitado = True)
-    relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
+    padres = obtener_relaciones_izq(art, [])
+    padres.remove(art)
+    hijos = obtener_relaciones_der(art, [])
+    hijos.remove(art)
     return render_to_response("desarrollo/artefacto/revisar_artefacto.html", {'proyecto':proyect, 'user':user,
                                                                               'art':art,
                                                                               'archivos':archivos,
-                                                                              'relaciones':relaciones,
+                                                                              'padres':padres,
+                                                                              'hijos':hijos,
                                                                               'revisar_artefacto': 'Revisar artefactos' in permisos})
 
 
@@ -1982,6 +1988,7 @@ def ver_detalle(request, proyecto_id, art_id):
     
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
+    art = Artefacto.objects.get(pk=art_id)
     # Validacion de permisos
     permisos_ant = []
     if art.fase.id == 1:
@@ -1992,24 +1999,17 @@ def ver_detalle(request, proyecto_id, art_id):
         permisos_ant = get_permisos_proyecto(user, proyect)
     permiso = 'Ver artefactos' in permisos_ant or 'ABM artefactos' in permisos_ant
     
-    art = Artefacto.objects.get(pk=art_id)
     archivos = Adjunto.objects.filter(artefacto = art, habilitado = True)
-    rel_atras = RelArtefacto.objects.filter(hijo = art, habilitado = True)
-    rel_adelante = RelArtefacto.objects.filter(padre = art, habilitado = True)
-    lista = []
-    for item in rel_atras: 
-        lista.append(item.padre)
-    for item in rel_adelante:
-        lista.append(item.hijo)
-    lista.sort(cmp=None, key=None, reverse=False)
-    
-    return render_to_response("desarrollo/artefacto/ver_detalle.html",
-                              {'proyecto': proyect,
-                               'user': user,
-                               'art': art,
-                               'archivos': archivos,
-                               'relaciones': lista,
-                               'ver_artefactos': permiso})
+    padres = obtener_relaciones_izq(art, [])
+    padres.remove(art)
+    hijos = obtener_relaciones_der(art, [])
+    hijos.remove(art)
+    return render_to_response("desarrollo/artefacto/ver_detalle.html",{'proyecto':proyect, 'user':user,
+                                                                              'art':art,
+                                                                              'archivos':archivos,
+                                                                              'padres':padres,
+                                                                              'hijos':hijos,
+                                                                              'ver_artefactos': permiso})
 
 @login_required
 def calcular_impacto(request, proyecto_id, art_id):
@@ -2267,12 +2267,15 @@ def linea_revisar_artefacto(request, proyecto_id, art_id):
             return HttpResponseRedirect("/proyectos/lineabase&id=" + str(proyect.id)+"/revisar/")
     
     archivos = Adjunto.objects.filter(artefacto = art, habilitado = True)
-    relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
-    return render_to_response("gestion/linea_revisar_detalles.html", {'proyecto':proyect, 
-                                                                   'user':user,
-                                                                   'art':art,
-                                                                   'archivos':archivos,
-                                                                   'relaciones':relaciones,
+    padres = obtener_relaciones_izq(art, [])
+    padres.remove(art)
+    hijos = obtener_relaciones_der(art, [])
+    hijos.remove(art)
+    return render_to_response("gestion/linea_revisar_detalles.html", {'proyecto':proyect, 'user':user,
+                                                                              'art':art,
+                                                                              'archivos':archivos,
+                                                                              'padres':padres,
+                                                                              'hijos':hijos,
                                                                    'revisar_artefacto': 'Revisar artefactos' in permisos})
 
 @login_required

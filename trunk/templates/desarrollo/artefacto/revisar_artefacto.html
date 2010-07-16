@@ -11,19 +11,76 @@
 <tr><th>Descripci&oacute;n Corta:</th><td>{{ art.descripcion_corta }}</td></tr>
 <tr><th>Descripci&oacute;n Larga:</th><td>{{ art.descripcion_larga }}</td></tr>
 <tr><th>Tipo:</th><td>{{ art.tipo }}</td></tr>
-<tr><th>Icono:</th><td>{{ art.icono }}</td></tr>
+{% ifequal art.fase.id 1%}
 <tr><th>Relaciones:</th>
-    <td><ul>{% for item in relaciones %}
-        <li>{{item.padre.nombre}}</li>
-	{% empty %}
-		<li>No tiene relaciones</li>
-    {% endfor %}</ul></td></tr>
+    <td>{% if padres %}<p>Padres</p>{% endif %}
+        <ul>{% for item in padres %}
+                <li>{{item.nombre}}</li>
+            {% endfor %}</ul>
+     
+    {% if hijos %}<p>Hijos</p>{% endif %}
+        <ul>{% for item in hijos %}
+                <li>{{item.nombre}}</li>
+            {% endfor %}</ul></td></tr>
+{% endifequal %}
+
+{% ifequal art.fase.id 2%}
+<tr><th>Relaciones-Analisis </th>
+
+    <td><ul>{% for item in padres %}
+                {% ifequal item.fase.id 1%}
+                    <li>{{item.nombre}}</li>
+                {% endifequal %}
+            {% endfor %}</ul></td></tr>
+
+<tr><th>Relaciones-Diseno </th>
+    <td><p>Padres:</p>
+        <ul>{% for item in padres %}
+                {% ifequal item.fase.id 2%}
+                    <li>{{item.nombre}}</li>
+                {% endifequal %}
+            {% endfor %}</ul>
+        
+        <p>Hijos:</p>
+        <ul>{% for item in hijos %}
+                {% ifequal item.fase.id 2%}
+                    <li>{{item.nombre}}</li>
+                {% endifequal %}
+            {% endfor %}</ul></td></tr>
+{% endifequal %}
+
+{% ifequal art.fase.id 3%}
+<tr><th>Relaciones-Diseno </th>
+
+    <td><ul>{% for item in padres %}
+                {% ifequal item.fase.id 2%}
+                    <li>{{item.nombre}}</li>
+                {% endifequal %}
+            {% endfor %}</ul></td></tr>
+
+<tr><th>Relaciones-Implementacion </th>
+        <td><p>Padres:</p>
+        <ul>{% for item in padres %}
+                {% ifequal item.fase.id 3%}
+                    <li>{{item.nombre}}</li>
+                {% endifequal %}
+            {% endfor %}</ul>
+     
+        <p>Hijos:</p>
+        <ul>{% for item in hijos %}
+                {% ifequal item.fase.id 3%}
+                    <li>{{item.nombre}}</li>
+                {% endifequal %}
+            {% endfor %}</ul></td></tr>
+{% endifequal %}
+
+
 <tr><th>Adjuntos:</th>
     <td><ul>{% for item in archivos %}
-        <li>{{item.nombre}}</li>
-	{% empty %}
-		<li>No tiene adjuntos</li>
-    {% endfor %}</ul></td></tr>
+                <li><a href = "/proyectos/artefactos&id={{proyecto.id}}/adj&id={{art.id}}/get&id={{item.id}}/">{{item.nombre}}</a></li>
+        	{% empty %}
+        		<li>No tiene adjuntos</li>
+            {% endfor %}</ul></td></tr>
 	<tr><td colspan="2" class="buttonlist" style="border:none;">
     <input type="submit" value="Aprobar artefacto" />
     <input type="button" value="Volver" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/' "/></td></tr>
