@@ -72,10 +72,11 @@ class Proyecto(models.Model):
     
 class TipoArtefacto(models.Model):
     """"Esta clase representa a que tipo pertenece un artefacto."""
-    nombre = models.CharField(unique=True, max_length=50)
+    nombre = models.CharField(max_length=50)
     descripcion = models.CharField(max_length=50)
     #claves foraneas
     fase = models.ForeignKey(Fase)
+    proyecto = models.BooleanField(default=False)
     
     def __unicode__(self):
         return self.nombre

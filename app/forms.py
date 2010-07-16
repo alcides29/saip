@@ -162,14 +162,14 @@ class TipoArtefactoForm(forms.Form):
     descripcion = forms.CharField(max_length=100, label='Nombre')
     fase = forms.ModelChoiceField(queryset=Fase.objects.all(), label='Fase')
     
-    def clean_nombre(self):
-    	if 'nombre' in self.cleaned_data:
-			roles = TipoArtefacto.objects.all()
-			nombre = self.cleaned_data['nombre']
-			for item in roles: 
-				if nombre == item.nombre:
-					raise forms.ValidationError('Ya existe este nombre.')
-			return nombre
+    #def clean_nombre(self):
+    	#if 'nombre' in self.cleaned_data:
+			#roles = TipoArtefacto.objects.all()
+			#nombre = self.cleaned_data['nombre']
+			#for item in roles: 
+				#if nombre == item.nombre:
+					#raise forms.ValidationError('Ya existe este nombre.')
+			#return nombre
 
 class ModTipoArtefactoForm(forms.Form):
     """Form para Tipo de artefacto."""
