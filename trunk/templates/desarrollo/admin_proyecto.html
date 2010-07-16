@@ -2,7 +2,7 @@
 {% block title %}{{proyecto.nombre}}{% endblock %}
 {% block head %}{{proyecto.nombre}}<br>{% endblock %}
 {% block content %}
-{% if ver_artefactos or abm_artefactos or ver_miembros or abm_miembros or asignar_roles or generarlb or ver_artefactos_ant%}
+{% if ver_artefactos or abm_artefactos or ver_miembros or abm_miembros or asignar_roles or generarlb or ver_artefactos_ant_req or ver_artefactos_ant_dis%}
 <p>{{proyecto.descripcion}}</p>
 <p>L&iacute;der del proyecto: {{proyecto.usuario_lider}}</p>
 <p>Fase del Proyecto: {{proyecto.fase}}</p>
@@ -23,6 +23,15 @@
         <li><a href="/proyectos/artefactos&id={{proyecto.id}}&fasesAnt=1/">Artefactos de An&aacute;lisis y Requerimientos</a></li>
         <li><a href="/proyectos/artefactos&id={{proyecto.id}}&fasesAnt=2/">Artefactos de Dise&ntilde;o</a></li>
         <li><a href="/proyectos/artefactos&id={{proyecto.id}}&fasesAnt=3/">Artefactos de Implementaci&oacute;n</a></li>
+	{% else %}
+		{% if ver_artefactos_ant_dis %}
+			<li><a href="/proyectos/artefactos&id={{proyecto.id}}&fasesAnt=1/">Artefactos de An&aacute;lisis y Requerimientos</a></li>
+			<li><a href="/proyectos/artefactos&id={{proyecto.id}}&fasesAnt=2/">Artefactos de Dise&ntilde;o</a></li>
+		{% else %}
+			{% if ver_artefactos_ant_req %}
+				<li><a href="/proyectos/artefactos&id={{proyecto.id}}&fasesAnt=1/">Artefactos de An&aacute;lisis y Requerimientos</a></li>
+			{% endif %}
+		{% endif %}
     {% endif %}
 
 {% else %}
@@ -36,12 +45,21 @@
         <li><a href="/proyectos/artefactos&id={{proyecto.id}}&fasesAnt=2/">Artefactos de Dise&ntilde;o</a></li>
     {% endifequal %}
     <li><a href="/proyectos/artefactos&id={{proyecto.id}}/">Artefactos de la fase actual</a></li>
+	{% else %}
+		{% if ver_artefactos_ant_dis %}
+			<li><a href="/proyectos/artefactos&id={{proyecto.id}}&fasesAnt=1/">Artefactos de An&aacute;lisis y Requerimientos</a></li>
+			<li><a href="/proyectos/artefactos&id={{proyecto.id}}&fasesAnt=2/">Artefactos de Dise&ntilde;o</a></li>
+		{% else %}
+			{% if ver_artefactos_ant_req %}
+				<li><a href="/proyectos/artefactos&id={{proyecto.id}}&fasesAnt=1/">Artefactos de An&aacute;lisis y Requerimientos</a></li>
+			{% endif %}
+		{% endif %}
     {% endif %}
 {% endif %}
 </ul>
 
 {% else %}
 	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
-    <input type="button" value="Aceptar" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/' "/>
+    <input type="button" value="Aceptar" onClick = "location.href='/' "/>
 {% endif %}
 {% endblock%}

@@ -12,6 +12,9 @@
 	<li>No depende de ning&uacute;n artefacto.</li>
 {% endfor %}
 </ul>
+{% if suma_izq %}
+<p><strong>Impacto a la izquierda:</strong> {{suma_izq}}</p>
+{% endif %}
 </div>
 <div class="comp"><p><strong>Artefactos dependientes de {{art.nombre}} (hijos):</strong></p>
 <ul>
@@ -21,6 +24,9 @@
 	<li>Ning&uacute;n artefacto depende de &eacute;l.</li>
 {% endfor %}
 </ul>
+{% if suma_der %}
+<p><strong>Impacto a la derecha:</strong> {{suma_der}}</p>
+{% endif %}
 </div>
 <div style="clear:left; padding: 5px;">
 <div style="background-color:#f8f8f8; font-style:italic;"><p>El impacto de cambio de {{art.nombre}} es {{impacto}}</p></div>

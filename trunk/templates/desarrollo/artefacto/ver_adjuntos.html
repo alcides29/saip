@@ -6,7 +6,7 @@
 <ul>
 {% if lista %} 
     {% for item in lista %}
-    <li> {{ item.nombre }} </li>
+    <li> <a href = "/proyectos/artefactos&id={{proyecto.id}}/adj&id={{art.id}}/get&id={{item.id}}/">{{ item.nombre }}</a></li>
     {% endfor %}
 {% else %}
      <li>Este artefacto no tiene adjuntos</li>

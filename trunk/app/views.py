@@ -69,12 +69,14 @@ def administrar_proyecto(request, proyecto_id):
     user = User.objects.get(username=request.user.username)
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
     permisos = get_permisos_proyecto(user, proyecto)
-    permisos_ant = []
+    permisos_ant_req = []
+    permisos_ant_dis = []
     if proyecto.fase.id == 2:
-        permisos_ant = get_permisos_proyecto_ant(user, proyecto, Fase.objects.get(pk=1))
+        permisos_ant_req = get_permisos_proyecto_ant(user, proyecto, Fase.objects.get(pk=1))
     elif proyecto.fase.id == 3:
-        permisos_ant = get_permisos_proyecto_ant(user, proyecto, Fase.objects.get(pk=1)) + get_permisos_proyecto_ant(user, proyecto, Fase.objects.get(pk=2)) 
-    print permisos_ant
+        permisos_ant_req = get_permisos_proyecto_ant(user, proyecto, Fase.objects.get(pk=1))
+        permisos_ant_dis = get_permisos_proyecto_ant(user, proyecto, Fase.objects.get(pk=2)) 
+    #print permisos_ant
     linea = LineaBase.objects.filter(proyectos=proyecto, fase=3)
     return render_to_response("desarrollo/admin_proyecto.html", {'proyecto':proyecto, 
                                                                  'user':user,
@@ -86,7 +88,8 @@ def administrar_proyecto(request, proyecto_id):
                                                                  'asignar_roles': 'Asignar roles' in permisos,
                                                                  'generarlb':'Generar LB' in permisos,
                                                                  'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos,
-                                                                 'ver_artefactos_ant': 'Ver artefactos' in permisos_ant or 'ABM artefactos' in permisos_ant})
+                                                                 'ver_artefactos_ant_req': 'Ver artefactos' in permisos_ant_req or 'ABM artefactos' in permisos_ant_req,
+                                                                 'ver_artefactos_ant_dis': 'Ver artefactos' in permisos_ant_dis or 'ABM artefactos' in permisos_ant_dis})
     
 @login_required
 def admin_usuarios_proyecto(request, object_id):
@@ -1175,15 +1178,7 @@ def crear_artefacto(request, proyecto_id):
     """Crear un artefacto"""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     if request.method == 'POST':
         form = ArtefactoForm(proyect.fase, proyecto_id, request.POST, request.FILES)
         if form.is_valid():
@@ -1227,16 +1222,7 @@ def modificar_artefacto(request, proyecto_id, art_id):
     """Modificar un artefacto"""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     if request.method == 'POST':
         art = Artefacto.objects.get(pk=art_id)
         form = ModArtefactoForm(proyect.fase, request.POST, request.FILES)
@@ -1298,16 +1284,7 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
     """Definir las relaciones de un artefacto."""
     user = User.objects.get(username=request.user.username)
     p = Proyecto.objects.get(pk=proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = p).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, p)
     art = get_object_or_404(Artefacto, id=art_id)
     fase_actual = Fase.objects.get(pk=fase)
     relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
@@ -1382,17 +1359,16 @@ def ver_dependencias(request, proyecto_id, art_id, fase):
     """ver las relaciones de un artefacto."""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     art = get_object_or_404(Artefacto, id=art_id)
+    permisos_ant = []
+    if art.fase.id == 1:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2)) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    elif art.fase.id == 2:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    else:
+        permisos_ant = get_permisos_proyecto(user, proyect)
+    permiso = 'Ver artefactos' in permisos_ant or 'ABM artefactos' in permisos_ant
     relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
     lista = []
     for item in relaciones:
@@ -1402,45 +1378,43 @@ def ver_dependencias(request, proyecto_id, art_id, fase):
                                                                          'art':art, 
                                                                          'proyecto':proyect,
                                                                          'lista':lista,
-                                                                         'abm_artefactos':'ABM artefactos' in permisos})
+                                                                         'ver_artefactos': permiso})
 
 @login_required
 def ver_adjuntos(request, proyecto_id, art_id):
-    """ver las relaciones de un artefacto."""
+    """ver los archivos adjuntos de un artefacto."""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     art = get_object_or_404(Artefacto, id=art_id)
+    permisos_ant = []
+    if art.fase.id == 1:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2)) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    elif art.fase.id == 2:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    else:
+        permisos_ant = get_permisos_proyecto(user, proyect)
+    permiso = 'Ver artefactos' in permisos_ant or 'ABM artefactos' in permisos_ant
     adjuntos = Adjunto.objects.filter(artefacto = art, habilitado = True)
     
-    return render_to_response("desarrollo/artefacto/ver_adjuntos.html", {'art':art, 
+    return render_to_response("desarrollo/artefacto/ver_adjuntos.html", {'art':art, 'user':user,
                                                                          'proyecto':proyect,
                                                                          'lista':adjuntos,
-                                                                         'abm_artefactos':'ABM artefactos' in permisos})
+                                                                         'abm_artefactos':permiso})
 
 @login_required
 def ver_historial(request, proyecto_id, art_id):
     art = Artefacto.objects.get(pk=art_id)
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    #-------------------------------------------------------------------
+    permisos_ant = []
+    if art.fase.id == 1:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2)) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    elif art.fase.id == 2:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    else:
+        permisos_ant = get_permisos_proyecto(user, proyect)
+    permiso = 'Ver artefactos' in permisos_ant or 'ABM artefactos' in permisos_ant
     historial = Historial.objects.get(artefacto=art)
     versiones = RegistroHistorial.objects.filter(historial=historial).order_by('version')
     linea = LineaBase.objects.filter(proyectos=proyect, fase=3)
@@ -1448,12 +1422,12 @@ def ver_historial(request, proyecto_id, art_id):
         fin = 0
     else:
         fin = 1
-    variables = RequestContext(request, {'historial': historial, 
+    variables = RequestContext(request, {'historial': historial, 'user': user,
                                          'lista': versiones,
                                          'art': art,
                                          'fin':fin,
                                          'proyecto': proyect,
-                                         'abm_artefactos': 'ABM artefactos' in permisos})
+                                         'abm_artefactos': permiso})
     return render_to_response('desarrollo/artefacto/historial.html', variables)
     
 
@@ -1462,16 +1436,7 @@ def borrar_artefacto(request, proyecto_id, art_id):
     """Dar de baja un artefacto."""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     art = get_object_or_404(Artefacto, id=art_id)
     r = RelArtefacto.objects.filter(padre = art)
     if r:
@@ -1496,16 +1461,7 @@ def admin_artefactos_eliminados(request, proyecto_id):
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     fase = Fase.objects.get(pk = proyect.fase.id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     lista = Artefacto.objects.filter(proyecto=proyect, fase=fase, habilitado=False)
     variables = RequestContext(request, {'proyecto': proyect, 'lista': lista, 
                                          'abm_artefactos': 'ABM artefactos' in permisos})
@@ -1601,9 +1557,16 @@ def retornar_archivo(request, proyecto_id, art_id, arch_id):
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     art = get_object_or_404(Artefacto, id=art_id)
-    permisos = get_permisos_proyecto(user, proyect)
     adjunto = get_object_or_404(Adjunto, id=arch_id)
-    if 'ABM artefactos' in permisos:
+    permisos_ant = []
+    if art.fase.id == 1:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2)) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    elif art.fase.id == 2:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    else:
+        permisos_ant = get_permisos_proyecto(user, proyect)
+    permiso = 'Ver artefactos' in permisos_ant or 'ABM artefactos' in permisos_ant
+    if permiso:
         if request.method == 'GET':
             respuesta = HttpResponse(base64.b64decode(adjunto.contenido), content_type= adjunto.mimetype)
             respuesta['Content-Disposition'] = 'attachment; filename=' + adjunto.nombre
@@ -1642,16 +1605,7 @@ def restaurar_artefacto_eliminado(request, proyecto_id, art_id):
     """Metodo que restaura un artefacto eliminado a su ultima version."""
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     art = get_object_or_404(Artefacto, id=art_id)
     
     if request.method == 'POST':
@@ -1671,15 +1625,15 @@ def historial_relaciones(request, proyecto_id, art_id, reg_id, fase):
     art = Artefacto.objects.get(pk=art_id)
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    #-------------------------------------------------------------------
+    #permisos = get_permisos_proyecto(user, proyect)
+    permisos_ant = []
+    if art.fase.id == 1:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2)) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    elif art.fase.id == 2:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    else:
+        permisos_ant = get_permisos_proyecto(user, proyect)
+    permiso = 'Ver artefactos' in permisos_ant or 'ABM artefactos' in permisos_ant
     reg = RegistroHistorial.objects.get (pk=reg_id)
     relaciones = RegHistoRel.objects.filter (registro = reg)
     lista = []
@@ -1690,7 +1644,7 @@ def historial_relaciones(request, proyecto_id, art_id, reg_id, fase):
                                          'lista': lista,
                                          'art': art,
                                          'proyecto': proyect,
-                                         'abm_artefactos': 'ABM artefactos' in permisos})
+                                         'abm_artefactos': permiso})
     return render_to_response('desarrollo/artefacto/historial_relaciones.html', variables)
 
 @login_required
@@ -1698,15 +1652,14 @@ def historial_adjuntos(request, proyecto_id, art_id, reg_id):
     art = Artefacto.objects.get(pk=art_id)
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-    #-------------------------------------------------------------------
+    permisos_ant = []
+    if art.fase.id == 1:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2)) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    elif art.fase.id == 2:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    else:
+        permisos_ant = get_permisos_proyecto(user, proyect)
+    permiso = 'Ver artefactos' in permisos_ant or 'ABM artefactos' in permisos_ant
     reg = RegistroHistorial.objects.get (pk=reg_id)
     adjuntos = RegHistoAdj.objects.filter (registro = reg)
     
@@ -1714,7 +1667,7 @@ def historial_adjuntos(request, proyecto_id, art_id, reg_id):
                                          'lista': adjuntos,
                                          'art': art,
                                          'proyecto': proyect,
-                                         'abm_artefactos': 'ABM artefactos' in permisos})
+                                         'abm_artefactos': permiso})
     return render_to_response('desarrollo/artefacto/historial_adjuntos.html', variables)
 
 
@@ -1723,16 +1676,7 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     art = Artefacto.objects.get(pk = art_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)
-   
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     if request.method == 'POST':
         art = Artefacto.objects.get(pk = art_id)
         relaciones = RelArtefacto.objects.filter(hijo = art,habilitado=True)
@@ -1785,16 +1729,7 @@ def revisar_artefacto(request, proyecto_id, art_id):
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     art = Artefacto.objects.get(pk=art_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')    
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())    
-    permisos = []    
-    for item in permisos_obj:
-        permisos.append(item.nombre)        
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     if request.method == 'POST':
             art.estado = 3        
             art.save()                
@@ -1816,7 +1751,14 @@ def ver_detalle(request, proyecto_id, art_id):
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     # Validacion de permisos
-    permisos = get_permisos_proyecto(user, proyect)
+    permisos_ant = []
+    if art.fase.id == 1:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2)) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    elif art.fase.id == 2:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    else:
+        permisos_ant = get_permisos_proyecto(user, proyect)
+    permiso = 'Ver artefactos' in permisos_ant or 'ABM artefactos' in permisos_ant
     
     art = Artefacto.objects.get(pk=art_id)
     #fase = Fase.objects.get(pk=proyect.fase.id)
@@ -1829,7 +1771,7 @@ def ver_detalle(request, proyecto_id, art_id):
                                'art': art,
                                'archivos': archivos,
                                'relaciones': relaciones,
-                               'ver_artefactos': 'Ver artefactos' in permisos})
+                               'ver_artefactos': permiso})
 
 @login_required
 def calcular_impacto(request, proyecto_id, art_id):
@@ -1837,27 +1779,30 @@ def calcular_impacto(request, proyecto_id, art_id):
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     art = get_object_or_404(Artefacto, id=art_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')    
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())    
-    permisos = []    
-    for item in permisos_obj:
-        permisos.append(item.nombre)        
-    #-------------------------------------------------------------------
+    permisos_ant = []
+    if art.fase.id == 1:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=2)) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    elif art.fase.id == 2:
+        permisos_ant = get_permisos_proyecto_ant(user, proyect, art.fase) + get_permisos_proyecto_ant(user, proyect, Fase.objects.get(pk=3))
+    else:
+        permisos_ant = get_permisos_proyecto(user, proyect)
+    permiso = 'Ver artefactos' in permisos_ant or 'ABM artefactos' in permisos_ant
     relaciones_izq = obtener_relaciones_izq(art, [])
     print relaciones_izq
     relaciones_der = obtener_relaciones_der(art, [])
     print relaciones_der
     impacto = 0
+    suma_izq = 0
+    suma_der = 0
     if relaciones_izq:
         for item in relaciones_izq:
             impacto = impacto + item.complejidad
+            suma_izq = suma_izq + item.complejidad
             print impacto
     if relaciones_der:
         for item in relaciones_der:
             impacto = impacto + item.complejidad
+            suma_der = suma_der + item.complejidad
             print impacto
     impacto = impacto - art.complejidad
     del relaciones_izq[0]
@@ -1865,10 +1810,10 @@ def calcular_impacto(request, proyecto_id, art_id):
     linea = LineaBase.objects.filter(proyectos=proyect, fase=3)
     return render_to_response("desarrollo/artefacto/complejidad.html", {'art': art, 'user': user, 'impacto': impacto,
                                                                         'izq': relaciones_izq, 'der': relaciones_der,
-                                                                        'fin':linea,
+                                                                        'fin':linea,'suma_der': suma_der, 'suma_izq': suma_izq,
                                                                         'proyecto': proyect,
-                                                                        'abm_artefactos': 'ABM artefactos' in permisos,
-                                                                        'ver_artefactos': 'Ver artefactos' in permisos})
+                                                                        'abm_artefactos': permiso,
+                                                                        'ver_artefactos': permiso})
     
 @login_required
 def fases_anteriores(request, proyecto_id, fase):
@@ -1876,6 +1821,7 @@ def fases_anteriores(request, proyecto_id, fase):
     proyect = Proyecto.objects.get(pk=proyecto_id)
     fase = Fase.objects.get(pk=fase)
     permisos = get_permisos_proyecto(user, proyect)
+    print permisos
     
     linea1 = LineaBase.objects.filter(proyectos=proyect, fase=1)
     linea2 = LineaBase.objects.filter(proyectos=proyect, fase=2)
@@ -1904,7 +1850,7 @@ def fases_anteriores(request, proyecto_id, fase):
                                                                               'lista':lista,
                                                                               'fase':fase,
                                                                               'fin':linea3,
-                                                                              'abm_artefactos': 'ABM artefactos' in permisos,
+                                                                              'abm_artefactos': 'ABM artefactos' in permisos or 'Ver artefactos' in permisos,
                                                                               'ver_artefactos_ant_1':'ABM artefactos'in permisos_ant1 or 'Ver artefactos' in permisos_ant1,
                                                                               'ver_artefactos_ant_2':'ABM artefactos'in permisos_ant2 or 'Ver artefactos' in permisos_ant2,
                                                                               'ver_artefactos_ant_3':'ABM artefactos'in permisos_ant3 or 'Ver artefactos' in permisos_ant3
@@ -1915,16 +1861,7 @@ def linea_base (request, proyecto_id):
     user = User.objects.get(username = request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     fase = Fase.objects.get(pk=proyect.fase.id)
-    #Validacion de los permisos-----------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(proyecto=proyect, usuario=user).only('rol')
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())        
-    permisos = []
-    for item in permisos_obj:
-        permisos.append(item.nombre)        
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     if (fase.id > 1):
         fase_ant = Fase.objects.get(pk=proyect.fase.id - 1)
         tipoArtefactos_ant = TipoArtefactoFaseProyecto.objects.filter(fase=fase_ant)
@@ -2004,16 +1941,7 @@ def linea_revisar(request, proyecto_id):
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     fase = Fase.objects.get(pk=proyect.fase.id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')    
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())    
-    permisos = []    
-    for item in permisos_obj:
-        permisos.append(item.nombre)        
-    print permisos
-    #------------------------------------------------------------------- 
+    permisos = get_permisos_proyecto(user, proyect)
     if (fase.id > 1):
         fase_ant = Fase.objects.get(pk=proyect.fase.id - 1)
         tipoArtefactos_ant = TipoArtefactoFaseProyecto.objects.filter(fase=fase_ant)
@@ -2038,16 +1966,7 @@ def linea_revisar_artefacto(request, proyecto_id, art_id):
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     art = Artefacto.objects.get(pk=art_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')    
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())    
-    permisos = []    
-    for item in permisos_obj:
-        permisos.append(item.nombre)        
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     if request.method == 'POST':
             art.estado = 3        
             art.save()                
@@ -2068,16 +1987,7 @@ def linea_relacionar(request, proyecto_id):
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     fase = Fase.objects.get(pk=proyect.fase.id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')    
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())    
-    permisos = []    
-    for item in permisos_obj:
-        permisos.append(item.nombre)        
-    print permisos
-    #------------------------------------------------------------------- 
+    permisos = get_permisos_proyecto(user,proyect)
     tipoArtefactos = TipoArtefactoFaseProyecto.objects.filter(fase=fase)
     artefactos = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipoArtefactos, habilitado=True)
     lista = []       
@@ -2102,16 +2012,7 @@ def linea_relacionar_artefacto(request, proyecto_id, art_id, fase):
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     art = Artefacto.objects.get(pk=art_id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')    
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())    
-    permisos = []    
-    for item in permisos_obj:
-        permisos.append(item.nombre)        
-    print permisos
-    #-------------------------------------------------------------------
+    permisos = get_permisos_proyecto(user, proyect)
     fase_actual = Fase.objects.get(pk=fase)
     relaciones_padres = RelArtefacto.objects.filter(hijo = art, habilitado = True)
     relaciones_hijos = RelArtefacto.objects.filter(padre = art, habilitado = True)
@@ -2182,16 +2083,7 @@ def linea_anteriores(request, proyecto_id):
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     fase = Fase.objects.get(pk=proyect.fase.id)
-    #Validacion de permisos---------------------------------------------
-    roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyect).only('rol')    
-    permisos_obj = []
-    for item in roles:
-        permisos_obj.extend(item.rol.permisos.all())    
-    permisos = []    
-    for item in permisos_obj:
-        permisos.append(item.nombre)        
-    print permisos
-    #------------------------------------------------------------------- 
+    permisos = get_permisos_proyecto(user, proyect)
     if (fase.id > 1):
         fase_ant = Fase.objects.get(pk=proyect.fase.id - 1)
         tipoArtefactos_ant = TipoArtefactoFaseProyecto.objects.filter(fase=fase_ant)
