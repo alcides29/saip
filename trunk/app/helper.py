@@ -42,6 +42,17 @@ def obtener_relaciones_der(art, lista_existentes):
     return ret
 
 def get_permisos_proyecto(user, proyecto):
+    """Metodo que valida los permisos de usuario para el proyecto.
+    
+    @param user: Usuario actual del proyecto
+    @type user: Usuario
+    @param proyecto: Proyecto para la validacion del permiso
+    @type proyecto: Proyecto 
+    
+    @return: Lista de permisos del usuario para el proyecto
+    @rtype: Lista
+    """
+    
     roles = UsuarioRolProyecto.objects.filter(usuario = user, proyecto = proyecto).only('rol')
     permisos_obj = []
     for item in roles:
