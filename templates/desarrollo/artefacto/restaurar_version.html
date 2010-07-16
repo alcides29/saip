@@ -3,13 +3,21 @@
 {% block head %}Restaurar Versi&oacute;n<br>{% endblock %}
 {% block content %}
 {% if abm_artefactos %}
-<form action=" " method="post">
-<p>Est&aacute; seguro?<span class="optionbuttons">
-	<input type="submit" value="S&iacute;" />
-	<input type="button" value="No" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/historial&id={{art.id}}/' "/></span></p>
+
+<table class="art-inf">
+<form id="form_id" action="" method="post">
+<tr><th>Versi&oacute;n:</th><td>{{ art.version }}</td></tr>
+<tr><th>Complejidad:</th><td>{{ art.complejidad }}</td></tr>
+<tr><th>Descripci&oacute;n Corta:</th><td>{{ art.descripcion_corta }}</td></tr>
+<tr><th>Descripci&oacute;n Larga:</th><td>{{ art.descripcion_larga }}</td></tr>
+<tr><th>Tipo:</th><td>{{ art.tipo }}</td></tr>
+
+    <tr><td colspan="2" class="buttonlist" style="border:none;">
+    <input type="submit" value="Restaurar" />
+    <input type="button" value="Cancelar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/historial&id={{a.id}}/'"/></td></tr>
 </form>
+</table>
 {% else %}
 	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>
-    <input type="button" value="Aceptar" onClick = "location.href='/proyectos/artefactos&id={{proyecto.id}}/historial&id={{art.id}}/' "/>
 {% endif %}
 {% endblock%}

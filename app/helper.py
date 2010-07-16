@@ -92,7 +92,6 @@ def registrar_version(art, relaciones, archivos):
     reg.descripcion_corta = art.descripcion_corta
     reg.descripcion_larga = art.descripcion_larga
     reg.habilitado = art.habilitado
-    reg.icono = art.icono
     reg.tipo = art.tipo
     reg.fecha_modificacion = datetime.datetime.today()
     historial = Historial.objects.get(artefacto = art)

@@ -105,7 +105,6 @@ class Artefacto(models.Model):
     descripcion_corta = models.TextField(null=True, blank=True)
     descripcion_larga = models.TextField(null=True, blank=True)
     habilitado = models.BooleanField(default=True)
-    icono = models.FileField(upload_to='icono', null=True, blank=True)
     #claves foraneas
     proyecto = models.ForeignKey(Proyecto)
     tipo = models.ForeignKey(TipoArtefactoFaseProyecto)
@@ -136,7 +135,6 @@ class RegistroHistorial(models.Model):
     descripcion_corta = models.TextField(null=True, blank=True)
     descripcion_larga = models.TextField(null=True, blank=True)
     habilitado = models.BooleanField()
-    icono = models.FileField(upload_to='icono', null=True, blank=True)
     tipo = models.ForeignKey(TipoArtefactoFaseProyecto)
     fecha_modificacion = models.DateTimeField(auto_now=True, auto_now_add=False, editable=False)
     #claves foraneas
