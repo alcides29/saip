@@ -5,11 +5,10 @@
 {% if abm_artefactos %}
 <p>Usuario: {{ historial.usuario }}</p>
 <p>Fecha de creacion: {{ historial.fecha_creacion }}</p>
+{% if lista %}
 <form action="" method="post">
 	<table class="admin">
 	<tr><td colspan="5">{{form.filtro.label}}: {{form.filtro}}</td><td align="right">{{form.paginas.label}}: {{form.paginas}}<input type="submit" value="Ok" name="Buscar"/></td></tr>
-
-{% if lista %}
 
 	<tr>
 		<td class="titulo">Versi&oacute;n</td>
