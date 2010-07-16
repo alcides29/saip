@@ -787,7 +787,6 @@ def crear_proyecto(request):
     permisos = []
     for item in permisos_obj:
         permisos.append(item.nombre)
-    print permisos
     #-------------------------------------------------------------------
     if request.method == 'POST':
         form = ProyectosForm(request.POST, request.FILES)
@@ -808,7 +807,7 @@ def crear_proyecto(request):
             relacion.save()
             
             # Asociacion inicial de TipoArtefacto a fase por proyecto
-            lista = TipoArtefacto.objects.all()
+            lista = TipoArtefacto.objects.filter(proyecto = False)
             for item in lista:
                 rel = TipoArtefactoFaseProyecto()
                 rel.proyecto = p
@@ -895,7 +894,7 @@ def admin_tipo_artefacto(request):
     """Muestra la pagina de administracion de tipo de artefactos."""
     user = User.objects.get(username=request.user.username)
     permisos = get_permisos_sistema(user)
-    lista = TipoArtefacto.objects.all()
+    lista = TipoArtefacto.objects.filter(proyecto=False)
     if request.method == 'POST':
         form = FilterForm(request.POST)
         if form.is_valid():
@@ -961,6 +960,7 @@ def crear_tipo_artefacto(request):
             nuevo.nombre = form.cleaned_data['nombre']
             nuevo.descripcion = form.cleaned_data['descripcion']
             nuevo.fase = form.cleaned_data['fase']
+            nuevo.proyecto = False
             nuevo.save()
             
             # Agregamos en cada uno de los proyectos
@@ -1001,6 +1001,7 @@ def add_tipo_artefacto(request, proyecto_id):
             nuevo.nombre = form.cleaned_data['nombre']
             nuevo.descripcion = form.cleaned_data['descripcion']
             nuevo.fase = form.cleaned_data['fase']
+            nuevo.proyecto = True
             nuevo.save()
             
             # Agregamos al proyecto actual
@@ -1761,16 +1762,22 @@ def ver_detalle(request, proyecto_id, art_id):
     permiso = 'Ver artefactos' in permisos_ant or 'ABM artefactos' in permisos_ant
     
     art = Artefacto.objects.get(pk=art_id)
-    #fase = Fase.objects.get(pk=proyect.fase.id)
     archivos = Adjunto.objects.filter(artefacto = art, habilitado = True)
-    relaciones = RelArtefacto.objects.filter(hijo = art, habilitado = True)
+    rel_atras = RelArtefacto.objects.filter(hijo = art, habilitado = True)
+    rel_adelante = RelArtefacto.objects.filter(padre = art, habilitado = True)
+    lista = []
+    for item in rel_atras: 
+        lista.append(item.padre)
+    for item in rel_adelante:
+        lista.append(item.hijo)
+    lista.sort(cmp=None, key=None, reverse=False)
     
     return render_to_response("desarrollo/artefacto/ver_detalle.html",
                               {'proyecto': proyect,
                                'user': user,
                                'art': art,
                                'archivos': archivos,
-                               'relaciones': relaciones,
+                               'relaciones': lista,
                                'ver_artefactos': permiso})
 
 @login_required
