@@ -25,11 +25,13 @@ from saip.app.reports import *
 
 @login_required
 def principal(request):
-    """Muestra la pagina principal."""
+    """Muestra la pagina principal.
+    
+    @return: Pagina principal, lista de proyectos y usuario.
+    """
     user = User.objects.get(username=request.user.username)
      #Validacion de permisos---------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
-    print roles
     permisos_obj = []
     for item in roles:
         permisos_obj.extend(item.rol.permisos.all())
@@ -46,7 +48,6 @@ def principal(request):
             variables['usuarios'] = True
         if item == 'Ver tipos-artefacto' or item == 'Crear tipo-artefacto' or item == 'Modificar tipo-artefacto' or item == 'Eliminar tipo-artefacto':
             variables['tipos_artefacto'] = True
-    print permisos_sistema
     roles = UsuarioRolProyecto.objects.filter(usuario = user).only('rol')
     lista_proyectos = []
     for item in roles:
@@ -56,16 +57,20 @@ def principal(request):
     variables['permisos_proyecto'] = lista_proyectos
     #-------------------------------------------------------------------
     lista = Proyecto.objects.all()
-    #print lista
     variables['user'] = user
     variables['lista'] = lista
     print variables
     return render_to_response('main_page.html', variables)
-    #return render_to_response('main_page.html', RequestContext(request))
     
 @login_required
 def administrar_proyecto(request, proyecto_id):
-    """Administracion de proyecto para el modulo de desarrollo."""
+    """Administracion de proyecto para el modulo de desarrollo.
+    
+    @param proyecto_id: Id del proyecto a administrar
+    @type proyecto_id: Integer
+    @return: admin_proyecto.html, proyecto, usuario y lista de permisos
+    @rtype: Lista 
+    """
     user = User.objects.get(username=request.user.username)
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
     permisos = get_permisos_proyecto(user, proyecto)
@@ -93,6 +98,14 @@ def administrar_proyecto(request, proyecto_id):
     
 @login_required
 def admin_usuarios_proyecto(request, object_id):
+    """Metodo para administracion de miembros de un proyecto.
+    
+    @param object_id: Id del proyecto
+    @type object_id: Integer
+    
+    @return: Usuario, proyecto, lista de miembros y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     p = Proyecto.objects.get(pk = object_id)
     #Validacion de permisos---------------------------------------------
@@ -118,6 +131,16 @@ def admin_usuarios_proyecto(request, object_id):
     
 @login_required
 def cambiar_rol_usuario_proyecto(request, proyecto_id, user_id):
+    """Metodo para cambiar roles a un usuario de proyecto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param user_id: Id del proyecto
+    @type user_id: Integer
+    
+    @return: Usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     p = Proyecto.objects.get(pk = proyecto_id)
     #Validacion de permisos---------------------------------------------
@@ -128,7 +151,6 @@ def cambiar_rol_usuario_proyecto(request, proyecto_id, user_id):
     permisos = []
     for item in permisos_obj:
         permisos.append(item.nombre)
-    print permisos
     #-------------------------------------------------------------------
     u = User.objects.get(pk = user_id)
     lista = UsuarioRolProyecto.objects.filter(proyecto = p, usuario = u)
@@ -168,6 +190,14 @@ def cambiar_rol_usuario_proyecto(request, proyecto_id, user_id):
     
 @login_required
 def add_usuario_proyecto(request, object_id):
+    """Metodo para agregar un usuario a un proyecto.
+    
+    @param object_id: Id del proyecto
+    @type object_id: Integer
+    
+    @return: Usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     p = get_object_or_404(Proyecto, id = object_id)
     #Validacion de permisos---------------------------------------------
@@ -207,6 +237,16 @@ def add_usuario_proyecto(request, object_id):
 
 @login_required
 def eliminar_miembro_proyecto(request, proyecto_id, user_id):
+    """Metodo para eliminar un miembro de un proyecto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param user_id: Id del proyecto
+    @type user_id: Integer
+    
+    @return: Usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     usuario = get_object_or_404(User, pk=user_id)
     proy = get_object_or_404(Proyecto, pk=proyecto_id)
@@ -218,7 +258,6 @@ def eliminar_miembro_proyecto(request, proyecto_id, user_id):
     permisos = []
     for item in permisos_obj:
         permisos.append(item.nombre)
-    print permisos
     #-------------------------------------------------------------------
     if request.method == 'POST':
         lista = UsuarioRolProyecto.objects.filter(proyecto = proy, usuario = usuario)
@@ -233,7 +272,16 @@ def eliminar_miembro_proyecto(request, proyecto_id, user_id):
 
 @login_required
 def add_user(request):
-    """Agrega un nuevo usuario."""
+    """Agrega un nuevo usuario.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param user_id: Id del proyecto
+    @type user_id: Integer
+    
+    @return: Usuario y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos----------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -268,7 +316,14 @@ def add_user(request):
 
 @login_required
 def mod_user(request, usuario_id):
-    """Modifica los datos de un usuario."""
+    """Modifica los datos de un usuario.
+    
+    @param usuario_id: Id del proyecto
+    @type usuario_id: Integer
+    
+    @return: Usuario, form y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos----------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -297,7 +352,11 @@ def mod_user(request, usuario_id):
 
 @login_required
 def cambiar_password(request):
-    """Cambia la contrasena del usuario logueado"""
+    """Cambia la contrasena del usuario logueado
+    
+    @return: Usuario, html y formulario
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     if request.method == 'POST':
         form = CambiarPasswordForm(request.POST)
@@ -311,12 +370,19 @@ def cambiar_password(request):
 
 @login_required
 def asignar_roles_sistema(request, usuario_id):
-    """Asigna roles de sistema a un usuario"""
+    """Asigna roles de sistema a un usuario.
+    
+    @param usuario_id: Id del proyecto
+    @type usuario_id: Integer
+    
+    @return: Usuario, html y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     permisos = get_permisos_sistema(user)
     usuario = get_object_or_404(User, id=usuario_id)
     lista_roles = UsuarioRolSistema.objects.filter(usuario = usuario)
-    print lista_roles
+    
     if request.method == 'POST':
         form = AsignarRolesForm(1, request.POST)
         if form.is_valid():
@@ -345,7 +411,15 @@ def asignar_roles_sistema(request, usuario_id):
 
 @login_required
 def borrar_usuario(request, usuario_id):
-    """Borra un usuario, comprobando las dependencias primero"""
+    """Borra un usuario, comprobando las dependencias primero
+    
+    @param usuario_id: Id del proyecto
+    @type usuario_id: Integer
+    @precondition: Se verifican las dependencias
+    
+    @return: Usuario, html y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos----------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -390,8 +464,11 @@ def lista(request, tipo):
 
 @login_required
 def admin_usuarios(request):
-    """Administracion general de usuarios"""
-    '''Ya esta la validacion de permisos en este'''
+    """Administracion general de usuarios
+        
+    @return: Usuario, html y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     permisos = get_permisos_sistema(user)
     lista = User.objects.all().order_by("id")
@@ -446,7 +523,11 @@ def admin_usuarios(request):
 
 @login_required
 def admin_proyectos(request):
-    """Administracion general de proyectos"""
+    """Administracion general de proyectos
+    
+    @return: Usuario, html y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     permisos = get_permisos_sistema(user)
     lista = Proyecto.objects.all().order_by('id')
