@@ -5,7 +5,9 @@
 {% if revisar_artefacto %}
 
 {% if lista %}
-<table class="admin">
+<form action="" method="post">
+	<table class="admin">
+	<tr><td colspan="6">{{form.filtro.label}}: {{form.filtro}}</td><td align="right">{{form.paginas.label}}: {{form.paginas}}<input type="submit" value="Ok" name="Buscar"/></td></tr>
 	<tr>
 		<td class="titulo">Nombre</td>        
 		<td class="titulo">Versi&oacute;n</td>
@@ -15,7 +17,7 @@
 		<td class="titulo">Tipo</td>
 		<td class="titulo">Acci&oacute;n</td>
 	</tr>
-	{% for item in lista %}
+	{% for item in pag.object_list %}
 	<tr>
 	    <td>{{item.nombre}}</td>
 		<td>{{item.version}}</td>
@@ -26,7 +28,9 @@
 		<td><a href="/proyectos/lineabase&id={{proyecto.id}}/revisar&id={{item.id}}/" >Revisar</a></td>
 	</tr>
 	{% endfor %}
-</table><br>
+<tr><td>P&aacute;gina {{ pag.number }} de {{ pag.paginator.num_pages }}.</td><td colspan="3">{% if pag.has_previous %}<a href="?page={{ pag.previous_page_number }}">&lt;&lt;anterior</a>{% endif %}{% if pag.has_next %}<a href="?page={{ pag.next_page_number }}"> siguiente&gt;&gt;</a>{% endif %}
+</td></tr>
+</table></form>
 {% else %}
     <p>Todos los artefactos han sido aprobados</p>
 {% endif %}

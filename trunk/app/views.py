@@ -2084,17 +2084,50 @@ def fases_anteriores(request, proyecto_id, fase):
         
     
     lista = Artefacto.objects.filter(proyecto=proyect, habilitado=True, tipo__in=tipoArtefactos).order_by('id')
-        
-    return render_to_response("desarrollo/artefacto/Fases_anteriores.html", {'user': user, 
-                                                                             'proyecto':proyect,                                                                       
-                                                                              'lista':lista,
-                                                                              'fase':fase,
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            lista = Artefacto.objects.filter(Q(proyecto=proyect), Q(habilitado=True), Q(tipo__in=tipoArtefactos),Q(nombre__icontains = palabra)|Q(descripcion_corta__icontains = palabra)| Q(usuario__username__icontains = palabra)|Q(estado__icontains = palabra) | Q(tipo__tipo_artefacto__nombre__icontains= palabra)).order_by('id')
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            pag = page_excepcion1(request, paginator)
+            return render_to_response("desarrollo/artefacto/Fases_anteriores.html", {'lista': lista, 'pag':pag,
+                                                                             'form': form,'user': user, 
+                                                                             'proyecto':proyect,'fase':fase,
                                                                               'fin':linea3,
                                                                               'abm_artefactos': 'ABM artefactos' in permisos or 'Ver artefactos' in permisos,
                                                                               'ver_artefactos_ant_1':'ABM artefactos'in permisos_ant1 or 'Ver artefactos' in permisos_ant1,
                                                                               'ver_artefactos_ant_2':'ABM artefactos'in permisos_ant2 or 'Ver artefactos' in permisos_ant2,
                                                                               'ver_artefactos_ant_3':'ABM artefactos'in permisos_ant3 or 'Ver artefactos' in permisos_ant3
                                                                               })    
+    else:
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
+    return render_to_response("desarrollo/artefacto/Fases_anteriores.html", {'lista': lista, 'pag':pag,
+                                                                             'form': form,'user': user, 
+                                                                             'proyecto':proyect,'fase':fase,
+                                                                              'fin':linea3,
+                                                                              'abm_artefactos': 'ABM artefactos' in permisos or 'Ver artefactos' in permisos,
+                                                                              'ver_artefactos_ant_1':'ABM artefactos'in permisos_ant1 or 'Ver artefactos' in permisos_ant1,
+                                                                              'ver_artefactos_ant_2':'ABM artefactos'in permisos_ant2 or 'Ver artefactos' in permisos_ant2,
+                                                                              'ver_artefactos_ant_3':'ABM artefactos'in permisos_ant3 or 'Ver artefactos' in permisos_ant3
+                                                                              })    
+                      
+        
+    
     
 @login_required
 def linea_base (request, proyecto_id):
@@ -2182,23 +2215,46 @@ def linea_revisar(request, proyecto_id):
     proyect = Proyecto.objects.get(id=proyecto_id)
     fase = Fase.objects.get(pk=proyect.fase.id)
     permisos = get_permisos_proyecto(user, proyect)
-    if (fase.id > 1):
-        fase_ant = Fase.objects.get(pk=proyect.fase.id - 1)
-        tipoArtefactos_ant = TipoArtefactoFaseProyecto.objects.filter(fase=fase_ant)
-        artefactos_ant = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipoArtefactos_ant, habilitado=True)
-             
     tipoArtefactos = TipoArtefactoFaseProyecto.objects.filter(fase=fase)
     artefactos = Artefacto.objects.filter(proyecto=proyect, tipo__in=tipoArtefactos, habilitado=True)
-    lista1 = []       
+    lista = []       
     if (artefactos):        
         for item in artefactos:
             if (item.estado != 3):
-                lista1.append(item)                
-    return render_to_response("gestion/linea_base_revisar.html", {'proyecto': proyect,
-                                                                   'user': user,
-                                                                   'lista': lista1,
-                                                                   'revisar_artefacto': 'Revisar artefactos' in permisos})
-           
+                lista.append(item) 
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            lista = Artefacto.objects.filter(Q(proyecto=proyect), Q(habilitado=True), Q(tipo__in=tipoArtefactos),Q(nombre__icontains = palabra)|Q(descripcion_corta__icontains = palabra)| Q(usuario__username__icontains = palabra)|Q(estado__icontains = palabra) | Q(tipo__tipo_artefacto__nombre__icontains= palabra)).order_by('id')
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            pag = page_excepcion1(request, paginator)
+            return render_to_response("gestion/linea_base_revisar.html", {'lista': lista, 'pag':pag,
+                                                                        'user':user, 'form': form,
+                                                                        'proyecto': proyect,
+                                                                        'revisar_artefacto': 'Revisar artefactos' in permisos})
+    
+    else:
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
+    return render_to_response("gestion/linea_base_revisar.html", {'lista': lista, 'pag':pag,
+                                                                        'user':user, 'form': form,
+                                                                        'proyecto': proyect,
+                                                                        'revisar_artefacto': 'Revisar artefactos' in permisos})
+                      
 
 @login_required
 def linea_revisar_artefacto(request, proyecto_id, art_id):
@@ -2240,11 +2296,43 @@ def linea_relacionar(request, proyecto_id):
                     if (not tiene_padre (item, padres)):
                         lista.append(item) 
                 else:
-                    lista.append(item)            
-    return render_to_response("gestion/linea_base_relacionar.html", {'proyecto': proyect,
+                    lista.append(item)   
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            lista = Artefacto.objects.filter(Q(proyecto=proyect), Q(habilitado=True), Q(tipo__in=tipoArtefactos),Q(nombre__icontains = palabra)|Q(descripcion_corta__icontains = palabra)| Q(usuario__username__icontains = palabra)|Q(estado__icontains = palabra) | Q(tipo__tipo_artefacto__nombre__icontains= palabra)).order_by('id')
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            pag = page_excepcion1(request, paginator)
+            return render_to_response("gestion/linea_base_relacionar.html", {'pag':pag,'form': form,
+                                                                     'proyecto': proyect,
                                                                      'user': user,
                                                                      'lista': lista,
                                                                      'abm_artefactos':'ABM artefactos' in permisos})
+    
+    else:
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
+    return render_to_response("gestion/linea_base_relacionar.html", {'pag':pag,'form': form,
+                                                                     'proyecto': proyect,
+                                                                     'user': user,
+                                                                     'lista': lista,
+                                                                     'abm_artefactos':'ABM artefactos' in permisos})
+                               
+    
            
 @login_required
 def linea_relacionar_artefacto(request, proyecto_id, art_id, fase):
@@ -2343,7 +2431,36 @@ def linea_anteriores(request, proyecto_id):
                                 lista.append(item) 
                     else:
                         lista.append(item)   
-    return render_to_response("gestion/linea_base_anteriores.html", {'proyecto': proyect,
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            palabra = form.cleaned_data['filtro']
+            lista = Artefacto.objects.filter(Q(proyecto=proyect), Q(habilitado=True), Q(tipo__in=tipoArtefactos),Q(nombre__icontains = palabra)|Q(descripcion_corta__icontains = palabra)| Q(usuario__username__icontains = palabra)|Q(estado__icontains = palabra) | Q(tipo__tipo_artefacto__nombre__icontains= palabra)).order_by('id')
+            paginas = form.cleaned_data['paginas']
+            request.session['nro_items'] = paginas
+            paginator = Paginator(lista, int(paginas))
+            pag = page_excepcion1(request, paginator)
+            return render_to_response("gestion/linea_base_anteriores.html", {'pag':pag,'form': form,
+                                                                     'proyecto': proyect,
+                                                                   'user': user,
+                                                                   'lista': lista,
+                                                                   'abm_artefactos': 'ABM artefactos' in permisos})  
+    else:
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+        if not 'nro_items' in request.session:
+            request.session['nro_items'] = 5
+        paginas = request.session['nro_items']
+        paginator = Paginator(lista, int(paginas))
+        try:
+            pag = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            pag = paginator.page(paginator.num_pages)
+        form = FilterForm(initial={'paginas': paginas})
+    return render_to_response("gestion/linea_base_anteriores.html", {'pag':pag,'form': form,
+                                                                     'proyecto': proyect,
                                                                    'user': user,
                                                                    'lista': lista,
                                                                    'abm_artefactos': 'ABM artefactos' in permisos})  
