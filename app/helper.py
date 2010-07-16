@@ -1,4 +1,5 @@
 from saip.app.models import *
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 import datetime
 
 def validar_fase(proyecto, fase):
@@ -141,3 +142,16 @@ def tiene_hijo (padre, hijos):
                 hijos = Artefacto.objects.filter(id__in = relaciones)
                 return tiene_hijo (item, hijos)
     return False
+
+def page_excepcion1(request, paginator):
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+    try:
+        pag = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        pag = paginator.page(paginator.num_pages)
+    return pag
+    
+    

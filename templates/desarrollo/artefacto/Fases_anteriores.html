@@ -7,7 +7,10 @@
 
 {% ifequal fase.id 1%}
 {% if abm_artefactos or ver_artefactos_ant_1%}
-<table>
+<form action="" method="post">
+	<table class="admin">
+	<tr><td colspan="5">{{form.filtro.label}}: {{form.filtro}}</td><td align="right">{{form.paginas.label}}: {{form.paginas}}<input type="submit" value="Ok" name="Buscar"/></td></tr>
+
 	<tr>
 	  <td class="titulo">Nombre</td>        
 	  <td class="titulo">Versi&oacute;n</td>
@@ -17,7 +20,7 @@
 	  <td class="titulo">Acciones</td>
 	</tr>
 
-    {% for item in lista %}
+    {% for item in pag.object_list %}
 	<tr>
 	  <td><a href="/proyectos/artefactos&id={{proyecto.id}}/art&id={{item.id}}/">{{item.nombre}}</a></td>
 	  <td>{{item.version}}</td>        
@@ -31,8 +34,10 @@
 	</tr>
     
 	{% endfor %}
-   
-</table>
+<tr><td>P&aacute;gina {{ pag.number }} de {{ pag.paginator.num_pages }}.</td><td colspan="2">{% if pag.has_previous %}<a href="?page={{ pag.previous_page_number }}">&lt;&lt;anterior</a>{% endif %}{% if pag.has_next %}<a href="?page={{ pag.next_page_number }}"> siguiente&gt;&gt;</a>{% endif %}
+</td></tr>
+</table></form>
+
 
 <div class="footer"><div class="volver"><a href="/proyectos/admin&id={{proyecto.id}}/">&lt;&lt;Volver al proyecto</a></div><a href="/report/proyectos/artefactos&id={{proyecto.id}}&fasesAnt=1/">Obtener reporte</a></div>
 
@@ -41,7 +46,10 @@
 
 {% ifequal fase.id 2%}
 {% if abm_artefactos or ver_artefactos_ant_2%}
-<table>
+<form action="" method="post">
+	<table class="admin">
+	<tr><td colspan="5">{{form.filtro.label}}: {{form.filtro}}</td><td align="right">{{form.paginas.label}}: {{form.paginas}}<input type="submit" value="Ok" name="Buscar"/></td></tr>
+
     <tr>
 	    <td class="titulo">Nombre</td>        
         <td class="titulo">Versi&oacute;n</td>
@@ -51,7 +59,7 @@
         <td class="titulo">Acciones</td>
 	</tr>
     
-    {% for item in lista %}
+    {% for item in pag.object_list %}
 	<tr>
     	<td><a href="/proyectos/artefactos&id={{proyecto.id}}/art&id={{item.id}}/">{{item.nombre}}</td>
         <td>{{item.version}}</td>        
@@ -66,14 +74,18 @@
 	</td>
 	</tr>
 	{% endfor %}
-</table>
+<tr><td>P&aacute;gina {{ pag.number }} de {{ pag.paginator.num_pages }}.</td><td colspan="2">{% if pag.has_previous %}<a href="?page={{ pag.previous_page_number }}">&lt;&lt;anterior</a>{% endif %}{% if pag.has_next %}<a href="?page={{ pag.next_page_number }}"> siguiente&gt;&gt;</a>{% endif %}
+</td></tr>
+</table></form>
 <div class="footer"><div class="volver"><a href="/proyectos/admin&id={{proyecto.id}}/">&lt;&lt;Volver al proyecto</a></div><a href="/report/proyectos/artefactos&id={{proyecto.id}}&fasesAnt=2/">Obtener reporte</a></div>
 {% endif %}
 {% endifequal %}
 
 {% ifequal fase.id 3%}
 {% if abm_artefactos or ver_artefactos_ant_3%}
-<table>
+<form action="" method="post">
+	<table class="admin">
+	<tr><td colspan="5">{{form.filtro.label}}: {{form.filtro}}</td><td align="right">{{form.paginas.label}}: {{form.paginas}}<input type="submit" value="Ok" name="Buscar"/></td></tr>
     <tr>
     	<td class="titulo">Nombre</td>        
         <td class="titulo">Versi&oacute;n</td>
@@ -82,7 +94,7 @@
         <td class="titulo">Tipo</td>
         <td class="titulo">Acciones</td>
 	</tr>
-    {% for item in lista %}
+    {% for item in pag.object_list %}
 	<tr>
     	<td><a href="/proyectos/artefactos&id={{proyecto.id}}/art&id={{item.id}}/">{{item.nombre}}</td>
         <td>{{item.version}}</td>        
@@ -95,7 +107,9 @@
         <a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/ ">| Impacto</a></td>
 	</tr>
 	{% endfor %}
-</table>
+<tr><td>P&aacute;gina {{ pag.number }} de {{ pag.paginator.num_pages }}.</td><td colspan="2">{% if pag.has_previous %}<a href="?page={{ pag.previous_page_number }}">&lt;&lt;anterior</a>{% endif %}{% if pag.has_next %}<a href="?page={{ pag.next_page_number }}"> siguiente&gt;&gt;</a>{% endif %}
+</td></tr>
+</table></form>
 <div class="footer"><div class="volver"><a href="/proyectos/admin&id={{proyecto.id}}/">&lt;&lt;Volver al proyecto</a></div><a href="/report/proyectos/artefactos&id={{proyecto.id}}&fasesAnt=3/">Obtener reporte</a></div>
 {% endif %}
 {% endifequal %}

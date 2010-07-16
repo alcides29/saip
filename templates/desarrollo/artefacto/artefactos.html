@@ -4,18 +4,20 @@
 {% block content %}
 {% load app_extras %}
 {% if abm_artefactos  or ver_artefactos or revisar_artefactos %}
-<table class="admin">
+<form action="" method="post">
+	<table class="admin">
+	<tr><td colspan="6">{{form.filtro.label}}: {{form.filtro}}</td><td align="right">{{form.paginas.label}}: {{form.paginas}}<input type="submit" value="Ok" name="Buscar"/></td></tr>
+
 	<tr>
 		<td class="titulo">Nombre</td>        
 		<td class="titulo">Versi&oacute;n</td>
 		<td class="titulo">Estado</td>		
 		<td class="titulo">Complejidad</td>
 		<td class="titulo">Descripci&oacute;n Corta</td>
-		
 		<td class="titulo">Tipo</td>
 		<td class="titulo">Acciones</td>
 	</tr>
-	{% for item in lista %}
+	{% for item in pag.object_list%}
 	<tr>
 		{% if abm_artefactos%}<td>{% if not linea %}<a href="/proyectos/artefactos&id={{proyecto.id}}/mod&id={{item.id}}/">{% endif %}{{item.nombre}}</a></td>
 		{% else %}<td>{{item.nombre}}</td>{% endif %}
@@ -23,17 +25,20 @@
 		<td>{{item.estado|display}}</td>        
 		<td>{{item.complejidad}}</td>
 		<td>{{item.descripcion_corta}}</td>
-		
 		<td>{{item.tipo}}</td>
 		<td>{% if not linea %}{% if abm_artefactos %}<a href="/proyectos/artefactos&id={{proyecto.id}}/del&id={{item.id}}/">Borrar</a>{% endif %}{% endif %}{% if abm_artefactos %} | <a href="/proyectos/artefactos&id={{proyecto.id}}/historial&id={{item.id}}/">Historial</a> | <a href="/proyectos/artefactos&id={{proyecto.id}}/rel&id={{item.id}}&fase={{proyecto.fase.id}}/">Relaciones con la fase actual</a> | {% ifnotequal proyecto.fase.id 1 %}<a href="/proyectos/artefactos&id={{proyecto.id}}/rel&id={{item.id}}&fase={{proyecto.fase.id|add:"-1" }}/">Relaciones con la fase anterior</a> |{% endifnotequal %} <a href="/proyectos/artefactos&id={{proyecto.id}}/adj&id={{item.id}}/">Adjuntos</a> | {% endif %}<a href="/proyectos/artefactos&id={{proyecto.id}}/imp&id={{item.id}}/">Impacto</a>{% if not linea %}{% if revisar_artefactos %} | <a href="/proyectos/artefactos&id={{proyecto.id}}/revisar&id={{item.id}}/ ">Revisar</a>{% endif %}{% endif %}</td>
 	</tr>
 	{% endfor %}
-</table><br>
-<div class="footer">
+
+<tr><td>P&aacute;gina {{ pag.number }} de {{ pag.paginator.num_pages }}.</td><td colspan="3">{% if pag.has_previous %}<a href="?page={{ pag.previous_page_number }}">&lt;&lt;anterior</a>{% endif %}{% if pag.has_next %}<a href="?page={{ pag.next_page_number }}"> siguiente&gt;&gt;</a>{% endif %}
+</td></tr>
+</table></form>
+
+   <div class="footer">
   {% if not linea %}{% if abm_artefactos %}<td><a href="/proyectos/artefactos&id={{proyecto.id}}/crear/">Registrar un nuevo artefacto</a></td>
   <td><a href="/proyectos/artefactos&id={{proyecto.id}}/res/">| Ver artefactos eliminados</a></td>{% endif %}{% endif %}
   </div>
-<br>
+
 <input type="button" value="Volver" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}' "/>	
 {% else %}
 	<p>¡No tiene permisos para ver esta p&aacute;gina!</p>

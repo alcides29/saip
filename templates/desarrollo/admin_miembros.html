@@ -3,13 +3,17 @@
 {% block head %}Miembros del Proyecto {{proyecto.nombre}}<br>{% endblock %}
 {% block content %}
 {% if ver_miembros or abm_miembros %}
-<form id="form_id" action="" method="post">
-<table>
+<form action="" method="post">
+<table class="admin">
+<tr><td colspan="1">{{form.filtro.label}}: {{form.filtro}}</td><td align="right">{{form.paginas.label}}: {{form.paginas}}<input type="submit" value="Ok" name="Buscar"/></td></tr>
 <tr><td class="titulo">Usuario</td><td class="titulo">Acciones</td></tr>
-	{% for item in miembros %}
+	{% for item in pag.object_list %}
 	{% ifnotequal proyecto.usuario_lider.id item.id%}<tr><td>{{item.username}}</td><td>{% if abm_miembros %}<a href="/proyectos/miembros&id={{proyecto.id}}/cambiar&id={{item.id}}">Administrar Roles</a> | <a href="/proyectos/miembros&id={{proyecto.id}}/del&id={{item.id}}">Quitar</a>{% endif %}</td></tr>{% endifnotequal%}
 	{% endfor %}
-</table>
+<tr><td>P&aacute;gina {{ pag.number }} de {{ pag.paginator.num_pages }}.</td><td colspan="3">{% if pag.has_previous %}<a href="?page={{ pag.previous_page_number }}">&lt;&lt;anterior</a>{% endif %}{% if pag.has_next %}<a href="?page={{ pag.next_page_number }}"> siguiente&gt;&gt;</a>{% endif %}
+</td></tr>
+</table></form>
+
 {% if abm_miembros %}<p><a href="/proyectos/miembros&id={{proyecto.id}}/nuevo/">Agregar nuevo miembro</a></p>{% endif %}
 <input type="button" value="Volver" onClick = "location.href='/proyectos/admin&id={{proyecto.id}}/' "/>	
 </form>
