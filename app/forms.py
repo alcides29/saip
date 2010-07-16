@@ -145,7 +145,11 @@ class UsuarioProyectoForm(forms.Form):
     
     def __init__(self, proyecto, *args, **kwargs):
         super(UsuarioProyectoForm, self).__init__(*args, **kwargs)
-        self.fields['usuario'].queryset = User.objects.filter(~Q(id = proyecto.usuario_lider.id))
+        usuarios = UsuarioRolProyecto.objects.filter(proyecto = proyecto)
+        lista = []
+        for item in usuarios:
+            lista.append(item.usuario.id)
+        self.fields['usuario'].queryset = User.objects.filter(~Q(id = proyecto.usuario_lider.id),~Q(pk__in = lista))
 
 
     def clean_usuario(self):
