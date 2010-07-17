@@ -600,7 +600,11 @@ def admin_proyectos(request):
 
 @login_required
 def admin_roles(request):
-    """Administracion general de roles"""
+    """Administracion general de roles.
+        
+    @return: htmla, usuario y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     permisos = get_permisos_sistema(user)
     return render_to_response('admin/roles/roles.html',{'user':user,
@@ -610,7 +614,11 @@ def admin_roles(request):
                                                         'eliminar_rol': 'Eliminar rol' in permisos})
 @login_required
 def admin_roles_sist(request):
-    """Administracion general de roles"""
+    """Administracion general de roles de sistema.
+     
+    @return: Html, usuario y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     permisos = get_permisos_sistema(user)
     lista = Rol.objects.filter(categoria=1).order_by('id')
@@ -658,7 +666,11 @@ def admin_roles_sist(request):
                                                             'eliminar_rol': 'Eliminar rol' in permisos})
 @login_required
 def admin_roles_proy(request):
-    """Administracion general de roles"""
+    """Administracion general de roles de proyecto.
+    
+    @return: htmla, usuario y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     permisos = get_permisos_sistema(user)
     lista = Rol.objects.filter(categoria=2).order_by('id')
@@ -707,7 +719,11 @@ def admin_roles_proy(request):
 
 @login_required
 def crear_rol(request):
-    """Agrega un nuevo rol"""
+    """Crea un nuevo rol
+    
+    @return: html, usuarioy permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -738,6 +754,14 @@ def crear_rol(request):
 
 @login_required
 def admin_permisos(request, rol_id):
+    """Metodo de administracion de permisos para un rol.
+    
+    @param rol_id: Id del rol
+    @type rol_id: Integer
+    
+    @return: html, usuario, rol y permiso
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -814,6 +838,14 @@ def admin_permisos(request, rol_id):
                                                                   'mod_rol':'Modificar rol' in permisos})
 
 def mod_rol(request, rol_id):
+    """Metodo para modificacion de roles.
+    
+    @param rol_id: Id del rol
+    @type rol_id: Integer
+    
+    @return: html, usuario, rol y permiso
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -848,7 +880,14 @@ def mod_rol(request, rol_id):
 
 @login_required 
 def borrar_rol(request, rol_id):
-    """Borra un rol con las comprobaciones de consistencia"""
+    """Borra un rol con las comprobaciones de consistencia
+    
+    @param rol_id: Id del rol
+    @type rol_id: Integer
+        
+    @return: html, usuario, rol y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -888,7 +927,11 @@ def borrar_rol(request, rol_id):
 
 @login_required
 def crear_proyecto(request):
-    """Crea un nuevo proyecto."""
+    """Crea un nuevo proyecto.
+    
+    @return: html, usuario y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -936,6 +979,13 @@ def crear_proyecto(request):
 
 @login_required
 def mod_proyecto(request, proyecto_id):
+    """
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     p = get_object_or_404(Proyecto, id = proyecto_id)
     #Validacion de permisos---------------------------------------------
@@ -982,6 +1032,14 @@ def mod_proyecto(request, proyecto_id):
 
 @login_required
 def del_proyecto(request, proyecto_id):
+    """Borra un proyecto del sistema.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     p = get_object_or_404(Proyecto, id = proyecto_id)
     #Validacion de permisos---------------------------------------------
@@ -1003,7 +1061,11 @@ def del_proyecto(request, proyecto_id):
 
 @login_required
 def admin_tipo_artefacto(request):
-    """Muestra la pagina de administracion de tipo de artefactos."""
+    """Muestra la pagina de administracion de tipo de artefactos.
+    
+    @return: html, paginador,usuario y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     permisos = get_permisos_sistema(user)
     lista = TipoArtefacto.objects.filter(proyecto=False)
@@ -1054,6 +1116,11 @@ def admin_tipo_artefacto(request):
 
 @login_required
 def crear_tipo_artefacto(request):
+    """Crea un tipo de artefacto general.
+    
+    @return: Usuario, formulario y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -1093,7 +1160,14 @@ def crear_tipo_artefacto(request):
 
 @login_required
 def add_tipo_artefacto(request, proyecto_id):
-    """Crea un tipo de artefacto para un proyecto."""
+    """Crea un tipo de artefacto para un proyecto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -1134,6 +1208,14 @@ def add_tipo_artefacto(request, proyecto_id):
 
 @login_required
 def mod_tipo_artefacto(request, tipo_id):
+    """Modifica un tipo de artefacto.
+    
+    @param tipo_id: Id del tipo de artefacto
+    @type tipo_id: Integer
+    
+    @return: html, usuario, tipo de artefacto y permiso
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -1165,7 +1247,14 @@ def mod_tipo_artefacto(request, tipo_id):
 
 @login_required
 def borrar_tipo_artefacto(request, tipo_id):
-    """Borra un tipo de artefacto comprobando las dependencias"""
+    """Borra un tipo de artefacto comprobando las dependencias
+    
+    @param tipo_id: Id del proyecto
+    @type tipo_id: Integer
+        
+    @return: html, usuario, tipo de artefacto y permiso
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     #Validacion de permisos---------------------------------------------
     roles = UsuarioRolSistema.objects.filter(usuario = user).only('rol')
@@ -1196,7 +1285,14 @@ def borrar_tipo_artefacto(request, tipo_id):
 
 @login_required
 def admin_tipo_artefacto_fase(request, proyecto_id):
-    """Lista de tipos de artefacto con fase para el proyecto actual."""
+    """Lista de tipos de artefacto con fase para el proyecto actual.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+        
+    @return: html, usuario, paginador, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username = request.user.username)
     p = Proyecto.objects.get(id = proyecto_id)
     #Validacion de permisos---------------------------------------------
@@ -1244,7 +1340,16 @@ def admin_tipo_artefacto_fase(request, proyecto_id):
     
 @login_required
 def mod_tipo_artefacto_fase(request, proyecto_id, tipo_art_id):
-    """Permite asignar tipos de artefacto a una fase de un proyecto."""
+    """Permite asignar tipos de artefacto a una fase de un proyecto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param tipo_art_id: Id del tipo de artefacto
+    @type tipo_art_id: Integer
+    
+    @return: html, usuario, tipo artefacto, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     tipoA = TipoArtefacto.objects.get(id = tipo_art_id)
@@ -1275,7 +1380,16 @@ def mod_tipo_artefacto_fase(request, proyecto_id, tipo_art_id):
 
 @login_required
 def quitar_tipo_artefacto_fase(request, proyecto_id, tipo_art_id):
-    """Permite quitar un tipo de artefacto de un proyecto."""
+    """Permite quitar un tipo de artefacto de un proyecto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param tipo_art_id: Id de tipo de artefacto
+    @type tipo_art_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     tipoA = TipoArtefacto.objects.get(id = tipo_art_id)
@@ -1298,13 +1412,18 @@ def quitar_tipo_artefacto_fase(request, proyecto_id, tipo_art_id):
                               {'tipo':tipoA,
                                'user':user,
                                'proyecto': proyect,
-                               'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})
+                               'asignar_tipoArt': 'Asignar tipo-artefacto fase' in permisos})    
     
-        
-#desde aqui artefacto
 @login_required
 def admin_artefactos(request, proyecto_id):
-    """Muestra la pagina de administracion de artefactos."""
+    """Muestra la pagina de administracion de artefactos.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+        
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     tipoArtefactos = TipoArtefactoFaseProyecto.objects.filter(proyecto = proyecto_id, fase = proyect.fase)
@@ -1355,7 +1474,14 @@ def admin_artefactos(request, proyecto_id):
 
 @login_required
 def crear_artefacto(request, proyecto_id):
-    """Crear un artefacto"""
+    """Crear un artefacto
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+        
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     permisos = get_permisos_proyecto(user, proyect)
@@ -1398,7 +1524,16 @@ def crear_artefacto(request, proyecto_id):
 
 @login_required
 def modificar_artefacto(request, proyecto_id, art_id):
-    """Modificar un artefacto"""
+    """Modificar un artefacto
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del proyecto
+    @type art_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     permisos = get_permisos_proyecto(user, proyect)
@@ -1455,7 +1590,18 @@ def modificar_artefacto(request, proyecto_id, art_id):
 
 @login_required
 def definir_dependencias(request, proyecto_id, art_id, fase):
-    """Definir las relaciones de un artefacto."""
+    """Definir las relaciones de un artefacto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    @param fase: Id de la fase
+    @type fase: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     p = Proyecto.objects.get(pk=proyecto_id)
     permisos = get_permisos_proyecto(user, p)
@@ -1482,7 +1628,6 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
                 if ( item.padre.fase == Fase.objects.get(pk=fase)):
                     lista.append(item.padre)
                       
-            #if (lista):            
             for item in lista:
                 if (item in relaciones_nuevas) == 0:
                    cambio = True
@@ -1530,7 +1675,19 @@ def definir_dependencias(request, proyecto_id, art_id, fase):
         
 @login_required
 def ver_dependencias(request, proyecto_id, art_id, fase):
-    """ver las relaciones de un artefacto."""
+    """ver las relaciones de un artefacto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    @param fase: Id de la fase
+    @type fase: Integer
+    
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     permisos = get_permisos_proyecto(user, proyect)
@@ -1556,7 +1713,16 @@ def ver_dependencias(request, proyecto_id, art_id, fase):
 
 @login_required
 def ver_adjuntos(request, proyecto_id, art_id):
-    """ver los archivos adjuntos de un artefacto."""
+    """ver los archivos adjuntos de un artefacto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     permisos = get_permisos_proyecto(user, proyect)
@@ -1578,6 +1744,16 @@ def ver_adjuntos(request, proyecto_id, art_id):
 
 @login_required
 def ver_historial(request, proyecto_id, art_id):
+    """Muestra el historial de un artefacto
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     art = Artefacto.objects.get(pk=art_id)
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
@@ -1637,7 +1813,16 @@ def ver_historial(request, proyecto_id, art_id):
 
 @login_required
 def borrar_artefacto(request, proyecto_id, art_id):
-    """Dar de baja un artefacto."""
+    """Dar de baja un artefacto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     permisos = get_permisos_proyecto(user, proyect)
@@ -1661,7 +1846,14 @@ def borrar_artefacto(request, proyecto_id, art_id):
 
 @login_required
 def admin_artefactos_eliminados(request, proyecto_id):
-    """Muestra la lista de artefactos eliminados de un proyecto."""
+    """Muestra la lista de artefactos eliminados de un proyecto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     fase = Fase.objects.get(pk = proyect.fase.id)
@@ -1703,7 +1895,16 @@ def admin_artefactos_eliminados(request, proyecto_id):
 
 @login_required
 def admin_adjuntos(request, proyecto_id, art_id):
-    """Administracion de archivos de un artefacto dado"""
+    """Administracion de archivos de un artefacto dado
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     art = get_object_or_404(Artefacto, id = art_id)
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
@@ -1715,7 +1916,16 @@ def admin_adjuntos(request, proyecto_id, art_id):
 
 @login_required
 def adjuntos_eliminados(request, proyecto_id, art_id):
-    """Administracion de archivos de un artefacto dado"""
+    """Muestra los adjuntos eliminados de un artefacto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     art = get_object_or_404(Artefacto, id = art_id)
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
@@ -1727,6 +1937,15 @@ def adjuntos_eliminados(request, proyecto_id, art_id):
 
 @login_required
 def add_adjunto(request, proyecto_id, art_id):
+    """
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     permisos = get_permisos_proyecto(user, proyect)
@@ -1771,6 +1990,18 @@ def add_adjunto(request, proyecto_id, art_id):
 
 @login_required
 def quitar_archivo(request, proyecto_id, art_id, arch_id):
+    """Quita un adjunto de un artefacto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    @param arch_id: Id del archivo
+    @type arch_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     permisos = get_permisos_proyecto(user, proyect)
@@ -1788,6 +2019,18 @@ def quitar_archivo(request, proyecto_id, art_id, arch_id):
                                                                                        'abm_artefactos': 'ABM artefactos' in permisos})
 @login_required
 def retornar_archivo(request, proyecto_id, art_id, arch_id):
+    """Restaura un archivo al restaurar un artefacto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    @param arch_id: Id del archivo
+    @type arch_id: Integer
+    
+    @return: html, usuario y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     art = get_object_or_404(Artefacto, id=art_id)
@@ -1815,6 +2058,18 @@ def retornar_archivo(request, proyecto_id, art_id, arch_id):
 
 @login_required
 def restaurar_archivo(request, proyecto_id, art_id, arch_id):
+    """Restaura un archivo al restaurar un artefacto.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    @param arch_id: Id del archivo
+    @type arch_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     art = get_object_or_404(Artefacto, id=art_id)
@@ -1836,7 +2091,16 @@ def restaurar_archivo(request, proyecto_id, art_id, arch_id):
 
 @login_required
 def restaurar_artefacto_eliminado(request, proyecto_id, art_id):
-    """Metodo que restaura un artefacto eliminado a su ultima version."""
+    """Metodo que restaura un artefacto eliminado a su ultima version.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     permisos = get_permisos_proyecto(user, proyect)
@@ -1855,6 +2119,20 @@ def restaurar_artefacto_eliminado(request, proyecto_id, art_id):
 
 @login_required
 def historial_relaciones(request, proyecto_id, art_id, reg_id, fase):
+    """Muestra el historial de relaciones de los artefactos
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    @param reg_id: Id del registro historial
+    @type reg_id: Integer
+    @param fase: Id de la fase
+    @type fase: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     art = Artefacto.objects.get(pk=art_id)
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
@@ -1882,6 +2160,18 @@ def historial_relaciones(request, proyecto_id, art_id, reg_id, fase):
 
 @login_required
 def historial_adjuntos(request, proyecto_id, art_id, reg_id):
+    """Muesra el historial de adjuntos
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    @param reg_id: Id del registro historial
+    @type reg_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     art = Artefacto.objects.get(pk=art_id)
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
@@ -1906,6 +2196,18 @@ def historial_adjuntos(request, proyecto_id, art_id, reg_id):
 
 @login_required
 def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
+    """Restaura un artefacto
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    @param reg_id: Id del registro historial
+    @type reg_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     art = Artefacto.objects.get(pk = art_id)
@@ -1959,7 +2261,16 @@ def restaurar_artefacto(request, proyecto_id, art_id, reg_id):
 
 @login_required
 def revisar_artefacto(request, proyecto_id, art_id):
-    """Asigna roles de sistema a un usuario"""
+    """Asigna roles de sistema a un usuario
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     art = Artefacto.objects.get(pk=art_id)
@@ -1984,7 +2295,16 @@ def revisar_artefacto(request, proyecto_id, art_id):
 
 @login_required
 def ver_detalle(request, proyecto_id, art_id):
-    """Permite ver el detalle de los artefactos."""
+    """Permite ver el detalle de los artefactos.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    
+    @return: html, usuario, proyecto, adjunto, artefacto y permisos
+    @rtype: Lista
+    """
     
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
@@ -2013,7 +2333,16 @@ def ver_detalle(request, proyecto_id, art_id):
 
 @login_required
 def calcular_impacto(request, proyecto_id, art_id):
-    """Calculo del impacto de un artefacto"""
+    """Calculo del impacto de un artefacto
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     art = get_object_or_404(Artefacto, id=art_id)
@@ -2055,6 +2384,16 @@ def calcular_impacto(request, proyecto_id, art_id):
     
 @login_required
 def fases_anteriores(request, proyecto_id, fase):
+    """Muestra los artefactos de las fases anteriores
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param fase: Id de fase
+    @type fase: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username = request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     fase = Fase.objects.get(pk=fase)
@@ -2129,6 +2468,14 @@ def fases_anteriores(request, proyecto_id, fase):
     
 @login_required
 def linea_base (request, proyecto_id):
+    """Genera la linea base si se cumplen todos los requerimientos.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    
+    @return: html, usuario, linea base, fase, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username = request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
     fase = Fase.objects.get(pk=proyect.fase.id)
@@ -2208,7 +2555,14 @@ def linea_base (request, proyecto_id):
 
 @login_required
 def linea_revisar(request, proyecto_id):
-    """Asigna roles de sistema a un usuario"""
+    """Muestra los artefactos que aun faltan aprobarse
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     fase = Fase.objects.get(pk=proyect.fase.id)
@@ -2256,7 +2610,16 @@ def linea_revisar(request, proyecto_id):
 
 @login_required
 def linea_revisar_artefacto(request, proyecto_id, art_id):
-    """Asigna roles de sistema a un usuario"""
+    """Permite aprobar los artefactos desde la pagina de linea base.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     art = Artefacto.objects.get(pk=art_id)
@@ -2280,7 +2643,14 @@ def linea_revisar_artefacto(request, proyecto_id, art_id):
 
 @login_required
 def linea_relacionar(request, proyecto_id):
-    """Asigna roles de sistema a un usuario"""
+    """Verifica que todos los artefactos tengan alguna relacion
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     fase = Fase.objects.get(pk=proyect.fase.id)
@@ -2337,7 +2707,18 @@ def linea_relacionar(request, proyecto_id):
            
 @login_required
 def linea_relacionar_artefacto(request, proyecto_id, art_id, fase):
-    """Asigna roles de sistema a un usuario"""
+    """Muestra los artefactos que no tienen ninguna relacion
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del proyecto
+    @type art_id: Integer
+    @param fase: Id de la fase
+    @type fase: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     art = Artefacto.objects.get(pk=art_id)
@@ -2408,7 +2789,15 @@ def linea_relacionar_artefacto(request, proyecto_id, art_id, fase):
 
 @login_required
 def linea_anteriores(request, proyecto_id):
-    """Asigna roles de sistema a un usuario"""
+    """Muestra las lineas bases anteriores
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+        
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
+    
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(id=proyecto_id)
     fase = Fase.objects.get(pk=proyect.fase.id)
@@ -2469,6 +2858,16 @@ def linea_anteriores(request, proyecto_id):
     
 @login_required
 def reporte_artefacto(request, proyecto_id, fase):
+    """Genera un reporte de un artefacto especifico
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param fase: Id de la fase
+    @type fase: Integer
+    
+    @return: reporte de artefacto
+    @rtype: pdf
+    """
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     fase = get_object_or_404(Fase, id=fase)
@@ -2481,6 +2880,14 @@ def reporte_artefacto(request, proyecto_id, fase):
 
 @login_required
 def reporte_artefactos(request, proyecto_id):
+    """Genera un reporte de los artefactos de un proyecto
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    
+    @return: reporte de artefactos por proyecto
+    @rtype: pdf
+    """
     user = User.objects.get(username=request.user.username)
     proyect = get_object_or_404(Proyecto, id=proyecto_id)
     artefactos = Artefacto.objects.filter(proyecto=proyect, habilitado=True).order_by('id')
@@ -2491,6 +2898,11 @@ def reporte_artefactos(request, proyecto_id):
  
 @login_required
 def reporte_usuario(request):
+    """Genera un reporte de los usuarios
+    
+    @return: reporte de usuarios
+    @rtype: pdf
+    """
     user = User.objects.get(username=request.user.username)
     usuarios = User.objects.order_by('id')
     resp = HttpResponse(mimetype='application/pdf')
@@ -2500,6 +2912,11 @@ def reporte_usuario(request):
 
 @login_required
 def reporte_proyecto(request):
+    """Genera un reporte de los proyectos del sistema
+    
+    @return: reporte de proyectos
+    @rtype: pdf
+    """
     user = User.objects.get(username=request.user.username)
     proyectos = Proyecto.objects.order_by('id')
     resp = HttpResponse(mimetype='application/pdf')
@@ -2509,6 +2926,14 @@ def reporte_proyecto(request):
 
 @login_required
 def reporte_rol(request, cat):
+    """Genera un reporte de roles y categoria
+    
+    @param cat: Categoria del rol
+    @type cat: Integer
+    
+    @return: reporte de roles
+    @rtype: pdf
+    """
     user = User.objects.get(username=request.user.username)
     roles = Rol.objects.filter(categoria=cat).order_by('id')
     resp = HttpResponse(mimetype='application/pdf')
@@ -2518,6 +2943,16 @@ def reporte_rol(request, cat):
 
 @login_required
 def reporte_historial(request, proyecto_id, art_id):
+    """Genera un reporte de historial de artefactos.
+    
+    @param proyecto_id: Id del proyecto
+    @type proyecto_id: Integer
+    @param art_id: Id del artefacto
+    @type art_id: Integer
+    
+    @return: html, usuario, proyecto y permisos
+    @rtype: Lista
+    """
     art = Artefacto.objects.get(pk=art_id)
     user = User.objects.get(username=request.user.username)
     proyect = Proyecto.objects.get(pk=proyecto_id)
@@ -2530,15 +2965,27 @@ def reporte_historial(request, proyecto_id, art_id):
 
 @login_required
 def terminar(peticion):
-    """Muestra una pagina de confirmacion de exito"""
+    """Muestra la confirmacion de exito de cierre de sesion de un usuario.
+    
+    @return: html de confirmacion exitosa
+    @rtype: html
+    """
     return render_to_response('operacion_exitosa.html');
 
 def login_redirect(request):
-    """Redirige de /accounts/login a /login."""
+    """Redirige de /accounts/login a /login.
+        
+    @return: html
+    @rtype: html
+    """
     return HttpResponseRedirect('/login')
 
 def logout_pagina(request):
-    """Pagina de logout"""
+    """Cierra la sesion de un usuario
+    
+    @return: html
+    @rtype: html
+    """
     try:
         del request.session['nro_items']
     except KeyError:
