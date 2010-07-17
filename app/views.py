@@ -894,15 +894,22 @@ def borrar_rol(request, rol_id):
         permisos.append(item.nombre)
     print permisos
     #-------------------------------------------------------
+    sist = False
+    proy = False
     actual = get_object_or_404(Rol, id=rol_id)
     #Obtener todas las posibles dependencias
     if actual.categoria == 1:
         relacionados = UsuarioRolSistema.objects.filter(rol = actual).count()
+        sist = True
     elif actual.categoria == 2:
         relacionados = UsuarioRolProyecto.objects.filter(rol = actual).count()
+        proy= True
     if request.method == 'POST':
         actual.delete()
-        return HttpResponseRedirect("/roles")
+        if (sist == True):
+            return HttpResponseRedirect("/roles/sist/")
+        elif (proy == True):
+            return HttpResponseRedirect("/roles/proy/")
     else:
         if actual.id == 1:
             error = "No se puede borrar el rol de superusuario"

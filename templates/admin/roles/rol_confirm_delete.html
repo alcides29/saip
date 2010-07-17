@@ -11,7 +11,11 @@
 	<form id="form_id" action="" method="post">
 	<p>¿Est&aacute; seguro?<span class="optionbuttons">
 	<input type="submit" value="S&iacute;" />
-	<input type="button" value="No" onClick = "location.href='/roles' "/></span></p>
+    {% ifequal rol.categoria 1%}
+    	<input type="button" value="No" onClick = "location.href='/roles/sist/' "/></span></p>
+    {% else %}
+        <input type="button" value="No" onClick = "location.href='/roles/proy/' "/></span></p>
+    {% endifequal %}
 	</form>
 {% endif %}
 {% else %}
