@@ -298,11 +298,6 @@ def eliminar_miembro_proyecto(request, proyecto_id, user_id):
 def add_user(request):
     """Agrega un nuevo usuario.
     
-    @param proyecto_id: Id del proyecto
-    @type proyecto_id: Integer
-    @param user_id: Id del proyecto
-    @type user_id: Integer
-    
     @return: Usuario y permisos
     @rtype: Lista
     """
