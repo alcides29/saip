@@ -1,6 +1,6 @@
 # SAIP
 
 A project defining artifacts and baseline of a software.
-It uses Python and Django framework, it was a project of Software Engineer class at University. I worked with two other classmates. 
+It uses Python 2.7 and Django framework, it was a project of Software Engineer.
 
 Automatically exported from code.google.com/p/saip
